@@ -12,10 +12,11 @@
         <version>2.2.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.entreprise</groupId>
-    <artifactId>boating</artifactId>
+
+    <groupId>com.mercure</groupId>
+    <artifactId>parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>boating</name>
+    <name>jenkins_training</name>
     <description>Continuous learning</description>
 
     <properties>
