@@ -6,14 +6,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FirstClassTest {
 
-    private FirstClass test;
-
-    public FirstClassTest(FirstClass test) {
-        this.test = test;
-    }
 
     @Test
     public void shouldCount() {
-       assertEquals(5,test.count() );
+        FirstClass temp = new FirstClass();
+       assertEquals(5,temp.count() );
     }
 }
