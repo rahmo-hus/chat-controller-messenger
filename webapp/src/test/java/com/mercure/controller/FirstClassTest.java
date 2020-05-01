@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FirstClassTest {
 
-     @Test
+    @Test
     public void shouldCount() {
         FirstClass temp = new FirstClass();
-       assertEquals(5,temp.count() );
+        assertEquals(5, temp.count());
     }
 }

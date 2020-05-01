@@ -20,6 +20,8 @@
     <description>Continuous learning</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
     </properties>
 
@@ -49,6 +51,14 @@
             </exclusions>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>mojo.website</id>
+            <name>Mojo Website</name>
+            <url>scp://beaver.codehaus.org/home/projects/mojo/public_html/</url>
+        </site>
+    </distributionManagement>
 
     <build>
         <plugins>
