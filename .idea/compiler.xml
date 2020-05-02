@@ -7,7 +7,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="webapp" />
-        <module name="java-training" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -17,7 +16,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="java-training" options="-parameters" />
+      <module name="java-training" options="" />
       <module name="webapp" options="-parameters" />
     </option>
   </component>
