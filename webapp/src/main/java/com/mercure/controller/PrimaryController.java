@@ -11,4 +11,9 @@ public class PrimaryController {
         return "health check ok";
     }
 
+    @RequestMapping("/home")
+    public String home() {
+        return "This is the main page of spring boot application";
+    }
+
 }
