@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+<body>
+
+<div th:include="fragment/header :: header"></div>
+<div class="container">
+    <table class="table table-dark">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Enabled</th>
+            <th scope="col">Credentials non expired</th>
+            <th scope="col">Account non expired</th>
+            <th scope="col">Non locked</th>
+            <th scope="col">Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user,iter : ${userList}">
+            <form action="#" th:action="@{/auth/user/edit}" th:object="${user}" method="post">
+                <input type="hidden" th:value="${user.id}" name="id">
+                <td th:utext="${user.getId()}"/>
+                <td th:utext="${user.username}"/>
+                <td th:utext="${user.mail}"/>
+                <td><input th:value="${user.isEnabled()}" th:checked="${user.isEnabled()}" name="enabled" type="checkbox"></td>
+                <td><input th:value="${user.isCredentialsNonExpired()}" th:checked="${user.isCredentialsNonExpired()}" name="credentialsNonExpired"
+                           type="checkbox"></td>
+                <td><input th:value="${user.isAccountNonExpired()}" th:checked="${user.isAccountNonExpired()}" name="accountNonExpired"
+                           type="checkbox"></td>
+                <td><input th:value="${user.isAccountNonLocked()}" th:checked="${user.isAccountNonLocked()}" name="accountNonLocked"
+                           type="checkbox"></td>
+                <td><input class="btn btn-info" type="submit" value="Save"></td>
+            </form>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

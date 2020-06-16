@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+<body>
+<style>
+    .divider-text {
+        position: relative;
+        text-align: center;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .divider-text span {
+        padding: 7px;
+        font-size: 12px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .divider-text:after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        border-bottom: 1px solid #ddd;
+        top: 55%;
+        left: 0;
+        z-index: 1;
+    }
+</style>
+
+<div th:include="fragment/header :: header"></div>
+
+<div class="card bg-light">
+    <article class="card-body mx-auto" style="max-width: 400px;">
+        <h4 class="card-title mt-3 text-center">Create Account</h4>
+        <p class="text-center">Get started with your free account</p>
+        <p class="divider-text"/>
+
+        <div th:if="${errorList != null}" class="alert alert-danger" role="alert">
+            <div th:each="error: ${errorList}">
+                <span th:utext="${error}"></span>
+            </div>
+        </div>
+
+        <div th:if="${newUser != null}" class="alert alert-success" role="alert">
+            <div>User has been created successfully </div>
+            <div>A mail has been sent to <span th:utext="${newUser.getEmail()}"></span></div>
+        </div>
+
+        <form th:action="@{/save}" th:object="${userModel}" method="post">
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                </div>
+                <input type="text" th:field="${userModel.username}" class="form-control" placeholder="Full name"/>
+            </div> <!-- form-group// -->
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                </div>
+                <input th:field="${userModel.mail}" class="form-control" placeholder="Email address" type="text">
+            </div> <!-- form-group// -->
+
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                </div>
+                <input th:field="${userModel.password}" class="form-control" placeholder="Create password"
+                       type="password">
+            </div> <!-- form-group// -->
+            <div class="form-group input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                </div>
+                <input th:field="${userModel.matchedPassword}" class="form-control" placeholder="Repeat password"
+                       type="password">
+            </div> <!-- form-group// -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block"> Create Account</button>
+            </div> <!-- form-group// -->
+        </form>
+    </article>
+</div> <!-- card.// -->
+
+</div>
+
+
+<!--<h1>Register new account</h1>-->
+<!--<form th:action="@{/save}" th:object="${userModel}" method="post">-->
+<!--    <table border="1">-->
+<!--        <tr>-->
+<!--            <td>Username</td>-->
+<!--            <td><input type="text" th:field="${userModel.username}" /></td>-->
+<!--            <td>Password</td>-->
+<!--            <td><input type="text" th:field="${userModel.password}" /></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <td><input type="submit" value="Submit" /></td>-->
+<!--        </tr>-->
+<!--    </table>-->
+<!--</form>-->
+</body>
+</html>

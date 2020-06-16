@@ -10,4 +10,5 @@ public class JenkinsTrainingApplication {
 		SpringApplication.run(JenkinsTrainingApplication.class, args);
 	}
 
+
 }

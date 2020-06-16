@@ -1,17 +1,17 @@
 package com.mercure.spring;
 
+import com.mercure.spring.controller.MainController;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainControllerTest {
 
-    @Test
-    void welcome() {
-        MainController mainController = new MainController();
-        assertEquals("Health check ok", mainController.welcome());
-    }
+//    @Test
+//    void welcome() {
+//        MainController mainController = new MainController();
+//        assertEquals("Health check ok", mainController.welcome());
+//    }
 
     @Test
     void home() {
