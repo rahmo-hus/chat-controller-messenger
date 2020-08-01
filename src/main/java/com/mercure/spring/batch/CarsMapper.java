@@ -1,19 +1,24 @@
 package com.mercure.spring.batch;
 
 import com.mercure.spring.entity.Cars;
-import com.mercure.spring.repository.CarsRepository;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class CsvProcessor implements ItemProcessor<Cars, Cars> {
+@Service
+public class CarsMapper  {
 
-    @Override
-    public Cars process(Cars cars) throws Exception {
-       return mapToEntity(cars);
+    public String mapStrToStr(String s) {
+        return s.toUpperCase();
     }
 
 
-    private Cars mapToEntity(Cars s) {
+    public Cars mapToEntity(Cars s) {
+        Cars car = new Cars();
+        car.setAcceleration(1.2);
+        return car;
+    }
+
+    public Cars mapStringToEntity(String s) {
         Cars car = new Cars();
         car.setAcceleration(1.2);
         return car;

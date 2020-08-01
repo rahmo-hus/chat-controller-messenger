@@ -7,22 +7,14 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet id="1" author="thibaut">
-        <createTable tableName="user">
-            <column name="id" type="int">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="username" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="password" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="accountNonExpired" type="boolean" defaultValueBoolean="false"/>
-            <column name="accountNonLocked" type="boolean" defaultValueBoolean="false"/>
-            <column name="credentialsNonExpired" type="boolean" defaultValueBoolean="false"/>
-            <column name="enabled" type="boolean" defaultValueBoolean="false"/>
-        </createTable>
+    <changeSet id="changeCarsTable" author="thibaut">
+        <preConditions onFail="MARK_RAN">
+                <tableExists tableName="cars"/>
+        </preConditions>
+        <renameColumn columnDataType="double"
+                      newColumnName="consumption"
+                      oldColumnName="mpg"
+                      tableName="cars"/>
     </changeSet>
 
 </databaseChangeLog>

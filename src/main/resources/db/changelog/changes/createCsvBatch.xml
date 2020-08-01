@@ -8,40 +8,57 @@
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
 
-<!--    Car;MPG;Cylinders;Displacement;Horsepower;Weight;Acceleration;Model;Origin-->
+    <!--    Car;MPG;Cylinders;Displacement;Horsepower;Weight;Acceleration;Model;Origin
+        STRING,DOUBLE,INT,DOUBLE,DOUBLE,DOUBLE,DOUBLE,INT,CAT
+    -->
     <changeSet id="addTableBatchCsv" author="thibaut">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="cars"/>
+            </not>
+        </preConditions>
         <createTable tableName="cars">
             <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="car" type="varchar(50)">
+            <column name="name" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="mpg" type="varchar(255)">
+            <column name="mpg" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="cylinders" type="varchar(50)">
+            <column name="cylinders" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="displacement" type="varchar(255)">
+            <column name="displacement" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="horsepower" type="varchar(50)">
+            <column name="horsepower" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="weight" type="varchar(255)">
+            <column name="weight" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="acceleration" type="varchar(50)">
+            <column name="acceleration" type="DOUBLE">
                 <constraints nullable="false"/>
             </column>
-            <column name="model" type="varchar(255)">
+            <column name="model" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="origin" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addAutoIncrement
+                columnDataType="int"
+                columnName="id"
+                defaultOnNull="false"
+                generationType="ALWAYS"
+                incrementBy="1"
+                tableName="cars"/>
+        <rollback>
+            <dropTable tableName="cars"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

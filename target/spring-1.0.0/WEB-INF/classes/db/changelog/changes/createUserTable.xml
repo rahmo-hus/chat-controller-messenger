@@ -7,7 +7,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet id="1" author="thibaut">
+    <changeSet id="createUserTable" author="thibaut">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user"/>
+            </not>
+        </preConditions>
         <createTable tableName="user">
             <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
@@ -18,11 +23,20 @@
             <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="accountNonExpired" type="boolean" defaultValueBoolean="false"/>
-            <column name="accountNonLocked" type="boolean" defaultValueBoolean="false"/>
-            <column name="credentialsNonExpired" type="boolean" defaultValueBoolean="false"/>
+            <column name="account_non_expired" type="boolean" defaultValueBoolean="false"/>
+            <column name="account_non_locked" type="boolean" defaultValueBoolean="false"/>
+            <column name="credentials_non_expired" type="boolean" defaultValueBoolean="false"/>
             <column name="enabled" type="boolean" defaultValueBoolean="false"/>
         </createTable>
+        <addAutoIncrement columnDataType="int"
+                          columnName="id"
+                          defaultOnNull="false"
+                          generationType="ALWAYS"
+                          incrementBy="1"
+                          tableName="user"/>
+        <rollback>
+            <dropTable tableName="user"/>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

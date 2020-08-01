@@ -8,4 +8,6 @@
 
     <include file="/db/changelog/changes/createUserTable.xml"/>
     <include file="/db/changelog/changes/addColumnToUser.xml"/>
+    <include file="/db/changelog/changes/createCsvBatch.xml"/>
+    <include file="/db/changelog/changes/changeCarsTable.xml"/>
 </databaseChangeLog>

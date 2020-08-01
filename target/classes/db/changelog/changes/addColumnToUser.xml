@@ -7,7 +7,10 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet author="thibaut" id="addColumn">
+    <changeSet id="addColumnMailToUser" author="thibaut">
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--                <tableExists tableName="user"/> -->
+<!--        </preConditions>-->
         <addColumn tableName="user">
             <column name="mail" type="varchar(255)"/>
         </addColumn>

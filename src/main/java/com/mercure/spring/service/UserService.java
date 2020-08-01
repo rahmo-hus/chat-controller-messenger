@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,6 +92,10 @@ public class UserService implements UserDetailsService {
     }
 
     public UserEntity updateUser(UserDTO dto) {
+        if (dto == null) {
+            log.warn("Received object is empty");
+            return null;
+        }
         // Chercher l'entity associée
         List<UserEntity> completeList = userRepository.findAll();
         UserEntity userEntity = completeList.stream().filter(user -> dto.getId().equals(user.getUserId())).findFirst().orElse(null);
