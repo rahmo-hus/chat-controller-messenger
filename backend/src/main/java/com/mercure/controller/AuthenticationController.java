@@ -3,12 +3,13 @@ package com.mercure.controller;
 import com.mercure.dto.JwtDTO;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.UserDTO;
-import com.mercure.entity.GroupRoleKey;
-import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.model.JwtResponseModel;
-import com.mercure.service.*;
+import com.mercure.service.CustomUserDetailsService;
+import com.mercure.service.GroupService;
+import com.mercure.service.MessageService;
+import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,18 +21,15 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin
+@RequestMapping(value = "/api")
 public class AuthenticationController {
 
     @Autowired
@@ -44,7 +42,7 @@ public class AuthenticationController {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private GroupUserJoinService groupUserJoinService;
+    private UserMapper userMapper;
 
     @Autowired
     private UserService userService;
@@ -80,9 +78,8 @@ public class AuthenticationController {
         return null;
     }
 
-    @PostMapping(value = "/fetch")
+    @GetMapping(value = "/fetch")
     public UserDTO fetchInformation(HttpServletRequest request) {
-        UserMapper userMapper = new UserMapper();
         return userMapper.toUserDTO(getUserEntity(request));
     }
 

@@ -6,6 +6,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import AuthService from "../../service/auth-service";
+import {generateColorMode} from "../style/enable-dark-mode";
 
 class CreateGroup extends Component {
     constructor(props) {
@@ -20,7 +21,7 @@ class CreateGroup extends Component {
     createGroup(event) {
         event.preventDefault();
         AuthService.createGroup(this.state.groupName).then(r => {
-            console.log(r)
+            console.log(r.status)
         }).catch(err => {
             console.log(err)
         })
@@ -31,104 +32,48 @@ class CreateGroup extends Component {
         this.setState({groupName: value});
     }
 
-    generate(element) {
-        return this.state.groups.map((value) =>
-            React.cloneElement(element, {
-                key: value,
-            }),
-        )
-    }
-
-    goToChat(event) {
-        event.preventDefault();
-    }
-
-    componentDidMount() {
-        // AuthService.fetchUserInformation().then(r => {
-        //     console.log(r);
-        //     // console.log(r.data.groupSet)
-        //     if (r.data.length !== 0) {
-        //         // this.setState(prevState => ({
-        //         //     groups: [...prevState.groups, r.data]
-        //         // }))
-        //         this.setState({groups: r.data});
-        //     }
-        // })
-    }
 
     render() {
         return (
-            <div style={{textAlign: "center", marginTop: "40px"}}>
-                <Container component="main" maxWidth="xs">
+            <div className={generateColorMode(this.props.isDarkModeEnable)}
+                 style={{height: "calc(100% - 64px)", textAlign: "center", paddingTop: "40px"}}>
+                <Container className={"clrcstm"} component="main" maxWidth="xs">
                     <CssBaseline/>
-                    <div>
-                        <Grid container spacing={2}>
-                            {/*<Grid item xs={12} md={6}>*/}
-                            {/*    <Typography variant="h6">*/}
-                            {/*        My groups*/}
-                            {/*    </Typography>*/}
-                            {/*    <div>*/}
-                            {/*        <List>*/}
-                            {/*            {this.state.groups ? this.state.groups.map((val, index) => (*/}
-                            {/*                <ListItem key={val.id}>*/}
-                            {/*                    <ListItemAvatar>*/}
-                            {/*                        <Avatar>*/}
-                            {/*                            <FolderIcon/>*/}
-                            {/*                        </Avatar>*/}
-                            {/*                    </ListItemAvatar>*/}
-                            {/*                    <Link to={{*/}
-                            {/*                        pathname: "/t/messages",*/}
-                            {/*                        groupId: val.id*/}
-                            {/*                    }}>*/}
-                            {/*                        <ListItemText*/}
-                            {/*                            primary={val.name}*/}
-                            {/*                        />*/}
-                            {/*                    </Link>*/}
-                            {/*                </ListItem>*/}
-                            {/*            )) : <ListItem/>*/}
-                            {/*            }*/}
-                            {/*        </List>*/}
-                            {/*    </div>*/}
-                            {/*</Grid>*/}
-                        </Grid>
-                    </div>
-                    <div className={"main-register-form"}>
-                        <Typography component="h1" variant="h5">
+                    <div className={"main-register-form clrcstm"}>
+                        <Typography className={"clrcstm"} variant="h6">
                             Créer un groupe
                         </Typography>
                     </div>
-                    <div>
-                        <form>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        id="username"
-                                        name="username"
-                                        variant="outlined"
-                                        required
-                                        value={this.state.groupName}
-                                        onChange={(event) => this.groupNameConstructor(event)}
-                                        fullWidth
-                                        label={"Username"}
-                                        autoFocus
-                                    />
-                                </Grid>
-                                <div>
-                                    <Grid item xs={12}>
-                                        <Button
-                                            className={"button-register-form"}
-                                            style={{marginTop: "15px"}}
-                                            onClick={(event) => this.createGroup(event)}
-                                            fullWidth
-                                            variant="contained"
-                                            color="primary"
-                                        >
-                                            Valider
-                                        </Button>
-                                    </Grid>
-                                </div>
+                    <div className={"clrcstm"}>
+                        <Grid className={"clrcstm"} container spacing={2}>
+                            <Grid className={"clrcstm"} item xs={12}>
+                                <TextField
+                                    id="username"
+                                    name="username"
+                                    variant="outlined"
+                                    required
+                                    value={this.state.groupName}
+                                    onChange={(event) => this.groupNameConstructor(event)}
+                                    fullWidth
+                                    label={"Username"}
+                                    autoFocus
+                                />
                             </Grid>
-                        </form>
+                            <div>
+                                <Grid item xs={12}>
+                                    <Button
+                                        className={"button-register-form"}
+                                        style={{marginTop: "15px"}}
+                                        onClick={(event) => this.createGroup(event)}
+                                        fullWidth
+                                        variant="outlined"
+                                        color="primary"
+                                    >
+                                        Valider
+                                    </Button>
+                                </Grid>
+                            </div>
+                        </Grid>
                     </div>
                 </Container>
             </div>

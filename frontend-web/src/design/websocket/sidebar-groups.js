@@ -1,56 +1,119 @@
 import React, {Component} from "react";
-import Drawer from "@material-ui/core/Drawer";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import FolderIcon from "@material-ui/icons/Folder";
-import AuthService from "../../service/auth-service";
-import {Link} from "react-router-dom";
+import {withRouter} from "react-router-dom";
+import {generateColorMode} from "../style/enable-dark-mode";
+import "./websocketStyle.css";
+
+let groupEventListener = null;
 
 class SidebarGroups extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            groups: null
+
+    removeUnreadMessageClassName() {
+
+    }
+
+    redirectToGroup(event, groupId, groupURL) {
+        event.preventDefault();
+        this.removeUnreadMessageClassName();
+        console.log("Changing group");
+        this.props.history.push({
+            pathname: "/t/messages/" + groupURL,
+            groupId: groupId,
+            groupUrl: groupURL
+        })
+    }
+
+    styleSelectedGroup(matchedUrl) {
+        const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
+        if (generateColorMode(this.props.isDarkModeEnable) === "light") {
+            return groupUrl === matchedUrl ? "selected-group-light" : "";
+        }
+        if (generateColorMode(this.props.isDarkModeEnable) === "dark") {
+            return groupUrl === matchedUrl ? "selected-group-dark" : "";
         }
     }
 
 
-    componentDidMount() {
-        AuthService.fetchUserInformation().then(r => {
-            if (r.data.length !== 0) {
-                this.setState({groups: r.data});
-            }
-        })
+    launchGroupEventListener() {
+        if (this.props.ws !== null || undefined) {
+            groupEventListener = this.props.ws.subscribe("/topic/notification/" + this.props.userId, (res) => {
+                this.props.updateLastMessageInGroups(JSON.parse(res.body));
+            })
+        } else {
+            console.warn("NO WS PROPS")
+        }
     }
 
+    styleUnreadMessage(isLastMessageSeen) {
+        return isLastMessageSeen ? "bold-unread-message" : "";
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.activate !== this.props.activate) {
+            this.launchGroupEventListener();
+        }
+    }
+
+    componentWillUnmount() {
+        if (groupEventListener !== null || undefined) {
+            groupEventListener.unsubscribe();
+        }
+    }
 
     render() {
         return (
-            <Drawer variant="permanent">
-                <div
-                    style={{width: "240px"}}>
-                    <div style={{minHeight: "64px"}}/>
-                    <List>
-                        {this.state.groups && this.state.groups.map((data) => (
-                            <ListItem button key={data.id}>
-                                <Avatar>
-                                    <FolderIcon/>
-                                </Avatar>
-                                <Link to={{
-                                    pathname: `/t/messages/${data.url}`,
-                                    groupId: data.id
-                                }}>
-                                    <ListItemText style={{marginLeft: "5px"}} primary={data.name}/>
-                                </Link>
-                            </ListItem>
-                        ))}
-                    </List>
-                </div>
-            </Drawer>
+            <div
+                className={"sidebar"}
+                style={{borderRight: "1px solid #C8C8C8"}}>
+                <List>
+                    {this.props.groups && this.props.groups.map(data => (
+                        <ListItem className={this.styleSelectedGroup(data.url)} button key={data.id}
+                                  onClick={(event => this.redirectToGroup(event, data.id, data.url))}>
+                            <Avatar>
+                                <FolderIcon/>
+                            </Avatar>
+                            <ListItemText
+                                style={{marginLeft: "5px"}}
+                                primary={
+                                    <React.Fragment>
+                                        <span className={this.styleUnreadMessage(data.lastMessageSeen)}>
+                                            {data.name}
+                                        </span>
+                                    </React.Fragment>
+                                }
+                                secondary={
+                                    <React.Fragment>
+                                        <span
+                                            className={this.styleUnreadMessage(data.lastMessageSeen) + " group-subtitle-color"}
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "space-between"
+                                            }}>
+                                            <span
+                                                className={"clrcstm"}
+                                                style={{
+                                                    overflowX: "hidden",
+                                                    whiteSpace: "nowrap",
+                                                    textOverflow: "ellipsis"
+                                                }}>
+                                                {data.lastMessage}
+                                            </span>
+                                            <span className={"clrcstm"} style={{fontWeight: "inherit"}}>
+                                                {data.lastMessageDate}
+                                            </span>
+                                        </span>
+                                    </React.Fragment>}
+                            />
+                        </ListItem>
+                    ))}
+                </List>
+            </div>
         )
     }
 }
 
-export default SidebarGroups
+export default withRouter(SidebarGroups);

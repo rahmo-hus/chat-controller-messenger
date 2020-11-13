@@ -17,6 +17,8 @@ public class LightUserDTO {
 
     public String lastName;
 
+    private int groupRole;
+
     public int getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class LightUserDTO {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public int getGroupRole() {
+        return groupRole;
+    }
+
+    public void setGroupRole(int groupRole) {
+        this.groupRole = groupRole;
     }
 }

@@ -1,64 +1,123 @@
 package com.mercure.controller;
 
-import com.mercure.entity.UserEntity;
+import com.mercure.dto.MessageDTO;
+import com.mercure.dto.NotificationDTO;
+import com.mercure.dto.UserDTO;
+import com.mercure.entity.MessageEntity;
+import com.mercure.service.GroupService;
+import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
+import com.mercure.utils.JwtUtil;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin
 public class WsController {
 
+    private Logger log = LoggerFactory.getLogger(WsController.class);
+
     @Autowired
     private UserService userService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
-    public String testRoute() {
-        return "OK";
+    public String testRoute(HttpServletRequest request) {
+        String requestTokenHeader = request.getHeader("authorization");
+        if (StringUtils.isEmpty(requestTokenHeader)) {
+            return null;
+        }
+        return jwtUtil.getUserNameFromJwtToken(requestTokenHeader.substring(7));
     }
 
-    @GetMapping(value = "/manual")
-    public String wsStatus() {
-//        UserEntity user = new UserEntity();
-//        user.setFirstName("thibaut");
-//        user.setLastName("jobles2121s");
-//        user.setPassword(passwordEncoder.encode("root"));
-//        user.setMail("thibaut1@ecole.software.com");
-//        user.setEnabled(true);
-//        user.setCredentialsNonExpired(true);
-//        user.setAccountNonLocked(true);
-//        user.setAccountNonExpired(true);
-//        user.setRole(1);
-//        userService.save(user);
-        UserEntity user1 = new UserEntity();
-        user1.setFirstName("guillaume");
-        user1.setLastName("mouton1");
-        user1.setPassword(passwordEncoder.encode("root"));
-        user1.setMail("thibaut242542on@ecole.software.com");
-        user1.setEnabled(true);
-        user1.setCredentialsNonExpired(true);
-        user1.setAccountNonLocked(true);
-        user1.setAccountNonExpired(true);
-        user1.setRole(1);
-        userService.save(user1);
-        UserEntity user2 = new UserEntity();
-        user2.setFirstName("pauline");
-        user2.setLastName("mouto212n");
-        user2.setPassword(passwordEncoder.encode("root"));
-        user2.setMail("thibaut2mouton@ecole.software.com");
-        user2.setEnabled(true);
-        user2.setCredentialsNonExpired(true);
-        user2.setAccountNonLocked(true);
-        user2.setAccountNonExpired(true);
-        user2.setRole(1);
-        userService.save(user2);
-        return "OK";
+    /**
+     * Used this to retrieve user information (without password)
+     * and all groups attached to the user
+     *
+     * @param req the String request from client
+     * @return {@link UserDTO}
+     * @throws ParseException if the client request is malformed
+     */
+    @MessageMapping("/message")
+    @SendToUser("/queue/reply")
+    public UserDTO initUserProfile(String req) throws ParseException {
+        JSONObject jsonObject = (JSONObject) new JSONParser().parse(req);
+        String token = (String) jsonObject.get("token");
+        String username = jwtUtil.getUserNameFromJwtToken(token);
+        if (StringUtils.isEmpty(username)) {
+            log.warn("Username not found");
+            return null;
+        }
+        return userService.getUserInformation(username);
     }
 
+
+    /**
+     * Receive message from user and dispatch to all users subscribed to conversation
+     *
+     * @param userId     the int userId for mapping message to a user
+     * @param groupUrl   the string groupUrl for mapping message to a group
+     * @param messageDTO the payload received
+     * @return a messageDTO with all informations
+     */
+    @MessageMapping("/message/{userId}/group/{groupUrl}")
+    @SendTo("/topic/{groupUrl}")
+    public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) {
+        int groupId = groupService.findGroupByUrl(groupUrl);
+        MessageEntity messageEntity = new MessageEntity(userId, groupId, messageDTO.getMessage());
+        MessageEntity msg = messageService.save(messageEntity);
+        NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
+        List<Integer> toSend = messageService.createNotificationList(groupUrl);
+        toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
+        return messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+    }
+
+    /**
+     * Return history of group discussion
+     *
+     * @param url The group url to map
+     * @return List of message
+     */
+    @SubscribeMapping("/groups/get/{url}")
+    public List<MessageDTO> findOne(@DestinationVariable String url) {
+//        log.info("Subscription to topic {}", url);
+        if (url != null) {
+            List<MessageDTO> messageDTOS = new ArrayList<>();
+            int groupId = groupService.findGroupByUrl(url);
+            messageService.findByGroupId(groupId).forEach(msg -> {
+                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
+            });
+            return messageDTOS;
+        }
+        return null;
+    }
 }

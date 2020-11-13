@@ -28,8 +28,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (!user.isEnabled()) {
             throw new DisabledException("Account is not enabled");
         }
-        log.info("UserEntity found");
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
-//        return new UserEntity(user.getId(), user.getFirstName(), user.getPassword());
     }
 }

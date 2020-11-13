@@ -19,7 +19,7 @@ public class GroupUser {
     @JoinColumn(name = "user_id")
     UserEntity userMapping;
 
-    int role;
+    private int role;
 
     public GroupRoleKey getId() {
         return id;

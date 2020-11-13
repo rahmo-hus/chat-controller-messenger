@@ -3,7 +3,6 @@ package com.mercure.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil implements Serializable {
 
-    public static final long JWT_TOKEN_VALIDITY = 1000 * 3600;
+    public static final long JWT_TOKEN_VALIDITY = 1000 * 3600 * 365;
 
     public static final String JWT_TOKEN = "d95d7dc9-0d56-4ef3-8d03-263c23b5bce5";
 

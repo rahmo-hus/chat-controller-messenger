@@ -1,6 +1,5 @@
 package com.mercure.dto;
 
-import com.mercure.entity.GroupEntity;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -19,7 +18,7 @@ public class UserDTO {
 
     private String jwt;
 
-    private Set<GroupEntity> groupSet;
+    private Set<GroupDTO> groupSet;
 
     private Date expiration_date;
 
@@ -93,11 +92,11 @@ public class UserDTO {
         this.jwt = jwt;
     }
 
-    public Set<GroupEntity> getGroupSet() {
+    public Set<GroupDTO> getGroupSet() {
         return groupSet;
     }
 
-    public void setGroupSet(Set<GroupEntity> groupSet) {
+    public void setGroupSet(Set<GroupDTO> groupSet) {
         this.groupSet = groupSet;
     }
 

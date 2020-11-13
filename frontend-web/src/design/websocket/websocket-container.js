@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import MessageModel from "../../model/message-model";
-import AuthService from "../../service/auth-service";
 import {withRouter} from "react-router-dom";
 import Tooltip from "@material-ui/core/Tooltip";
-import SidebarGroupActions from "./sidebar-group-actions";
+import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
 
 class WebSocketContainer extends Component {
     constructor(props) {
@@ -13,13 +12,17 @@ class WebSocketContainer extends Component {
         this.state = {
             message: "",
             history: [],
+            historySubscriptionId: null,
+            groupTopicSubscriptionId: null,
             groupId: null,
+            groupUrl: null,
+            client: null,
             ws: null
         };
         this.typingMessage = this.typingMessage.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.receiveMessage = this.receiveMessage.bind(this);
-        this.fetchAllMessages = this.fetchAllMessages.bind(this);
+        // this.fetchAllMessages = this.fetchAllMessages.bind(this);
     }
 
     typingMessage(event) {
@@ -28,175 +31,163 @@ class WebSocketContainer extends Component {
     }
 
     sendMessage() {
-        const temp = this.props.location.userId ? this.props.location.userId : null;
-        if (temp === null) {
+        const userId = this.props.location.userId ? this.props.location.userId : this.props.userId ? this.props.userId : null;
+        if (userId === null || undefined) {
             console.warn("userId is null !")
         }
-        if (this.props.location.groupId === null) {
+        if (this.props.location.groupUrl === null) {
             console.warn("groupId is null !")
         }
-        const toSend = new MessageModel(temp, this.props.location.groupId, this.state.message)
-        this.state.ws.send(JSON.stringify(toSend));
+        const toSend = new MessageModel(userId, this.props.location.groupId, this.state.message)
+        this.props.ws.publish({
+            destination: "/app/message/" + userId + "/group/" + this.props.location.groupUrl,
+            body: JSON.stringify(toSend)
+        });
         this.setState({message: ""})
     }
 
     submitMessage(event) {
-        if (event.key === undefined || event.key === 'Enter') {
-            this.sendMessage();
-        }
-    }
-
-    fetchAllMessages() {
-        const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
-        AuthService.fetchMessages(groupUrl).then(r => {
-            if (r.data.length !== 0) {
-                this.setState({history: r.data}, () => {
-                    console.log(this.state.history)
-                });
+        if (this.state.message !== "") {
+            if (event.key === undefined || event.key === 'Enter') {
+                this.sendMessage();
             }
-        })
+        }
     }
 
     receiveMessage(payload) {
         this.setState(prevState => ({
-            history: [...prevState.history, JSON.parse(payload.data)]
+            history: [...prevState.history, JSON.parse(payload)]
         }), () => {
-            this.messagesEnd.scrollIntoView({behavior: "smooth"});
+            this.scrollToEnd();
         });
     }
 
-    connect() {
-        const ws = new WebSocket("ws://localhost:9292/ws")
-        ws.onopen = () => {
-            console.log("Websocket connected");
-            this.setState({connected: true});
-            this.setState({ws: ws})
-        };
+    scrollToEnd() {
+        this.messagesEnd.scrollIntoView({behavior: "smooth"});
+    }
 
-        ws.onmessage = (payload) => {
-            this.receiveMessage(payload);
+    launchSubscribe() {
+        this.setState({history: []});
+        if (this.state.historySubscriptionId) {
+            this.props.ws.unsubscribe(this.state.historySubscriptionId);
+            // console.log("UNSUBSCRIBE HISTORY");
         }
-
-        // websocket onclose event listener
-        ws.onclose = e => {
-            console.log("disconnected ", e.reason)
-            this.setState({connected: false})
-        };
-
-        // websocket onerror event listener
-        ws.onerror = err => {
-            console.error(err.message);
-            ws.close();
-        };
-    };
-
+        if (this.state.groupTopicSubscriptionId) {
+            // console.log("UNSUBSCRIBE TOPIC");
+            this.props.ws.unsubscribe(this.state.groupTopicSubscriptionId);
+        }
+        const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
+        let subscribeToHistory = this.props.ws.subscribe("/app/groups/get/" + groupUrl, (res) => {
+            this.setState({history: JSON.parse(res.body), historySubscriptionId: subscribeToHistory.id}, () => {
+                this.messagesEnd.scrollIntoView({block: "start", behavior: "auto"});
+            })
+        });
+        let subscribeToGroupTopic = this.props.ws.subscribe("/topic/" + this.props.location.groupUrl, (res) => {
+            this.receiveMessage(res.body);
+        });
+        this.setState({groupTopicSubscriptionId: subscribeToGroupTopic.id});
+    }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        // if (prevProps.connected !== this.state.connected && !this.state.connected) {
-        //     setTimeout(() => {
-        //         this.connect();
-        //     }, 3000)
-        // }
-        if (prevProps.location.groupId !== this.props.location.groupId) {
-            console.log("Changed !")
-            this.setState({history: []});
-            this.fetchAllMessages();
+        if (prevProps.activate !== this.props.activate) {
+            this.launchSubscribe();
+            this.messagesEnd.scrollIntoView({block: "start", behavior: "smooth"});
         }
     }
 
-    componentWillUnmount() {
-    }
-
-    componentDidMount() {
-        this.connect();
-        this.fetchAllMessages();
+    styleSelectedMessage() {
+        return this.props.isDarkModeEnable ? "hover-msg-dark" : "hover-msg-light";
     }
 
     render() {
         return (
-            <div>
-                <SidebarGroupActions groupUrl={this.props.location.pathname.split("/").slice(-1)[0]}/>
-                <div style={{marginRight: "240px", marginLeft: "240px", height: "93%"}}>
-                    <div style={{display: "flex", alignItems: "center", flexDirection: "column"}}>
-                        <div style={{backgroundColor: "#e3e3e3", width: "100%", overflowY: "scroll", height: "84vh"}}>
-                            {this.state.history && this.state.history.map((val, index, array) => (
-                                <Tooltip
-                                    key={index}
-                                    title={new Date(val.time).getHours() + ":" + new Date(val.time).getMinutes()}
-                                    placement="left">
-                                    <div className={"msg"} key={index} style={{display: "flex", alignItems: "center"}}>
-                                        {index >= 1 && array[index - 1].userId === array[index].userId ?
-                                            <div style={{
-                                                width: "40px",
-                                                height: "40px",
-                                            }}/>
-                                            :
-                                            <div style={{
-                                                fontFamily: "Segoe UI,SegoeUI,\"Helvetica Neue\",Helvetica,Arial,sans-serif",
-                                                backgroundColor: `${val.color}`,
-                                                letterSpacing: "1px",
-                                                width: "40px",
-                                                height: "40px",
-                                                textAlign: "center",
-                                                fontSize: "20px",
-                                                borderRadius: " 50%",
-                                                lineHeight: "37px"
-                                            }}>
-                                                <div style={{color: "#FFFFFF"}}>{val.initials}</div>
-                                            </div>
-                                        }
-                                        <div style={{margin: "4px"}}>
-                                            {index >= 1 && array[index - 1].userId === array[index].userId ?
-                                                <div/>
-                                                :
-                                                <div>
-                                                    <b>{val.sender} </b>
-                                                </div>
-                                            }
-                                            <div>{val.message}</div>
-                                        </div>
+            <div style={{display: "flex", flex: "1", flexDirection: "column"}}>
+                <div style={{
+                    backgroundColor: "transparent",
+                    width: "100%",
+                    height: "calc(100% - 56px)",
+                    overflowY: "scroll"
+                }}>
+                    {this.state.history && this.state.history.map((val, index, array) => (
+                        <Tooltip
+                            key={index}
+                            enterDelay={700}
+                            leaveDelay={0}
+                            title={new Date(val.time).getHours() + ":" + new Date(val.time).getMinutes()}
+                            placement="left">
+                            <div className={'msg ' + this.styleSelectedMessage()} key={index}
+                                 style={{display: "flex", alignItems: "center"}}>
+                                {index >= 1 && array[index - 1].userId === array[index].userId ?
+                                    <div style={{
+                                        width: "40px",
+                                        height: "40px",
+                                    }}/>
+                                    :
+                                    <div style={{
+                                        fontFamily: "Segoe UI,SegoeUI,\"Helvetica Neue\",Helvetica,Arial,sans-serif",
+                                        backgroundColor: `${val.color}`,
+                                        letterSpacing: "1px",
+                                        width: "40px",
+                                        height: "40px",
+                                        textAlign: "center",
+                                        fontSize: "20px",
+                                        borderRadius: " 50%",
+                                        lineHeight: "37px"
+                                    }}>
+                                        <div style={{color: "#FFFFFF"}}>{val.initials}</div>
                                     </div>
-                                </Tooltip>
-                            ))}
-                            <div style={{float: "left", clear: "both"}}
-                                 ref={(el) => {
-                                     this.messagesEnd = el;
-                                 }}>
+                                }
+                                <div style={{margin: "4px"}}>
+                                    {index >= 1 && array[index - 1].userId === array[index].userId ?
+                                        <div/>
+                                        :
+                                        <div>
+                                            <b>{val.sender} </b>
+                                        </div>
+                                    }
+                                    <div>{val.message}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div style={{
-                            display: "flex",
-                            width: "100%",
-                            alignItems: "center",
-                            position: "relative",
-                            bottom: "0"
-                        }}>
-                            <TextField
-                                variant="outlined"
-                                onChange={(e) => this.typingMessage(e)}
-                                onKeyDown={(event) => this.submitMessage(event)}
-                                margin="normal"
-                                fullWidth
-                                id="message"
-                                label="Your message"
-                                name="message"
-                                value={this.state.message}
-                                autoFocus
-                            />
-                            <Button
-                                onClick={this.sendMessage}
-                                variant="contained"
-                                color="primary"
-                                style={{
-                                    marginLeft: "3px",
-                                    maxWidth: "20px"
-                                }}
-                                disabled={this.state.message === ""}
-                            >
-                                >>
-                            </Button>
-                        </div>
+                        </Tooltip>
+                    ))}
+                    <div style={{float: "left", clear: "both"}}
+                         ref={(el) => {
+                             this.messagesEnd = el;
+                         }}>
                     </div>
+                </div>
+                <div style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    position: "relative",
+                    bottom: "0",
+                    padding: "5px"
+                }}>
+                    <TextField
+                        variant="outlined"
+                        onChange={(e) => this.typingMessage(e)}
+                        onKeyDown={(event) => this.submitMessage(event)}
+                        margin="normal"
+                        id="message"
+                        label="Your message"
+                        name="message"
+                        value={this.state.message}
+                        autoFocus
+                        style={{width: "90%"}}
+                    />
+                    <Button
+                        onClick={this.sendMessage}
+                        variant="contained"
+                        color="primary"
+                        style={{
+                            marginLeft: "3px",
+                            maxWidth: "20px"
+                        }}
+                        disabled={this.state.message === ""}
+                    >
+                        <DoubleArrowIcon/>
+                    </Button>
                 </div>
             </div>
         )

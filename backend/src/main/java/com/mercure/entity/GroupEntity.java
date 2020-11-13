@@ -19,6 +19,12 @@ public class GroupEntity implements Serializable {
         this.name = name;
     }
 
+    public GroupEntity(int id, String name, String url) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -27,12 +33,12 @@ public class GroupEntity implements Serializable {
 
     private String url;
 
-    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_user",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonIgnore
     private Set<UserEntity> userEntities = new HashSet<>();
 
     @OneToMany(mappedBy = "groupMapping")

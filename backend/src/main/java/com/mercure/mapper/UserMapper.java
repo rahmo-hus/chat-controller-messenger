@@ -1,29 +1,53 @@
 package com.mercure.mapper;
 
+import com.mercure.dto.GroupDTO;
 import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.UserEntity;
+import com.mercure.utils.ComparatorListGroupDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.*;
+
+@Service
 public class UserMapper {
 
+    @Autowired
+    private GroupMapper groupMapper;
+
+    /**
+     * Map a UserEntity to a UserDTO
+     * Please note the password is not sent
+     *
+     * @param userEntity the {@link UserEntity} to map
+     * @return a {@link UserDTO}
+     */
     public UserDTO toUserDTO(UserEntity userEntity) {
+        // Init
         UserDTO userDTO = new UserDTO();
+        Set<GroupDTO> groupEntitySet = new HashSet<>();
+
+        // Main user infos
         userDTO.setId(userEntity.getId());
         userDTO.setFirstName(userEntity.getFirstName());
         userDTO.setLastName(userEntity.getLastName());
         userDTO.setMail(userEntity.getMail());
-
+        // Global role
         userDTO.setRole(userEntity.getRole());
-
+        // Spring security mapping
         userDTO.setAccountNonExpired(userEntity.isAccountNonExpired());
         userDTO.setAccountNonLocked(userEntity.isAccountNonLocked());
         userDTO.setCredentialsNonExpired(userEntity.isCredentialsNonExpired());
         userDTO.setEnabled(userEntity.isEnabled());
         userDTO.setExpiration_date(userEntity.getExpiration_date());
-
         userDTO.setJwt(userEntity.getJwt());
-        userDTO.setGroupSet(userEntity.getGroupSet());
         userDTO.setAuthorities(userEntity.getAuthorities());
+
+        userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(userEntity.getId(), groupEntity)));
+        List<GroupDTO> sortedList = new ArrayList<>(groupEntitySet);
+        sortedList.sort(new ComparatorListGroupDTO());
+        userDTO.setGroupSet(groupEntitySet);
         return userDTO;
     }
 

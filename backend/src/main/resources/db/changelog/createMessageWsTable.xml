@@ -17,7 +17,7 @@
             <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="message" type="varchar(255)">
+            <column name="message" type="MEDIUMTEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="msg_group_id" type="INT">

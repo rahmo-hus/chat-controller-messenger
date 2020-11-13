@@ -1,54 +1,90 @@
-html, body {
-    height: 100vh;
+body {
+    overflow-y: scroll;
 }
 
 #root {
     height: 100vh;
 }
 
-.App {
-    text-align: center;
+::-webkit-scrollbar {
+    width: 10px;
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+::-webkit-scrollbar-track {
+    background: #c4c4c4;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #656565;
 }
 
-.App-header {
-    background-color: #282c34;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-}
-
-.App-link {
-    color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .msg {
-    padding-left: 5px;
+    padding: 2px 0 2px 5px;
 }
 
-.msg:hover {
-    background-color: #00e1ff;
+.bold-unread-message {
+    font-weight: bold !important;
+    color: white !important;
+}
+
+.hover-msg-light:hover {
+    background-color: cornflowerblue;
+}
+
+.hover-msg-dark:hover {
+    background-color: #262626;
+}
+
+.selected-group-light {
+    background-color: cornflowerblue !important;
+}
+
+.selected-group-dark {
+    background-color: #262626 !important;
+}
+
+.group-subtitle-color {
+    color: #787878
+}
+
+/************OVERRIDE MATERIAL UI STYLES******************************************************************************/
+
+.MuiButton-root {
+    color: inherit !important;
+}
+
+.MuiFormControl-marginNormal {
+    margin: 0 !important;
+}
+
+/************ OVERRIDE ******************************************************************************/
+.lnk {
+    text-decoration: none;
+}
+
+.clrcstm {
+    color: inherit;
+    font-weight: inherit;
+}
+
+/************ DARK & LIGHT MODE ******************************************************************************/
+.dark {
+    color: white;
+    background-color: #393939;
+}
+
+.light {
+    color: black;
+    background-color: #ffffff;
+    /*background-color: #A9A9A9*/
+}
+
+.jsLink {
+    color: white;
 }

@@ -1,19 +1,18 @@
 import React, {Component} from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
 import {Link, withRouter} from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
 import AuthService from "../../service/auth-service";
 import Alert from "@material-ui/lab/Alert";
 import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
+import "./register-form.css";
+import {generateColorMode, generateIconColorMode, generateLinkColorMode} from "../style/enable-dark-mode";
+import CustomTextField from "../partials/custom-material-textfield";
 
 class RegisterForm extends Component {
     constructor(props) {
@@ -23,8 +22,8 @@ class RegisterForm extends Component {
             username: "",
             lastName: "",
             email: "",
-            password: "root",
-            repeatPassword: "root",
+            password: "",
+            repeatPassword: "",
 
             noMatchPasswordsError: false,
             displayNoMatchPasswordsError: false,
@@ -65,14 +64,21 @@ class RegisterForm extends Component {
         e.preventDefault();
         this.errorArray = [];
         this.checkFormValidation()
-        console.log(this.errorArray.length)
         if (this.errorArray.length === 0) {
             console.log("Registering user ...")
             AuthService.createUser(this.state.username, this.state.lastName, this.state.email, this.state.password).then(r => {
-                console.log(r.status);
-                this.clearFields();
+                this.props.history.push({
+                    pathname: "/",
+                    openToaster: true,
+                    text: "Your account has been created ! Welcome " + this.state.username + " !",
+                    severity: "success"
+                })
             }).catch(e => {
+                console.log(e.response)
                 console.log("Error during registration : ", e.message)
+                this.errorArray.push(e.response.data);
+                this.setState({displayFormValidationError: true})
+
             })
         } else {
             this.setState({formValidationError: true});
@@ -153,15 +159,18 @@ class RegisterForm extends Component {
 
     render() {
         return (
-            <Container style={{marginTop: "144px"}} component="main" maxWidth="xs">
-                <CssBaseline/>
+            <div className={generateColorMode(this.props.isDarkModeEnable)}
+                 style={{height: "calc(100% - 64px)", width: "100%"}}>
                 <div className={"main-register-form"}>
-                    <Avatar className={"user-register-form"}>
-                        <LockOutlinedIcon/>
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign up
-                    </Typography>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                        <AccountCircleIcon fontSize={"large"}
+                                           className={generateIconColorMode(this.props.isDarkModeEnable)}/>
+                    </div>
+                    <div style={{textAlign: "center"}}>
+                        <Typography component="h1" variant="h5">
+                            Sign up
+                        </Typography>
+                    </div>
                     <form style={{marginTop: "24px"}}>
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
@@ -192,41 +201,22 @@ class RegisterForm extends Component {
                                 }
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    id="firstName"
-                                    name="firstName"
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    label="First Name"
-                                    value={this.state.username}
-                                    onChange={(event) => this.handleChange(event)}
-                                    autoFocus
-                                />
+                                <CustomTextField id={"firstNameInput"} label={"First Name"} name={"firstName"}
+                                                 value={this.state.username}
+                                                 handleChange={this.handleChange}
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    id="lastName"
-                                    label="Last Name"
-                                    value={this.state.lastName}
-                                    name="lastName"
-                                    onChange={(event) => this.handleChange(event)}
-                                />
+                                <CustomTextField id={"lastNameInput"} label={"Last Name"} name={"lastName"}
+                                                 value={this.state.lastName}
+                                                 handleChange={this.handleChange}
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    id="email"
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    value={this.state.email}
-                                    label="Email Address"
-                                    name="email"
-                                    onChange={(event) => this.handleChange(event)}
-                                />
+                                <CustomTextField id={"emailInput"} label={"Email Address"} name={"email"}
+                                                 value={this.state.email}
+                                                 handleChange={this.handleChange}
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
                                 {
                                     <Collapse in={this.state.displayEmailNotValid} timeout={1500}>
                                         <Alert action={
@@ -243,30 +233,17 @@ class RegisterForm extends Component {
                                 }
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    id="password"
-                                    variant="outlined"
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    value={this.state.password}
-                                    type="password"
-                                    onChange={(event) => this.handleChange(event)}
-                                />
+                                <CustomTextField id={"passwordInput"} label={"Password"} name={"password"}
+                                                 handleChange={this.handleChange}
+                                                 value={this.state.password}
+                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeEnable}/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    id="repeatPassword"
-                                    required
-                                    variant="outlined"
-                                    fullWidth
-                                    name="repeatPassword"
-                                    label="Repeat password"
-                                    value={this.state.repeatPassword}
-                                    type="password"
-                                    onChange={(event) => this.handleChange(event)}
-                                />
+                                <CustomTextField id={"repeatPasswordInput"} label={"Repeat password"}
+                                                 name={"repeatPassword"}
+                                                 handleChange={this.handleChange}
+                                                 value={this.state.repeatPassword}
+                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeEnable}/>
                                 {
                                     <Collapse in={this.state.displayNoMatchPasswordsError} timeout={1500}>
                                         <Alert action={
@@ -283,19 +260,23 @@ class RegisterForm extends Component {
                                 }
                             </Grid>
                         </Grid>
-                        <Button
-                            className={"button-register-form"}
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            onClick={(e) => this.registerUser(e)}
-                        >
-                            Sign Up
-                        </Button>
+                        <div style={{marginTop: "10px"}}>
+                            <Button
+                                className={"button-register-form"}
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                onClick={(e) => this.registerUser(e)}
+                            >
+                                Sign Up
+                            </Button>
+                        </div>
                         <Grid container justify="flex-end">
                             <Grid item>
-                                <Link className={"jsLink"} to={"/sign_in"} variant="body2">
+                                <Link className={"lnk"}
+                                      style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
+                                      to={"/sign_in"} variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>
@@ -303,16 +284,17 @@ class RegisterForm extends Component {
                     </form>
                 </div>
                 <Box mt={5}>
-                    <Typography variant="body2" color="textSecondary" align="center">
+                    <Typography variant="body2" color="inherit" align="center">
                         {'Copyright © '}
-                        <Link color="inherit" to="/">
+                        <Link style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}} className={"lnk"}
+                              color="inherit" to="/">
                             RS Software
                         </Link>{' '}
                         {new Date().getFullYear()}
                         {'.'}
                     </Typography>
                 </Box>
-            </Container>
+            </div>
         );
     }
 }

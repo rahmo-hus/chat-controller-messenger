@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Component
+//@Component
 public class SocketHandler extends TextWebSocketHandler {
 
     Logger log = LoggerFactory.getLogger(SocketHandler.class);
