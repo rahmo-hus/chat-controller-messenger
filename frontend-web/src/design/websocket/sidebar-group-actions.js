@@ -40,26 +40,38 @@ class SidebarGroupActions extends Component {
         };
         this.handleClick = this.handleClick.bind(this);
         this.handleTooltipAction = this.handleTooltipAction.bind(this);
+        this.closeUserMenu = this.closeUserMenu.bind(this);
+        this.handleDisplayUserAction = this.handleDisplayUserAction.bind(this);
     }
 
 
-    handleClose(event, order) {
+    handleAddUserAction(event, action) {
         event.preventDefault();
-        if (order === "open") {
-            AuthService.fetchAllUsers().then(r => {
-                this.setState({usersList: r.data})
-            });
-            this.setState({popupOpen: true});
-        } else {
-            this.setState({popupOpen: false})
+        switch (action) {
+            case "open":
+                AuthService.fetchAllUsers().then(r => {
+                    this.setState({usersList: r.data})
+                });
+                this.setState({popupOpen: true});
+                break;
+            case "close":
+                this.setState({popupOpen: false});
+                break;
+            default:
+                throw new Error("Cannot handle AddUserAction");
         }
+
     }
 
     addUser(event, userId) {
         event.preventDefault();
         AuthService.addUserToGroup(userId, this.props.groupUrl).then(r => {
             console.log(r.status);
-        })
+            this.setState({popupOpen: false})
+            AuthService.fetchAllUsersInConversation(this.props.groupUrl).then(r => {
+                this.setState({usersInConversationList: r.data})
+            });
+        });
     }
 
     handleTooltipAction(event, action) {
@@ -77,6 +89,7 @@ class SidebarGroupActions extends Component {
             case "param":
                 const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
                 this.state.usersInConversationList.length === 0 && AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
+                    console.log(r.data)
                     this.setState({usersInConversationList: r.data})
                 })
                 this.setState(prevState => {
@@ -99,7 +112,10 @@ class SidebarGroupActions extends Component {
                 usersInGroupArray.splice(userToRemoveIndex, 1);
                 this.setState({usersInConversationList: usersInGroupArray, toasterOpened: true});
             }
-        });
+            this.closeUserMenu();
+        }).catch(err =>
+            this.closeUserMenu()
+        );
     }
 
     grantUserAdminInConversation(event, userId) {
@@ -107,17 +123,33 @@ class SidebarGroupActions extends Component {
         AuthService.grantUserAdminInConversation(userId, this.props.groupUrl).then(r => {
             if (r.status === 200) {
                 console.log(r);
-                // let userToRemoveIndex = this.state.usersInConversationList.findIndex(elt => elt.id === userId)
-                // let usersInGroupArray = [...this.state.usersInConversationList];
-                // usersInGroupArray.splice(userToRemoveIndex, 1);
-                // this.setState({usersInConversationList: usersInGroupArray, toasterOpened: true});
+                const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
+                AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
+                    console.log(r);
+                })
             }
-        });
+            this.closeUserMenu();
+        }).catch(err => this.closeUserMenu());
+    }
+
+    closeUserMenu() {
+        this.setState({paramsOpen: false})
+    }
+
+    handleDisplayUserAction(event, action) {
+        event.preventDefault();
+        switch (action) {
+            case "open":
+                this.setState({usersListAction: true});
+                break;
+            case "close":
+                this.setState({usersListAction: false});
+                break;
+        }
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevProps.activate !== this.props.activate) {
-            console.log("ACTIONS CHANGED !")
             this.setState({
                 popupOpen: false,
                 paramsOpen: false,
@@ -141,7 +173,7 @@ class SidebarGroupActions extends Component {
                                 <span className={"clrcstm"}>Parameters</span>
                             </ListSubheader>
                         }>
-                        <ListItem button onClick={(event) => this.handleClose(event, "open")}>
+                        <ListItem button onClick={(event) => this.handleAddUserAction(event, "open")}>
                             <ListItemIcon>
                                 <GroupAddIcon style={{color: generateIconColorMode(this.props.isDarkModeEnable)}}/>
                             </ListItemIcon>
@@ -157,7 +189,10 @@ class SidebarGroupActions extends Component {
                         <Collapse in={this.state.paramsOpen} timeout="auto">
                             <List component="div" disablePadding>
                                 {this.state.paramsOpen && this.state.usersInConversationList.map((value, index) => (
-                                    <ListItem key={index} button>
+                                    <ListItem key={index}
+                                              onMouseEnter={event => this.handleDisplayUserAction(event, "open")}
+                                              onMouseLeave={event => this.handleDisplayUserAction(event, "close")}
+                                              button>
                                         <ListItemIcon>
                                             {
                                                 value.admin ? <SecurityIcon
@@ -167,29 +202,35 @@ class SidebarGroupActions extends Component {
                                             }
                                         </ListItemIcon>
                                         <ListItemText primary={value.firstName + " " + value.lastName}/>
-                                        <ListItemSecondaryAction>
-                                            {value.admin ? "Administrator" :
-                                                <div>
-                                                    <IconButton
-                                                        onClick={event => this.handleTooltipAction(event, "open")}>
-                                                        <MoreHorizIcon
-                                                            style={{color: generateIconColorMode(this.props.isDarkModeEnable)}}/>
-                                                    </IconButton>
-                                                    <Menu
-                                                        id="fade-menu"
-                                                        anchorEl={this.state.anchorEl}
-                                                        keepMounted
-                                                        open={this.state.toolTipAction}
-                                                        onClose={(event => this.handleTooltipAction(event, "close"))}
-                                                    >
-                                                        <MenuItem
-                                                            onClick={event => this.grantUserAdminInConversation(event, value.userId)}
-                                                            dense={true}>Grant administrator</MenuItem>
-                                                        <MenuItem
-                                                            onClick={event => this.removeUserFromConversation(event, value.userId)}
-                                                            dense={true}>Remove from group</MenuItem>
-                                                    </Menu>
-                                                </div>
+                                        <ListItemSecondaryAction
+                                            onMouseEnter={event => this.handleDisplayUserAction(event, "open")}
+                                            onMouseLeave={event => this.handleDisplayUserAction(event, "close")}>
+                                            {!this.state.usersListAction && value.admin ? "Administrator" : ""}
+                                            {this.state.usersListAction &&
+                                            <div>
+                                                {
+                                                    this.props.userId !== value.userId ?
+                                                        <IconButton disabled={this.props.userId === value.userId}
+                                                                    onClick={event => this.handleTooltipAction(event, "open")}>
+                                                            <MoreHorizIcon
+                                                                style={{color: generateIconColorMode(this.props.isDarkModeEnable)}}/>
+                                                        </IconButton> : "You"
+                                                }
+                                                <Menu
+                                                    id="fade-menu"
+                                                    anchorEl={this.state.anchorEl}
+                                                    keepMounted
+                                                    open={this.state.toolTipAction}
+                                                    onClose={(event => this.handleTooltipAction(event, "close"))}
+                                                >
+                                                    <MenuItem
+                                                        onClick={event => this.grantUserAdminInConversation(event, value.userId)}
+                                                        dense={true}>Grant administrator</MenuItem>
+                                                    <MenuItem
+                                                        onClick={event => this.removeUserFromConversation(event, value.userId)}
+                                                        dense={true}>Remove from group</MenuItem>
+                                                </Menu>
+                                            </div>
                                             }
                                         </ListItemSecondaryAction>
                                     </ListItem>
@@ -198,13 +239,17 @@ class SidebarGroupActions extends Component {
                         </Collapse>
                     </List>
                 </div>
-                <Dialog onClose={(event) => this.handleClose(event, "close")} aria-labelledby="simple-dialog-title"
+                <Dialog onClose={(event) => this.handleAddUserAction(event, "close")}
+                        aria-labelledby="simple-dialog-title"
+                        fullWidth
+                        maxWidth={"md"}
                         open={this.state.popupOpen}>
                     <DialogTitle id="simple-dialog-title">Add people to conversation</DialogTitle>
                     <List>
                         {
                             this.state.popupOpen && this.state.usersList && this.state.usersList.map(data => (
-                                <ListItem button key={data.id} onClick={(event => this.addUser(event, data.id))}>
+                                <ListItem button key={data.id} disabled={data.id === this.props.userId}
+                                          onClick={(event => this.addUser(event, data.id))}>
                                     <ListItemAvatar>
                                         <Avatar>
                                             <AccountCircleIcon
@@ -215,6 +260,9 @@ class SidebarGroupActions extends Component {
                                         <React.Fragment>
                                                 <span style={{display: "flex", justifyContent: "space-around"}}>
                                                         {data.firstName + " " + data.lastName}
+                                            {
+                                                data.id === this.props.userId && "(You)"
+                                            }
                                                     </span>
                                         </React.Fragment>
                                     }
