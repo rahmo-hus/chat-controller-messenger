@@ -1,8 +1,6 @@
 package com.mercure.entity;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -14,13 +12,15 @@ public class MessageEntity {
     public MessageEntity() {
     }
 
-    public MessageEntity(int userId, int groupId, String message) {
+    public MessageEntity(int userId, int groupId, String type, String message) {
         this.user_id = userId;
         this.group_id = groupId;
+        this.type = type;
         this.message = message;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String message;
@@ -30,6 +30,9 @@ public class MessageEntity {
 
     @Column(name = "msg_user_id")
     private int user_id;
+
+    @Column(name = "type")
+    private String type;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -65,6 +68,14 @@ public class MessageEntity {
 
     public void setUser_id(int user_id) {
         this.user_id = user_id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Timestamp getCreatedAt() {

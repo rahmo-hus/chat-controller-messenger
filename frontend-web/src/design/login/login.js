@@ -137,13 +137,13 @@ class Login extends Component {
                             </Link>
                             <Link className={"lnk"}
                                   style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
-                                  to={"/sign_up"}>
+                                  to={"/register"}>
                                 S'enregistrer
                             </Link>
                         </Grid>
                     </div>
                     <Box mt={5}>
-                        <Typography variant="body2" color="textSecondary" align="center">
+                        <Typography variant="body2" color="inherit" align="center">
                             {'Copyright © '}
                             <Link to="/" className={"lnk"}
                                   style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}>

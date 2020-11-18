@@ -37,9 +37,6 @@ class App extends Component {
         this.setState({authenticated: value})
     }
 
-
-
-
     render() {
         return (
             <Router>

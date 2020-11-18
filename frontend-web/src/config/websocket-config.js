@@ -8,9 +8,9 @@ const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "192
 export function initWebSocket(securedUrl) {
     client = new Client({
         brokerURL: "ws://" + WS_URL + "messenger/websocket?token=" + securedUrl,
-        debug: function (str) {
-            console.log(str);
-        },
+        // debug: function (str) {
+        //     console.log(str);
+        // },
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

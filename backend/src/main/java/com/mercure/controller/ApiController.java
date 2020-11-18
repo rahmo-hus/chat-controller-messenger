@@ -2,15 +2,16 @@ package com.mercure.controller;
 
 import com.mercure.dto.GroupMemberDTO;
 import com.mercure.dto.LightUserDTO;
-import com.mercure.dto.UserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.GroupMapper;
 import com.mercure.mapper.GroupUserMapper;
+import com.mercure.service.FileService;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
+import com.mercure.utils.FileNameGenerator;
 import com.mercure.utils.JwtUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -49,6 +50,12 @@ public class ApiController {
 
     @Autowired
     private GroupUserMapper groupUserMapper;
+
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private FileNameGenerator fileNameGenerator;
 
     @GetMapping(value = "/users/all")
     public List<LightUserDTO> fetchAllUsers() {
@@ -109,6 +116,11 @@ public class ApiController {
         return doUserAction(request, userId, groupUrl, "grant");
     }
 
+    @GetMapping(value = "/user/remove/admin/{userId}/group/{groupUrl}")
+    public ResponseEntity<?> removeAdminUserFromConversation(HttpServletRequest request, @PathVariable Integer userId, @PathVariable String groupUrl) {
+        return doUserAction(request, userId, groupUrl, "removeAdmin");
+    }
+
     private ResponseEntity<?> doUserAction(HttpServletRequest request, Integer userId, String groupUrl, String action) {
         String requestTokenHeader = request.getHeader("authorization");
         if (StringUtils.isEmpty(requestTokenHeader)) {
@@ -127,6 +139,9 @@ public class ApiController {
                     }
                     if (action.equals("delete")) {
                         groupUserJoinService.removeUserFromConversation(userId, groupId);
+                    }
+                    if (action.equals("removeAdmin")) {
+                        groupUserJoinService.removeUserAdminFromConversation(userId, groupId);
                     }
                 } catch (Exception e) {
                     log.warn("Error during performing {} : {}", action, e.getMessage());

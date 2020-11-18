@@ -276,7 +276,7 @@ class RegisterForm extends Component {
                             <Grid item>
                                 <Link className={"lnk"}
                                       style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
-                                      to={"/sign_in"} variant="body2">
+                                      to={"/login"} variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>

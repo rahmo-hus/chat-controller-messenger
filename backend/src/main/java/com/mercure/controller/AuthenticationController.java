@@ -62,21 +62,22 @@ public class AuthenticationController {
     }
 
 
-    @PostMapping(value = "/fetchMessages")
-    public List<MessageDTO> fetchGroupMessages(@RequestBody String data) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject json = (JSONObject) jsonParser.parse(data);
-        String url = (String) json.get("id");
-        if (url != null) {
-            List<MessageDTO> messageDTOS = new ArrayList<>();
-            int groupId = groupService.findGroupByUrl(url);
-            messageService.findByGroupId(groupId).forEach(msg -> {
-                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
-            });
-            return messageDTOS;
-        }
-        return null;
-    }
+//    @PostMapping(value = "/fetchMessages")
+//    @Deprecated
+//    public List<MessageDTO> fetchGroupMessages(@RequestBody String data) throws ParseException {
+//        JSONParser jsonParser = new JSONParser();
+//        JSONObject json = (JSONObject) jsonParser.parse(data);
+//        String url = (String) json.get("id");
+//        if (url != null) {
+//            List<MessageDTO> messageDTOS = new ArrayList<>();
+//            int groupId = groupService.findGroupByUrl(url);
+//            messageService.findByGroupId(groupId).forEach(msg -> {
+//                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
+//            });
+//            return messageDTOS;
+//        }
+//        return null;
+//    }
 
     @GetMapping(value = "/fetch")
     public UserDTO fetchInformation(HttpServletRequest request) {

@@ -3,11 +3,14 @@ package com.mercure.controller;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.UserDTO;
+import com.mercure.entity.FileEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.service.GroupService;
 import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
+import com.mercure.utils.FileNameGenerator;
 import com.mercure.utils.JwtUtil;
+import com.mercure.utils.MessageTypeEnum;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -24,8 +27,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.socket.BinaryMessage;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +55,9 @@ public class WsController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private FileNameGenerator fileNameGenerator;
 
     @GetMapping
     public String testRoute(HttpServletRequest request) {
@@ -89,16 +98,37 @@ public class WsController {
      * @param messageDTO the payload received
      * @return a messageDTO with all informations
      */
-    @MessageMapping("/message/{userId}/group/{groupUrl}")
+    @MessageMapping("/message/text/{userId}/group/{groupUrl}")
     @SendTo("/topic/{groupUrl}")
     public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) {
         int groupId = groupService.findGroupByUrl(groupUrl);
-        MessageEntity messageEntity = new MessageEntity(userId, groupId, messageDTO.getMessage());
+        MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), messageDTO.getMessage());
         MessageEntity msg = messageService.save(messageEntity);
         NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
-        List<Integer> toSend = messageService.createNotificationList(groupUrl);
+        List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
         toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
-        return messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+        return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+    }
+
+
+    @MessageMapping("/message/blob/{userId}/group/{groupUrl}")
+    @SendTo("/topic/{groupUrl}")
+    public MessageDTO wsBinaryMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, byte[] binaryMessage) {
+        int groupId = groupService.findGroupByUrl(groupUrl);
+//        byte[] blob = binaryMessage.getPayload().array();
+        String fileName = fileNameGenerator.nextString();
+        MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.FILE.toString(), "text");
+        MessageEntity msg = messageService.save(messageEntity);
+
+        FileEntity fileEntity = new FileEntity();
+        fileEntity.setData(binaryMessage);
+        fileEntity.setFilename(fileName);
+        fileEntity.setMessageId(msg.getId());
+
+        NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
+        List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
+        toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
+        return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
     }
 
     /**
@@ -114,7 +144,7 @@ public class WsController {
             List<MessageDTO> messageDTOS = new ArrayList<>();
             int groupId = groupService.findGroupByUrl(url);
             messageService.findByGroupId(groupId).forEach(msg -> {
-                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
+                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
             });
             return messageDTOS;
         }

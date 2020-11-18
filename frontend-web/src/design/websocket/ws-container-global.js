@@ -8,6 +8,7 @@ import {buildUserToken, getUserToken} from "../../config/user-token";
 import {generateColorMode} from "../style/enable-dark-mode";
 import AuthService from "../../service/auth-service";
 import {playNotificationSound} from "../../config/play-sound-notification";
+import {MessageTypeEnum} from "../../utils/type-message-enum";
 
 
 let client = null;
@@ -24,6 +25,8 @@ class WsContainerGlobal extends Component {
             ws: null
         };
         this.updateLastMessageInGroups = this.updateLastMessageInGroups.bind(this);
+        this.updateGroupsWithLastMessageSent = this.updateGroupsWithLastMessageSent.bind(this);
+        this.updateGroupWhenUserSendMessage = this.updateGroupWhenUserSendMessage.bind(this);
     }
 
     /**
@@ -41,6 +44,45 @@ class WsContainerGlobal extends Component {
         this.setState({groups: groupsArray}, () => {
             playNotificationSound();
         });
+    }
+
+    /**
+     *
+     * @param groupUrl
+     * @param message
+     * @param type
+     */
+    updateGroupWhenUserSendMessage(groupUrl, message, type) {
+        let groupToUpdateIndex = this.state.groups.findIndex(elt => elt.url === groupUrl)
+        let groupsArray = [...this.state.groups];
+        let item = {...groupsArray[groupToUpdateIndex]};
+        switch (type) {
+            case MessageTypeEnum.text:
+                item.lastMessage = "You : " + message;
+                break
+            case MessageTypeEnum.image:
+                item.lastMessage = "You send a image to the conversation";
+                break;
+            default:
+                throw new Error("Group update failed");
+        }
+        item.lastMessageDate = new Date().getHours() + ":" + new Date().getMinutes();
+        item.lastMessageSeen = false;
+        groupsArray[groupToUpdateIndex] = item;
+        this.setState({groups: groupsArray});
+        // No sound played
+    }
+
+    updateGroupsWithLastMessageSent(groupUrl) {
+        let groupToPlaceInFirstPosition = this.state.groups.findIndex(elt => elt.url === groupUrl);
+        if (groupToPlaceInFirstPosition === 0) {
+            return
+        }
+        let groupsArray = [...this.state.groups];
+        let item = {...groupsArray[groupToPlaceInFirstPosition]};
+        groupsArray.splice(groupToPlaceInFirstPosition, 1);
+        groupsArray.unshift(item);
+        this.setState({groups: groupsArray});
     }
 
     connect() {
@@ -66,10 +108,6 @@ class WsContainerGlobal extends Component {
             console.log('Broker reported error: ' + frame.headers['message']);
             console.log('Additional details: ' + frame.body);
         };
-
-        client.onDisconnect((fr) => {
-            console.log(fr)
-        })
         client.activate();
     }
 
@@ -94,11 +132,9 @@ class WsContainerGlobal extends Component {
 
     componentWillUnmount() {
         if (client !== null || undefined) {
-            console.log("CLOSING WEBSOCKET")
             client.deactivate();
         }
     }
-
 
     render() {
         return (
@@ -114,8 +150,11 @@ class WsContainerGlobal extends Component {
                                     isDarkModeEnable={this.props.isDarkModeEnable}
                                     activate={this.activate}
                                     userId={this.state.userId}
-                                    groupUrl={this.state.groupUrl}/>
+                                    groupUrl={this.state.groupUrl}
+                                    updateGroupWhenUserSendMessage={this.updateGroupWhenUserSendMessage}
+                                    updateGroupsArrayOnMessage={this.updateGroupsWithLastMessageSent}/>
                 <SidebarGroupActions ws={this.state.ws}
+                                     userId={this.state.userId}
                                      isDarkModeEnable={this.props.isDarkModeEnable}
                                      activate={this.activate}
                                      groupUrl={this.state.groupUrl}/>

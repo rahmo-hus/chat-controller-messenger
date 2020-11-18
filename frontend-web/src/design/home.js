@@ -13,9 +13,6 @@ class HomePage extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props.location)
-        console.log(this.props.location.openToaster)
-        console.log(this.props.location.text)
         if (this.props.location !== undefined && this.props.location.openToaster) {
             this.setState({
                 openToaster: true,

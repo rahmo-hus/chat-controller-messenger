@@ -7,4 +7,5 @@
     <include file="/db/changelog/createGroupTable.xml"/>
     <include file="/db/changelog/createJoinTableUserGroup.xml"/>
     <include file="/db/changelog/createMessageWsTable.xml"/>
+    <include file="/db/changelog/createFileBlobTable.xml"/>
 </databaseChangeLog>

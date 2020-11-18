@@ -40,23 +40,23 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage data) throws ParseException {
         log.info("Handling text message ....");
-        JSONParser parser = new JSONParser();
-        JSONObject request = (JSONObject) parser.parse(data.getPayload());
-        Long userIdTemp = (Long) request.get("userId");
-        Long groupIdTemp = (Long) request.get("groupId");
-        MessageEntity msg = messageService.createAndSaveMessage(userIdTemp.intValue(), groupIdTemp.intValue(), (String) request.get("message"));
-        MessageDTO messageDTO = messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("id", messageDTO.getId());
-        jsonObject.addProperty("message", messageDTO.getMessage());
-        jsonObject.addProperty("userId", messageDTO.getUserId());
-        jsonObject.addProperty("groupId", messageDTO.getGroupId());
-        jsonObject.addProperty("sender", messageDTO.getSender());
-        jsonObject.addProperty("time", messageDTO.getTime());
-        jsonObject.addProperty("initials", messageDTO.getInitials());
-        jsonObject.addProperty("color", messageDTO.getColor());
-        TextMessage textMessage = new TextMessage(jsonObject.toString());
-        sendToAllUsers(textMessage);
+//        JSONParser parser = new JSONParser();
+//        JSONObject request = (JSONObject) parser.parse(data.getPayload());
+//        Long userIdTemp = (Long) request.get("userId");
+//        Long groupIdTemp = (Long) request.get("groupId");
+//        MessageEntity msg = messageService.createAndSaveMessage(userIdTemp.intValue(), groupIdTemp.intValue(), (String) request.get("message"));
+//        MessageDTO messageDTO = messageService.createMessageDTO(msg.getId(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+//        JsonObject jsonObject = new JsonObject();
+//        jsonObject.addProperty("id", messageDTO.getId());
+//        jsonObject.addProperty("message", messageDTO.getMessage());
+//        jsonObject.addProperty("userId", messageDTO.getUserId());
+//        jsonObject.addProperty("groupId", messageDTO.getGroupId());
+//        jsonObject.addProperty("sender", messageDTO.getSender());
+//        jsonObject.addProperty("time", messageDTO.getTime());
+//        jsonObject.addProperty("initials", messageDTO.getInitials());
+//        jsonObject.addProperty("color", messageDTO.getColor());
+//        TextMessage textMessage = new TextMessage(jsonObject.toString());
+//        sendToAllUsers(textMessage);
     }
 
     private void sendToAllUsers(TextMessage message) {

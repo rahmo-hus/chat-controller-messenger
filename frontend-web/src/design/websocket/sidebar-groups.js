@@ -68,7 +68,7 @@ class SidebarGroups extends Component {
         return (
             <div
                 className={"sidebar"}
-                style={{borderRight: "1px solid #C8C8C8"}}>
+                style={{borderRight: "1px solid #C8C8C8", overflowY: "scroll"}}>
                 <List>
                     {this.props.groups && this.props.groups.map(data => (
                         <ListItem className={this.styleSelectedGroup(data.url)} button key={data.id}

@@ -34,6 +34,10 @@ class Header extends Component {
 
     componentDidMount() {
         this.props.toggleDarkMode(this.state.isDarkMode);
+        this.fetchUserInformation();
+    }
+
+    fetchUserInformation() {
         AuthService.testRoute().then(r => {
             if (r.status === 200) {
                 this.setState({authenticated: true}, () => {
@@ -47,9 +51,21 @@ class Header extends Component {
         });
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.authenticated !== this.props.authenticated) {
+            if (this.props.authenticated) {
+                AuthService.testRoute().then(r => {
+                    if (r.status === 200) {
+                        this.setState({usernameLoggedIn: r.data.firstName});
+                    }
+                })
+            }
+        }
+    }
+
     logoutUser() {
         localStorage.removeItem("authorization");
-        this.setState({authenticated: false, snackBarOpened: true})
+        this.setState({authenticated: false, snackBarOpened: true, usernameLoggedIn: null})
         this.props.setUserAuthenticated(false);
         this.props.history.push({
             pathname: "/",
@@ -66,7 +82,7 @@ class Header extends Component {
                          style={{flexWrap: "wrap", boxSizing: "border-box", borderBottom: "0.5px solid #C8C8C8"}}>
                     <Typography variant="h6" style={{flexGrow: "1"}}>
                         <RouterLink className={"lnk clrcstm"} to={"/"}>
-                            Software
+                            Messenger
                         </RouterLink>
                     </Typography>
                     <nav className={"lnk clrcstm"}>
@@ -97,15 +113,6 @@ class Header extends Component {
                         }
                         {
                             this.props.authenticated &&
-                            <RouterLink className={"lnk clrcstm"} to={"#"}>
-                                <Button className={"clrcstm"} variant="outlined" onClick={this.logoutUser}
-                                        style={{margin: "8px 12px"}}>
-                                    Logout
-                                </Button>
-                            </RouterLink>
-                        }
-                        {
-                            this.props.authenticated &&
                             <RouterLink className={"lnk clrcstm"} to={"/create"}>
                                 <Button className={"clrcstm"} variant="outlined"
                                         style={{margin: "8px 12px"}}>
@@ -114,11 +121,20 @@ class Header extends Component {
                             </RouterLink>
                         }
                         {
-                            this.props.usernameLoggedIn &&
-                            <Button className={"clrcstm"} variant="outlined"
+                            this.state.usernameLoggedIn !== null &&
+                            <Button className={"clrcstm"} variant="outlined" disabled
                                     style={{margin: "8px 12px"}}>
                                 {this.state.usernameLoggedIn}
                             </Button>
+                        }
+                        {
+                            this.props.authenticated &&
+                            <RouterLink className={"lnk clrcstm"} to={"#"}>
+                                <Button className={"clrcstm"} variant="outlined" onClick={this.logoutUser}
+                                        style={{margin: "8px 12px"}}>
+                                    Logout
+                                </Button>
+                            </RouterLink>
                         }
                         <FormControlLabel
                             control={
@@ -138,7 +154,6 @@ class Header extends Component {
                 <Toaster toasterOpened={this.state.snackBarOpened} text={"You are successfully disconnected"}
                          severity={"info"}/>
             </div>
-
         )
     }
 }

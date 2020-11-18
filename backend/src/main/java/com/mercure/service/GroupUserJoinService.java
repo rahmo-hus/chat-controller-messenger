@@ -23,11 +23,19 @@ public class GroupUserJoinService {
     }
 
     public GroupUser grantUserAdminInConversation(int userIdToDelete, int groupId) {
+        return executeActionOnGroupUser(userIdToDelete, groupId, 1);
+    }
+
+    public void removeUserAdminFromConversation(int userIdToDelete, int groupId) {
+        executeActionOnGroupUser(userIdToDelete, groupId, 0);
+    }
+
+    private GroupUser executeActionOnGroupUser(int userIdToDelete, int groupId, int role) {
         GroupRoleKey groupRoleKey = new GroupRoleKey(groupId, userIdToDelete);
         Optional<GroupUser> optionalGroupUserToDelete = groupUserJoinRepository.findById(groupRoleKey);
         if (optionalGroupUserToDelete.isPresent()) {
             GroupUser groupUser = optionalGroupUserToDelete.get();
-            groupUser.setRole(1);
+            groupUser.setRole(role);
             return groupUserJoinRepository.save(groupUser);
         }
         return null;

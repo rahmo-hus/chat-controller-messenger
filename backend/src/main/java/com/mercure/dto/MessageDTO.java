@@ -5,8 +5,9 @@ public class MessageDTO {
     public MessageDTO() {
     }
 
-    public MessageDTO(int id, String message, int userId, int groupId, String sender, String time, String initials, String color) {
+    public MessageDTO(int id, String type, String message, int userId, int groupId, String sender, String time, String initials, String color) {
         this.id = id;
+        this.type = type;
         this.message = message;
         this.userId = userId;
         this.groupId = groupId;
@@ -17,6 +18,8 @@ public class MessageDTO {
     }
 
     private int id;
+
+    private String type;
 
     private String message;
 
@@ -38,6 +41,14 @@ public class MessageDTO {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getMessage() {

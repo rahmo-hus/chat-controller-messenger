@@ -1,12 +1,13 @@
 import React, {Component} from "react";
 import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import AuthService from "../../service/auth-service";
 import {generateColorMode} from "../style/enable-dark-mode";
+import CustomTextField from "../partials/custom-material-textfield";
+import {withRouter} from "react-router-dom";
 
 class CreateGroup extends Component {
     constructor(props) {
@@ -14,20 +15,33 @@ class CreateGroup extends Component {
         this.state = {
             groupName: "",
         }
-        this.groupNameConstructor = this.groupNameConstructor.bind(this);
         this.createGroup = this.createGroup.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.submitGroupCreation = this.submitGroupCreation.bind(this);
     }
 
     createGroup(event) {
         event.preventDefault();
         AuthService.createGroup(this.state.groupName).then(r => {
-            console.log(r.status)
+            this.props.history.push({
+                pathname: "/t/messages"
+            })
         }).catch(err => {
             console.log(err)
         })
     }
 
-    groupNameConstructor(event) {
+    submitGroupCreation(event) {
+        if (event.key === undefined || event.key === 'Enter') {
+            if (this.state.groupName === "") {
+                return;
+            }
+            this.createGroup(event)
+        }
+    }
+
+
+    handleChange(event) {
         let value = event.target.value;
         this.setState({groupName: value});
     }
@@ -47,17 +61,13 @@ class CreateGroup extends Component {
                     <div className={"clrcstm"}>
                         <Grid className={"clrcstm"} container spacing={2}>
                             <Grid className={"clrcstm"} item xs={12}>
-                                <TextField
-                                    id="username"
-                                    name="username"
-                                    variant="outlined"
-                                    required
-                                    value={this.state.groupName}
-                                    onChange={(event) => this.groupNameConstructor(event)}
-                                    fullWidth
-                                    label={"Username"}
-                                    autoFocus
-                                />
+                                <CustomTextField id={"createGroupMessenger"}
+                                                 label={"Type a name for your group"}
+                                                 name={"groupName"}
+                                                 handleChange={this.handleChange}
+                                                 type={"text"}
+                                                 keyUp={this.submitGroupCreation}
+                                                 isDarkModeEnable={this.props.isDarkModeEnable}/>
                             </Grid>
                             <div>
                                 <Grid item xs={12}>
@@ -81,4 +91,4 @@ class CreateGroup extends Component {
     }
 }
 
-export default CreateGroup;
+export default withRouter(CreateGroup);

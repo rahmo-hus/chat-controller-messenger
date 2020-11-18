@@ -1,6 +1,5 @@
 const userInfo = JSON.parse(localStorage.getItem("authorization"));
 export const getUserToken = () => {
-    console.log(userInfo)
     if (userInfo === null || undefined) {
         return "";
     } else {

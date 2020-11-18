@@ -49,8 +49,16 @@ class AuthService {
         return axios.get(API_URL + "user/remove/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
     }
 
+    removeAdminUserInConversation(userIdToRemove, groupId) {
+        return axios.get(API_URL + "user/remove/admin/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
+    }
+
     grantUserAdminInConversation(userIdToRemove, groupId) {
         return axios.get(API_URL + "user/grant/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
+    }
+
+    uploadFile(data) {
+        return axios.post(API_URL + "upload", data, {headers: authHeader()});
     }
 }
 
