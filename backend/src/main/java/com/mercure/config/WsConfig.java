@@ -25,7 +25,6 @@ public class WsConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        registry.addEndpoint("/messenger").setAllowedOrigins("*").withSockJS();
         registry.addEndpoint("/messenger").addInterceptors(handShakeInterceptor).setAllowedOrigins("*").withSockJS();
     }
 
@@ -33,24 +32,5 @@ public class WsConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/queue", "/topic");
         registry.setApplicationDestinationPrefixes("/app");
-    }
-
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-                if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    if (accessor.getNativeHeader("passcode") != null) {
-                        String token = Objects.requireNonNull(accessor.getNativeHeader("passcode")).get(0);
-//                        String username = jwtUtil.getUserNameFromJwtToken(token);
-//                        UserEntity user = userService.findByNameOrEmail(username, username);
-                    }
-                }
-                return message;
-            }
-        });
     }
 }

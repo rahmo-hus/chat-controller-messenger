@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query(value = "SELECT u.firstname, u.lastname FROM user u WHERE u.id = :userId", nativeQuery = true)
     String getUsernameByUserId(@Param(value = "userId") int id);
 
+    @Query(value = "SELECT u.firstname FROM user u WHERE u.wstoken = :token", nativeQuery = true)
+    String getUsernameWithWsToken(@Param(value = "token") String token);
 
     int countAllByFirstNameOrMail(String firstName, String mail);
 }

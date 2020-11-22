@@ -1,16 +1,15 @@
 package com.mercure.controller;
 
 import com.mercure.dto.JwtDTO;
-import com.mercure.dto.MessageDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.model.JwtResponseModel;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
-import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
+import com.mercure.utils.StaticVariable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -22,13 +21,14 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping(value = "/api")
 public class AuthenticationController {
 
@@ -50,34 +50,33 @@ public class AuthenticationController {
     @Autowired
     private GroupService groupService;
 
-    @Autowired
-    private MessageService messageService;
-
     @PostMapping(value = "/auth")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtDTO authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails);
-        return ResponseEntity.ok(new JwtResponseModel(token));
+        Cookie jwtAuthToken = new Cookie(StaticVariable.SECURE_COOKIE, token);
+        jwtAuthToken.setHttpOnly(true);
+        jwtAuthToken.setSecure(false);
+        jwtAuthToken.setPath("/");
+//        cookie.setDomain("http://localhost");
+//         7 days
+        jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
+        response.addCookie(jwtAuthToken);
+
+        return ResponseEntity.ok().build();
     }
 
-
-//    @PostMapping(value = "/fetchMessages")
-//    @Deprecated
-//    public List<MessageDTO> fetchGroupMessages(@RequestBody String data) throws ParseException {
-//        JSONParser jsonParser = new JSONParser();
-//        JSONObject json = (JSONObject) jsonParser.parse(data);
-//        String url = (String) json.get("id");
-//        if (url != null) {
-//            List<MessageDTO> messageDTOS = new ArrayList<>();
-//            int groupId = groupService.findGroupByUrl(url);
-//            messageService.findByGroupId(groupId).forEach(msg -> {
-//                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
-//            });
-//            return messageDTOS;
-//        }
-//        return null;
-//    }
+    @GetMapping(value = "/logout")
+    public ResponseEntity<?> fetchInformation(HttpServletResponse response) {
+        Cookie cookie = new Cookie(StaticVariable.SECURE_COOKIE, null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping(value = "/fetch")
     public UserDTO fetchInformation(HttpServletRequest request) {
@@ -106,13 +105,12 @@ public class AuthenticationController {
     }
 
     private UserEntity getUserEntity(HttpServletRequest request) {
-        String requestTokenHeader = request.getHeader("authorization");
         String username;
         String jwtToken;
         UserEntity user = new UserEntity();
-        UserDTO userDTO = new UserDTO();
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
+        Cookie cookie = WebUtils.getCookie(request, StaticVariable.SECURE_COOKIE);
+        if (cookie != null) {
+            jwtToken = cookie.getValue();
             username = jwtTokenUtil.getUserNameFromJwtToken(jwtToken);
             user = userService.findByNameOrEmail(username, username);
         }

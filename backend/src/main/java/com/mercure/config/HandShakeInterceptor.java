@@ -28,14 +28,12 @@ public class HandShakeInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        UserEntity user;
         String jwtToken = request.getURI().getQuery().substring(6);
         if (StringUtils.isEmpty(jwtToken)) {
             return false;
         }
-        String username = jwtUtil.getUserNameFromJwtToken(jwtToken);
-        user = userService.findByNameOrEmail(username, username);
-        return user != null;
+        String name = userService.findUsernameWithWsToken(jwtToken);
+        return !StringUtils.isEmpty(name);
     }
 
     @Override

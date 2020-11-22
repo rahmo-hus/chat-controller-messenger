@@ -1,6 +1,5 @@
 package com.mercure.service;
 
-import com.mercure.dto.GroupDTO;
 import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.GroupRoleKey;
@@ -8,7 +7,6 @@ import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.repository.UserRepository;
-import liquibase.pro.packaged.G;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,6 +50,10 @@ public class UserService {
         return toSend;
     }
 
+    public String findUsernameWithWsToken(String token) {
+        return userRepository.getUsernameWithWsToken(token);
+    }
+
     public UserEntity findByNameOrEmail(String str0, String str1) {
         return userRepository.getUserByFirstNameOrMail(str0, str1);
     }
@@ -82,14 +84,12 @@ public class UserService {
         return userRepository.countAllByFirstNameOrMail(firstName, mail) > 0;
     }
 
-    @Transactional
-    public List<GroupDTO> getAllGroupsByUser(String username) {
-        UserEntity userEntity = findByNameOrEmail(username, username);
-        List<GroupDTO> toReturn = new ArrayList<>();
-        userEntity.getGroupSet().forEach(group -> toReturn.add(new GroupDTO(group.getId(), group.getUrl(), group.getName())));
-        return toReturn;
-    }
 
+    /**
+     * At WebSocket init, fetch user data and map it to a {@link UserDTO}
+     * @param username string value for username
+     * @return a {@link UserDTO}
+     */
     @Transactional
     public UserDTO getUserInformation(String username) {
         UserEntity userEntity = findByNameOrEmail(username, username);

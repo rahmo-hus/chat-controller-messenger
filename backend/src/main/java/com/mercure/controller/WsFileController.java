@@ -53,9 +53,9 @@ public class WsFileController {
     /**
      * Receive file to put in DB and send it back to the group conversation
      *
-     * @param file The file to be uploaded
-     * @param userId int value for user ID sender of the message
-     * @param groupUrl string value for the group URL
+     * @param file      The file to be uploaded
+     * @param userId    int value for user ID sender of the message
+     * @param groupUrl  string value for the group URL
      * @param extension string value for the extension of the file
      * @return a {@link ResponseEntity} with HTTP code
      * @throws IOException if the file cannot be uploaded

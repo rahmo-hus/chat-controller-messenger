@@ -18,6 +18,8 @@ public class UserDTO {
 
     private String jwt;
 
+    private String wsToken;
+
     private Set<GroupDTO> groupSet;
 
     private Date expiration_date;
@@ -90,6 +92,14 @@ public class UserDTO {
 
     public void setJwt(String jwt) {
         this.jwt = jwt;
+    }
+
+    public String getWsToken() {
+        return wsToken;
+    }
+
+    public void setWsToken(String wsToken) {
+        this.wsToken = wsToken;
     }
 
     public Set<GroupDTO> getGroupSet() {

@@ -1,6 +1,5 @@
 package com.mercure.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,6 +30,9 @@ public class UserEntity implements UserDetails, Serializable {
     private String lastName;
 
     private String password;
+
+    @Column(name = "wstoken")
+    private String wsToken;
 
     private String jwt;
 
@@ -123,6 +125,14 @@ public class UserEntity implements UserDetails, Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getWsToken() {
+        return wsToken;
+    }
+
+    public void setWsToken(String wsToken) {
+        this.wsToken = wsToken;
     }
 
     public String getJwt() {

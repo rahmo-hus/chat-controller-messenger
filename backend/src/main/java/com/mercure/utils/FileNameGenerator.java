@@ -41,23 +41,14 @@ public class FileNameGenerator {
         this.buf = new char[length];
     }
 
-    /**
-     * Create an alphanumeric string generator.
-     */
     public FileNameGenerator(int length, Random random) {
         this(length, random, alphanum);
     }
 
-    /**
-     * Create an alphanumeric strings from a secure generator.
-     */
     public FileNameGenerator(int length) {
         this(length, new SecureRandom());
     }
 
-    /**
-     * Create session identifiers.
-     */
     public FileNameGenerator() {
         this(21);
     }

@@ -51,12 +51,6 @@ public class ApiController {
     @Autowired
     private GroupUserMapper groupUserMapper;
 
-    @Autowired
-    private FileService fileService;
-
-    @Autowired
-    private FileNameGenerator fileNameGenerator;
-
     @GetMapping(value = "/users/all")
     public List<LightUserDTO> fetchAllUsers() {
         return userService.fetchAllUsers();
@@ -174,6 +168,7 @@ public class ApiController {
         user.setLastName((String) json.get("lastname"));
         user.setMail((String) json.get("email"));
         user.setPassword(userService.passwordEncoder((String) json.get("password")));
+        user.setWsToken(UUID.randomUUID().toString());
         user.setRole(1);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);

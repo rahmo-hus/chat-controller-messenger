@@ -18,7 +18,7 @@ public class UserMapper {
 
     /**
      * Map a UserEntity to a UserDTO
-     * Please note the password is not sent
+     * The password is not sent
      *
      * @param userEntity the {@link UserEntity} to map
      * @return a {@link UserDTO}
@@ -33,6 +33,7 @@ public class UserMapper {
         userDTO.setFirstName(userEntity.getFirstName());
         userDTO.setLastName(userEntity.getLastName());
         userDTO.setMail(userEntity.getMail());
+        userDTO.setWsToken(userEntity.getWsToken());
         // Global role
         userDTO.setRole(userEntity.getRole());
         // Spring security mapping
