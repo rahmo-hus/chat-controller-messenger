@@ -1,5 +1,8 @@
-![React logo](src/main/resources/sample/react.png?raw=true "React logo")
-![Spring Boot logo](src/main/resources/sample/springboot.png?raw=true "Sprint boot logo")
+<div align="center">
+
+   ![React logo](assets/react.png "React logo")
+   ![Spring Boot logo](assets/springboot.png "Sprint boot logo")
+</div>
 
 # Messenger project : real time chat with ReactJS and Spring Boot
 
@@ -26,7 +29,7 @@ This web application is a project that I made myself to practice in Java and Rea
 
 ## Features
 
-![Project overview](src/main/resources/sample/messenger.jpg?raw=true "Project overview")
+![Project overview](backend/src/main/resources/sample/messenger.jpg?raw=true "Project overview")
 
 * Simple chat group application based on websocket
 * Secure user account based on Spring Security JWT
