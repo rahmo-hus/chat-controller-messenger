@@ -1,7 +1,5 @@
-<p align="center">
-<img src="https://www.metaltoad.com/sites/default/files/styles/large_personal_photo_870x500_/public/2020-05/react-js-blog-header.png" height="158">
-<img src="https://atomrace.com/blog/wp-content/uploads/2018/05/spring-boot-logo-300x158.png" height="150">
-</p>
+![React logo](src/main/resources/sample/react.png?raw=true "React logo")
+![Spring Boot logo](src/main/resources/sample/springboot.png?raw=true "Sprint boot logo")
 
 # Messenger project : real time chat with ReactJS and Spring Boot
 
