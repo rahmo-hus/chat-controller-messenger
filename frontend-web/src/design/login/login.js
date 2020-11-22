@@ -45,8 +45,10 @@ class Login extends Component {
     login(username, password) {
         console.log("Authentication in progress...");
         AuthService.authenticate(username, password).then(res => {
-            if (res.status === 200 && res.data && res.data.token) {
-                localStorage.setItem("authorization", JSON.stringify(res.data));
+            if (res.status === 200) {
+                // if (res.data && res.data.token) {
+                //     localStorage.setItem("authorization", JSON.stringify(res.data));
+                // }
                 console.log("Success");
                 this.setState({snackBarOpened: true, snackBarText: "You are connected !", severity: "info"})
                 this.props.setUserAuthenticated(true);

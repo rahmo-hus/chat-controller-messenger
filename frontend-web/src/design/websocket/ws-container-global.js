@@ -4,7 +4,6 @@ import WebSocketContainer from "./websocket-container";
 import {initWebSocket} from "../../config/websocket-config";
 import SidebarGroupActions from "./sidebar-group-actions";
 import SidebarGroups from "./sidebar-groups";
-import {buildUserToken, getUserToken} from "../../config/user-token";
 import {generateColorMode} from "../style/enable-dark-mode";
 import AuthService from "../../service/auth-service";
 import {playNotificationSound} from "../../config/play-sound-notification";
@@ -86,8 +85,7 @@ class WsContainerGlobal extends Component {
     }
 
     connect() {
-        const token = getUserToken();
-        client = initWebSocket(token);
+        client = initWebSocket(this.props.wsToken);
         this.setState({ws: client});
         client.onConnect = function (frame) {
             client.subscribe("/user/queue/reply", (res) => {
@@ -101,7 +99,8 @@ class WsContainerGlobal extends Component {
                     this.activate = !this.activate;
                 })
             });
-            client.publish({destination: "/app/message", body: buildUserToken()});
+            // client.publish({destination: "/app/message", body: buildUserToken()});
+            client.publish({destination: "/app/message", body: this.props.wsToken});
         }.bind(this);
 
         client.onStompError = function (frame) {
@@ -140,24 +139,28 @@ class WsContainerGlobal extends Component {
         return (
             <div className={generateColorMode(this.props.isDarkModeEnable)}
                  style={{height: "calc(100% - 64px)", display: "flex", justifyContent: "space-between"}}>
-                <SidebarGroups ws={this.state.ws}
-                               userId={this.state.userId}
-                               isDarkModeEnable={this.props.isDarkModeEnable}
-                               activate={this.activate}
-                               groups={this.state.groups}
-                               updateLastMessageInGroups={this.updateLastMessageInGroups}/>
-                <WebSocketContainer ws={this.state.ws}
-                                    isDarkModeEnable={this.props.isDarkModeEnable}
-                                    activate={this.activate}
-                                    userId={this.state.userId}
-                                    groupUrl={this.state.groupUrl}
-                                    updateGroupWhenUserSendMessage={this.updateGroupWhenUserSendMessage}
-                                    updateGroupsArrayOnMessage={this.updateGroupsWithLastMessageSent}/>
-                <SidebarGroupActions ws={this.state.ws}
-                                     userId={this.state.userId}
-                                     isDarkModeEnable={this.props.isDarkModeEnable}
-                                     activate={this.activate}
-                                     groupUrl={this.state.groupUrl}/>
+                {this.state.isComponentMounted &&
+                <React.Fragment>
+                    <SidebarGroups ws={this.state.ws}
+                                   userId={this.state.userId}
+                                   isDarkModeEnable={this.props.isDarkModeEnable}
+                                   activate={this.activate}
+                                   groups={this.state.groups}
+                                   updateLastMessageInGroups={this.updateLastMessageInGroups}/>
+                    <WebSocketContainer ws={this.state.ws}
+                                        isDarkModeEnable={this.props.isDarkModeEnable}
+                                        activate={this.activate}
+                                        userId={this.state.userId}
+                                        groupUrl={this.state.groupUrl}
+                                        updateGroupWhenUserSendMessage={this.updateGroupWhenUserSendMessage}
+                                        updateGroupsArrayOnMessage={this.updateGroupsWithLastMessageSent}/>
+                    <SidebarGroupActions ws={this.state.ws}
+                                         userId={this.state.userId}
+                                         isDarkModeEnable={this.props.isDarkModeEnable}
+                                         activate={this.activate}
+                                         groupUrl={this.state.groupUrl}/>
+                </React.Fragment>
+                }
             </div>
         )
     }

@@ -42,7 +42,8 @@ class Header extends Component {
             if (r.status === 200) {
                 this.setState({authenticated: true}, () => {
                     this.setState({isComponentMounted: true, usernameLoggedIn: r.data.firstName})
-                    this.props.setUserAuthenticated(true)
+                    this.props.setUserAuthenticated(true);
+                    this.props.setWsToken(r.data.wsToken);
                 });
             }
         }).catch(err => {
@@ -65,14 +66,16 @@ class Header extends Component {
 
     logoutUser() {
         localStorage.removeItem("authorization");
-        this.setState({authenticated: false, snackBarOpened: true, usernameLoggedIn: null})
-        this.props.setUserAuthenticated(false);
-        this.props.history.push({
-            pathname: "/",
-            openToaster: true,
-            text: "You have successfully logged out",
-            severity: "info"
-        });
+        AuthService.logout().then(() => {
+            this.setState({authenticated: false, snackBarOpened: true, usernameLoggedIn: null})
+            this.props.setUserAuthenticated(false);
+            this.props.history.push({
+                pathname: "/",
+                openToaster: true,
+                text: "You have successfully logged out",
+                severity: "info"
+            });
+        })
     }
 
     render() {

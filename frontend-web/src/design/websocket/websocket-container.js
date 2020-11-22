@@ -111,7 +111,6 @@ class WebSocketContainer extends Component {
         }
         const groupUrl = this.props.location.pathname.split("/").slice(-1)[0];
         let subscribeToHistory = this.props.ws.subscribe("/app/groups/get/" + groupUrl, (res) => {
-            console.log(res.body)
             this.setState({history: JSON.parse(res.body), historySubscriptionId: subscribeToHistory.id}, () => {
                 this.messagesEnd.scrollIntoView({block: "start", behavior: "auto"});
             })

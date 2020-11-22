@@ -22,11 +22,13 @@ class App extends Component {
         this.state = {
             isDarkModeEnabled: false,
             authenticated: null,
+            wsToken: null,
 
             openToaster: false
         };
         this.toggleDarkMode = this.toggleDarkMode.bind(this);
         this.setUserAuthenticated = this.setUserAuthenticated.bind(this);
+        this.setWsToken = this.setWsToken.bind(this);
     }
 
     toggleDarkMode = (value) => {
@@ -37,11 +39,19 @@ class App extends Component {
         this.setState({authenticated: value})
     }
 
+    setWsToken(value) {
+        this.setState({wsToken: value})
+    }
+
     render() {
         return (
             <Router>
-                <Header history={history} toggleDarkMode={this.toggleDarkMode} authenticated={this.state.authenticated}
-                        setUserAuthenticated={this.setUserAuthenticated}/>
+                <Header history={history} toggleDarkMode={this.toggleDarkMode}
+                        authenticated={this.state.authenticated}
+                        setUserAuthenticated={this.setUserAuthenticated}
+                        wsToken={this.state.wsToken}
+                        setWsToken={this.setWsToken}
+                />
                 <Switch>
                     <Route exact path="/" render={(props) =>
                         <HomePage
@@ -61,6 +71,7 @@ class App extends Component {
                         <WsContainerGlobal
                             {...props}
                             history={history}
+                            wsToken={this.state.wsToken}
                             isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
@@ -68,6 +79,7 @@ class App extends Component {
                         <WsContainerGlobal
                             {...props}
                             history={history}
+                            wsToken={this.state.wsToken}
                             isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
