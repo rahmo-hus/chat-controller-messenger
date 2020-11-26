@@ -46,7 +46,7 @@ class AuthService {
     }
 
     createUser(firstname, lastname, email, password) {
-        return axios.post(API_URL + "user/register", {
+        return instance.post(API_URL + "user/register", {
             firstname: firstname,
             lastname: lastname,
             email: email,
@@ -55,19 +55,20 @@ class AuthService {
     }
 
     removeUserFromConversation(userIdToRemove, groupId) {
-        return axios.get(API_URL + "user/remove/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
+        return instance.get(API_URL + "user/remove/" + userIdToRemove + "/group/" + groupId);
     }
 
     removeAdminUserInConversation(userIdToRemove, groupId) {
-        return axios.get(API_URL + "user/remove/admin/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
+        return instance.get(API_URL + "user/remove/admin/" + userIdToRemove + "/group/" + groupId);
     }
 
     grantUserAdminInConversation(userIdToRemove, groupId) {
-        return axios.get(API_URL + "user/grant/" + userIdToRemove + "/group/" + groupId, {headers: authHeader()});
+        return instance.get(API_URL + "user/grant/" + userIdToRemove + "/group/" + groupId);
     }
 
     uploadFile(data) {
-        return axios.post(API_URL + "upload", data, {headers: authHeader()});
+        console.log("Call axios post")
+        return instance.post(API_URL + "upload", data);
     }
 }
 

@@ -3,9 +3,9 @@ import {Link as RouterLink, withRouter} from "react-router-dom"
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import AuthService from "../../service/auth-service";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import AuthService from "../../service/auth-service";
 import {generateColorMode} from "../style/enable-dark-mode";
 import Toaster from "../utils/toaster";
 
@@ -13,8 +13,9 @@ class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            usernameLoggedIn: null,
             isDarkMode: true,
+
+            usernameLoggedIn: null,
             authenticated: null,
             isComponentMounted: false,
             snackBarOpened: false,
@@ -65,7 +66,6 @@ class Header extends Component {
     }
 
     logoutUser() {
-        localStorage.removeItem("authorization");
         AuthService.logout().then(() => {
             this.setState({authenticated: false, snackBarOpened: true, usernameLoggedIn: null})
             this.props.setUserAuthenticated(false);
@@ -152,6 +152,7 @@ class Header extends Component {
                                 this.state.isDarkMode ? "Dark " : "Light"
                             }
                         />
+
                     </nav>
                 </Toolbar>
                 <Toaster toasterOpened={this.state.snackBarOpened} text={"You are successfully disconnected"}

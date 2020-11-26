@@ -3,14 +3,10 @@ package com.mercure.config;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.WebUtils;
@@ -55,6 +51,8 @@ public class JwtWebConfig extends OncePerRequestFilter {
                 return;
             }
         }
+        response.setHeader("Access-Control-Allow-Origin", "http://192.168.1.2");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         filterChain.doFilter(request, response);
     }
 }

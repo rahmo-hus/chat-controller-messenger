@@ -5,6 +5,8 @@ import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.UserEntity;
 import com.mercure.utils.ComparatorListGroupDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,8 @@ import java.util.*;
 
 @Service
 public class UserMapper {
+
+    private Logger log = LoggerFactory.getLogger(UserMapper.class);
 
     @Autowired
     private GroupMapper groupMapper;
@@ -44,7 +48,6 @@ public class UserMapper {
         userDTO.setExpiration_date(userEntity.getExpiration_date());
         userDTO.setJwt(userEntity.getJwt());
         userDTO.setAuthorities(userEntity.getAuthorities());
-
         userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(userEntity.getId(), groupEntity)));
         List<GroupDTO> sortedList = new ArrayList<>(groupEntitySet);
         sortedList.sort(new ComparatorListGroupDTO());

@@ -29,9 +29,10 @@ This web application is a project that I made myself to practice in Java and Rea
 
 ## Features
 
-![Project overview](backend/src/main/resources/sample/messenger.jpg?raw=true "Project overview")
+![Project overview](assets/messenger.jpg?raw=true "Project overview")
 
 * Simple chat group application based on websocket
+* Send images
 * Secure user account based on Spring Security JWT
 * Room discussion with STOMP and SockJS
 * Chat group administrators

@@ -11,9 +11,6 @@ import com.mercure.service.UserService;
 import com.mercure.utils.FileNameGenerator;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.MessageTypeEnum;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +24,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.socket.BinaryMessage;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,12 +115,11 @@ public class WsController {
     @Deprecated
     public MessageDTO wsBinaryMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, byte[] binaryMessage) {
         int groupId = groupService.findGroupByUrl(groupUrl);
-        String fileName = fileNameGenerator.nextString();
+        String fileName = fileNameGenerator.getRandomString();
         MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.FILE.toString(), "text");
         MessageEntity msg = messageService.save(messageEntity);
 
         FileEntity fileEntity = new FileEntity();
-        fileEntity.setData(binaryMessage);
         fileEntity.setFilename(fileName);
         fileEntity.setMessageId(msg.getId());
 

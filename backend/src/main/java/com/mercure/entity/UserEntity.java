@@ -36,7 +36,8 @@ public class UserEntity implements UserDetails, Serializable {
 
     private String jwt;
 
-    @ManyToMany(mappedBy = "userEntities", fetch = FetchType.LAZY)
+    //    @ManyToMany(mappedBy = "userEntities", fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userEntities", cascade = CascadeType.ALL)
     private Set<GroupEntity> groupSet = new HashSet<>();
 
     @OneToMany(mappedBy = "groupMapping")

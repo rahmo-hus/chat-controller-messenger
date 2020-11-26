@@ -4,7 +4,6 @@ import com.mercure.dto.JwtDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
-import com.mercure.model.JwtResponseModel;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
 import com.mercure.service.UserService;
@@ -28,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(allowCredentials = "true")
 @RequestMapping(value = "/api")
 public class AuthenticationController {
 

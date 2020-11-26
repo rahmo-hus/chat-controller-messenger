@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 public class FileEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
 
     @Column(name = "fk_message_id")
@@ -20,10 +21,6 @@ public class FileEntity {
 
     @Column(name = "url")
     private String url;
-
-    @Lob
-    @Column(name = "data")
-    private byte[] data;
 
     @Column(name = "created_at")
     @CreationTimestamp
@@ -59,14 +56,6 @@ public class FileEntity {
 
     public void setFilename(String filename) {
         this.filename = filename;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 
     public Timestamp getCreatedAt() {

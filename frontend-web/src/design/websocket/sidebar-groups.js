@@ -4,8 +4,10 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 import Avatar from "@material-ui/core/Avatar";
 import FolderIcon from "@material-ui/icons/Folder";
-import {withRouter} from "react-router-dom";
-import {generateColorMode} from "../style/enable-dark-mode";
+import ErrorIcon from '@material-ui/icons/Error';
+import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
+import {Link, withRouter} from "react-router-dom";
+import {generateColorMode, generateLinkColorMode} from "../style/enable-dark-mode";
 import "./websocketStyle.css";
 
 let groupEventListener = null;
@@ -69,6 +71,28 @@ class SidebarGroups extends Component {
             <div
                 className={"sidebar"}
                 style={{borderRight: "1px solid #C8C8C8", overflowY: "scroll"}}>
+                {
+                    this.props.location.noGroups &&
+                    <div
+                        className={generateColorMode(this.props.isDarkModeEnable)}
+                        style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        textAlign: "center",
+                        marginTop: "20px"
+                    }}>
+                        <ErrorIcon fontSize={"large"}/>
+                        <h4>
+                            You don't have a group yet !
+                        </h4>
+                        <div style={{display: "flex"}}>
+                            <ArrowRightAltIcon/>
+                            <Link style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}} className={"lnk"}
+                                  to={"/create"}>Create group</Link>
+                        </div>
+                    </div>
+                }
                 <List>
                     {this.props.groups && this.props.groups.map(data => (
                         <ListItem className={this.styleSelectedGroup(data.url)} button key={data.id}

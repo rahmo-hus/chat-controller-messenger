@@ -10,6 +10,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import {MessageTypeEnum} from "../../utils/type-message-enum";
 import CustomTextField from "../partials/custom-material-textfield";
 import AuthService from "../../service/auth-service";
+import ImagePreview from "../partials/image-preview";
 
 class WebSocketContainer extends Component {
     constructor(props) {
@@ -27,13 +28,15 @@ class WebSocketContainer extends Component {
             file: "",
             imagePreviewUrl: "",
             binaryData: null,
-            imageLoaded: false
+            imageLoaded: false,
+            imgSrc: null
         };
         this.handleChange = this.handleChange.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.receiveMessage = this.receiveMessage.bind(this);
         this.resetImageBuffer = this.resetImageBuffer.bind(this);
         this.submitMessage = this.submitMessage.bind(this);
+        this.handleImagePreview = this.handleImagePreview.bind(this);
     }
 
     handleChange(event) {
@@ -64,9 +67,8 @@ class WebSocketContainer extends Component {
             formData.append("file", this.state.file)
             formData.append("userId", this.props.userId)
             formData.append("groupUrl", this.props.groupUrl)
-            formData.append("extension", ".jpg")
             AuthService.uploadFile(formData).then(r => {
-                // console.log(r.data)
+            }).catch(err => {
             })
             this.props.updateGroupWhenUserSendMessage(this.props.location.groupId, this.state.message, MessageTypeEnum.image);
             // this.props.ws.publish({
@@ -131,19 +133,6 @@ class WebSocketContainer extends Component {
         let reader = new FileReader();
         let file = event.target.files[0];
         reader.readAsDataURL(file)
-        // reader.readAsArrayBuffer(file);
-        // reader.onloadend = (evt) => {
-        //     if (evt.target.readyState === FileReader.DONE) {
-        //         let arrayBuffer = evt.target.result;
-        //         let array = new Uint8Array(arrayBuffer);
-        //         for (let i = 0; i < array.length; i) {
-        //             fileByteArray.push(array[i]);
-        //         }
-        //     }
-        //     this.setState({binaryData: fileByteArray}, () => {
-        //         console.log(this.state.binaryData)
-        //     });
-        // }
 
         reader.onload = (e) => {
             if (e.target.readyState === FileReader.DONE) {
@@ -158,12 +147,15 @@ class WebSocketContainer extends Component {
 
     generateImageRender(message) {
         const data = JSON.parse(message);
-        console.log(data.url)
         if (data.url === undefined) {
             return null;
         }
-        return <img src={"http://localhost:9090/images" + data.url} height={"200px"} alt={data.name}
-                    style={{border: "1px solid #c8c8c8", borderRadius: "8%"}}/>
+        return (
+            <div>
+                <img src={data.url} height={"200px"} alt={data.name}
+                     onClick={event => this.handleImagePreview(event, "OPEN", data.url)}
+                     style={{border: "1px solid #c8c8c8", borderRadius: "7%"}}/>
+            </div>)
     }
 
     resetImageBuffer(event) {
@@ -178,6 +170,20 @@ class WebSocketContainer extends Component {
         }
     }
 
+    handleImagePreview(event, action, src) {
+        event.preventDefault();
+        switch (action) {
+            case "OPEN":
+                this.setState({imgSrc: src, displayImagePreview: true});
+                break;
+            case "CLOSE":
+                this.setState({displayImagePreview: false})
+                break;
+            default:
+                throw new Error("handleImagePreview failed");
+        }
+    }
+
     render() {
         return (
             <div style={{display: "flex", flex: "1", flexDirection: "column"}}>
@@ -187,6 +193,11 @@ class WebSocketContainer extends Component {
                     height: "calc(100% - 56px)",
                     overflowY: "scroll"
                 }}>
+                    <ImagePreview displayImagePreview={this.state.displayImagePreview}
+                                  changeDisplayImagePreview={this.handleImagePreview}
+                                  isDarkModeEnable={this.props.isDarkModeEnable}
+                                  imgSrc={this.state.imgSrc}
+                    />
                     {this.state.history && this.state.history.map((val, index, array) => (
                         <Tooltip
                             key={index}

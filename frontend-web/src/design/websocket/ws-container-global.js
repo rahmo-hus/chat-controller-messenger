@@ -90,14 +90,21 @@ class WsContainerGlobal extends Component {
         client.onConnect = function (frame) {
             client.subscribe("/user/queue/reply", (res) => {
                 const data = JSON.parse(res.body);
-                this.setState({groups: data.groupSet, userId: data.id, groupUrl: data.groupSet[0].url}, () => {
+                if (data.groupSet[0] === undefined) {
                     this.props.history.push({
-                        pathname: `/t/messages/${this.state.groups[0].url}`,
-                        groupUrl: this.state.groupUrl,
-                        userId: this.state.userId
+                        pathname: "/t/messages/",
+                        noGroups: true
                     });
-                    this.activate = !this.activate;
-                })
+                } else {
+                    this.setState({groups: data.groupSet, userId: data.id, groupUrl: data.groupSet[0].url}, () => {
+                        this.props.history.push({
+                            pathname: `/t/messages/${this.state.groups[0].url}`,
+                            groupUrl: this.state.groupUrl,
+                            userId: this.state.userId
+                        });
+                        this.activate = !this.activate;
+                    })
+                }
             });
             // client.publish({destination: "/app/message", body: buildUserToken()});
             client.publish({destination: "/app/message", body: this.props.wsToken});
