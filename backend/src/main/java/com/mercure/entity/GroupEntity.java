@@ -41,7 +41,7 @@ public class GroupEntity implements Serializable {
     @JsonIgnore
     private Set<UserEntity> userEntities = new HashSet<>();
 
-    @OneToMany(mappedBy = "groupMapping")
+    @OneToMany(mappedBy = "groupMapping", fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<GroupUser> groupUsers = new HashSet<>();
 

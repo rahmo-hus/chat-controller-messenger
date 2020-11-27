@@ -48,7 +48,7 @@ public class UserMapper {
         userDTO.setExpiration_date(userEntity.getExpiration_date());
         userDTO.setJwt(userEntity.getJwt());
         userDTO.setAuthorities(userEntity.getAuthorities());
-        userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(userEntity.getId(), groupEntity)));
+        userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(groupEntity)));
         List<GroupDTO> sortedList = new ArrayList<>(groupEntitySet);
         sortedList.sort(new ComparatorListGroupDTO());
         userDTO.setGroupSet(groupEntitySet);

@@ -17,7 +17,7 @@ public class GroupMapper {
     @Autowired
     private MessageService messageService;
 
-    public GroupDTO toGroupDTO(int fromUserId, GroupEntity grp) {
+    public GroupDTO toGroupDTO(GroupEntity grp) {
         GroupDTO grpDTO = new GroupDTO();
         grpDTO.setId(grp.getId());
         grpDTO.setName(grp.getName());

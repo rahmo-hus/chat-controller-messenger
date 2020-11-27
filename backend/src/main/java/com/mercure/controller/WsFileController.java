@@ -18,7 +18,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -56,7 +55,6 @@ public class WsFileController {
         FileEntity fileEntity = new FileEntity();
         int groupId = groupService.findGroupByUrl(groupUrl);
         MessageEntity messageEntity = messageService.createAndSaveMessage(userId, groupId, MessageTypeEnum.FILE.toString(), "file");
-//        messageService.flush();
         storageService.store(file, messageEntity.getId());
         try {
             NotificationDTO notificationDTO = messageService.createNotificationDTO(messageEntity);

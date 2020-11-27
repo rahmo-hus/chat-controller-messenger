@@ -36,11 +36,10 @@ public class UserEntity implements UserDetails, Serializable {
 
     private String jwt;
 
-    //    @ManyToMany(mappedBy = "userEntities", fetch = FetchType.LAZY)
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userEntities", cascade = CascadeType.ALL)
     private Set<GroupEntity> groupSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "groupMapping")
+    @OneToMany(mappedBy = "groupMapping",fetch = FetchType.EAGER)
     private Set<GroupUser> groupUsers = new HashSet<>();
 
     @Column(name = "expiration_date")

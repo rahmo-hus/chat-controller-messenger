@@ -27,8 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@CrossOrigin(allowCredentials = "true")
 @RequestMapping(value = "/api")
+@CrossOrigin(allowCredentials = "true")
 public class AuthenticationController {
 
     @Autowired

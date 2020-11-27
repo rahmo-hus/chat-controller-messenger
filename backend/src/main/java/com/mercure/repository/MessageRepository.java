@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<MessageEntity, Integer> {
 
-
     @Query(value = "SELECT * FROM message m WHERE m.msg_group_id = :id", nativeQuery = true)
     List<MessageEntity> findAllByGroupId(@Param(value = "id") int id);
 

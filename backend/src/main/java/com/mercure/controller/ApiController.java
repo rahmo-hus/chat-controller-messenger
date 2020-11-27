@@ -11,6 +11,7 @@ import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
+import com.mercure.utils.StaticVariable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -20,7 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -113,16 +116,25 @@ public class ApiController {
         return doUserAction(request, userId, groupUrl, "removeAdmin");
     }
 
+    @GetMapping(value = "/user/leave/{userId}/group/{groupUrl}")
+    public ResponseEntity<?> leaveConversation(HttpServletRequest request, @PathVariable Integer userId, @PathVariable String groupUrl) {
+        return doUserAction(request, userId, groupUrl, "removeUser");
+    }
+
     private ResponseEntity<?> doUserAction(HttpServletRequest request, Integer userId, String groupUrl, String action) {
-        String requestTokenHeader = request.getHeader("authorization");
-        if (StringUtils.isEmpty(requestTokenHeader)) {
+        Cookie cookie = WebUtils.getCookie(request, StaticVariable.SECURE_COOKIE);
+        if (cookie == null) {
             return ResponseEntity.status(401).build();
         }
-        String username = jwtUtil.getUserNameFromJwtToken(requestTokenHeader.substring(7));
+        String cookieToken = cookie.getValue();
+        String username = jwtUtil.getUserNameFromJwtToken(cookieToken);
         int groupId = groupService.findGroupByUrl(groupUrl);
         UserEntity userEntity = userService.findByNameOrEmail(username, username);
         if (userEntity != null) {
             int adminUserId = userEntity.getId();
+            if (action.equals("removeUser")) {
+                groupUserJoinService.removeUserFromConversation(userId, groupId);
+            }
             if (userService.checkIfUserHasRightToDelete(adminUserId, groupId)) {
                 try {
                     if (action.equals("grant")) {
@@ -141,7 +153,7 @@ public class ApiController {
                 }
             }
         }
-        return null;
+        return ResponseEntity.status(401).build();
     }
 
 
@@ -173,8 +185,8 @@ public class ApiController {
         user.setCredentialsNonExpired(true);
         user.setEnabled(true);
         try {
-            log.info("User saved successfully");
             userService.save(user);
+            log.info("User saved successfully");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Error while registering user : {}", e.getMessage());

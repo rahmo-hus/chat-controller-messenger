@@ -76,7 +76,9 @@ class RegisterForm extends Component {
             }).catch(e => {
                 console.log(e.response)
                 console.log("Error during registration : ", e.message)
-                this.errorArray.push(e.response.data);
+                if (e.response !== undefined) {
+                    this.errorArray.push(e.response.data);
+                }
                 this.setState({displayFormValidationError: true})
 
             })

@@ -24,7 +24,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="varchar(255)"/>
-            <!-- Use these columns to active account with email -->
+
             <column name="jwt" type="varchar(255)"/>
             <column name="expiration_date" type="datetime"/>
 

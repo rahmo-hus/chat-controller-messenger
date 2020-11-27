@@ -39,6 +39,7 @@ public class UserService {
         userRepository.flush();
     }
 
+    @Transactional
     public void save(UserEntity userEntity) {
         userRepository.save(userEntity);
     }

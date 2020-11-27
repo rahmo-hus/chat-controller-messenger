@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Class used to fill the database on startup
+ * Uncomment @Service annotation to enable CommandLineRunner
+ */
 //@Service
 public class DbInit implements CommandLineRunner {
 

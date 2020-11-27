@@ -1,6 +1,5 @@
 import axios from 'axios';
 import JwtModel from "../model/jwt-model";
-import authHeader from "./AuthConstructorService";
 
 const API_URL = process.env.NODE_ENV === "development" ? 'http://localhost:9090/api/' : "http://192.168.1.2:9090/api/";
 
@@ -29,20 +28,19 @@ class AuthService {
     }
 
     fetchMessages(id) {
-        return axios.post(API_URL + "fetchMessages", {id: id}, {headers: authHeader()})
+        return instance.post(API_URL + "fetchMessages", {id: id})
     }
 
     addUserToGroup(userId, groupUrl) {
-        return axios.get(API_URL + "user/add/" + userId + "/" + groupUrl, {headers: authHeader()})
+        return instance.get(API_URL + "user/add/" + userId + "/" + groupUrl)
     }
 
     fetchAllUsers() {
-        return axios.get(API_URL + "users/all", {headers: authHeader()})
+        return instance.get(API_URL + "users/all")
     }
 
-
     fetchAllUsersInConversation(groupId) {
-        return axios.post(API_URL + "users/group/all", {groupUrl: groupId}, {headers: authHeader()})
+        return instance.post(API_URL + "users/group/all", {groupUrl: groupId})
     }
 
     createUser(firstname, lastname, email, password) {
@@ -52,6 +50,10 @@ class AuthService {
             email: email,
             password: password
         })
+    }
+
+    leaveConversation(userIdToRemove, groupId) {
+        return instance.get(API_URL + "user/leave/" + userIdToRemove + "/group/" + groupId);
     }
 
     removeUserFromConversation(userIdToRemove, groupId) {

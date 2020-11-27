@@ -51,8 +51,11 @@ public class JwtWebConfig extends OncePerRequestFilter {
                 return;
             }
         }
-        response.setHeader("Access-Control-Allow-Origin", "http://192.168.1.2");
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
         filterChain.doFilter(request, response);
     }
 }
