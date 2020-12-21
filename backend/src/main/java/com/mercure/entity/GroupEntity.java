@@ -2,6 +2,7 @@ package com.mercure.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mercure.utils.GroupTypeEnum;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -32,6 +33,10 @@ public class GroupEntity implements Serializable {
     private String name;
 
     private String url;
+
+    @Column(name = "type")
+    @Enumerated(value = EnumType.STRING)
+    private GroupTypeEnum groupTypeEnum;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -67,6 +72,14 @@ public class GroupEntity implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public GroupTypeEnum getGroupTypeEnum() {
+        return groupTypeEnum;
+    }
+
+    public void setGroupTypeEnum(GroupTypeEnum groupTypeEnum) {
+        this.groupTypeEnum = groupTypeEnum;
     }
 
     public Set<UserEntity> getUserEntities() {

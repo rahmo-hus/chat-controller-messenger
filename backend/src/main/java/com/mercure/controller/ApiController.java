@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
@@ -174,10 +173,13 @@ public class ApiController {
             return ResponseEntity.badRequest().body("Username or mail already used, please try again");
         }
         UserEntity user = new UserEntity();
-        user.setFirstName((String) json.get("firstname"));
-        user.setLastName((String) json.get("lastname"));
+        String firstName = (String) json.get("firstname");
+        String lastName = (String) json.get("lastname");
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setMail((String) json.get("email"));
         user.setPassword(userService.passwordEncoder((String) json.get("password")));
+        user.setShortUrl(userService.createShortUrl(firstName, lastName));
         user.setWsToken(UUID.randomUUID().toString());
         user.setRole(1);
         user.setAccountNonExpired(true);

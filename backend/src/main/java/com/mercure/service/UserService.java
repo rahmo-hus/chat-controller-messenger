@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +70,23 @@ public class UserService {
         return false;
     }
 
+    public String createShortUrl(String firstName, String lastName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(firstName);
+        sb.append(".");
+        sb.append(Normalizer.normalize(lastName.toLowerCase(), Normalizer.Form.NFD));
+        boolean isShortUrlAvailable = true;
+        int counter = 0;
+        while (isShortUrlAvailable) {
+            sb.append(counter);
+            if (userRepository.countAllByShortUrl(sb.toString()) == 0) {
+                isShortUrlAvailable = false;
+            }
+            counter++;
+        }
+        return sb.toString();
+    }
+
     public String findUsernameById(int id) {
         return userRepository.getUsernameByUserId(id);
     }
@@ -88,6 +106,7 @@ public class UserService {
 
     /**
      * At WebSocket init, fetch user data and map it to a {@link UserDTO}
+     *
      * @param username string value for username
      * @return a {@link UserDTO}
      */

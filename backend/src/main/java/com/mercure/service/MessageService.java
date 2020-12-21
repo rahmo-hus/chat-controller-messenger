@@ -31,8 +31,12 @@ public class MessageService {
     @Autowired
     private FileService fileService;
 
-    private static final String[] colorsArray = {"#FFC194", "#D2FF94", "#9DFF9", "#94FFC1",
-            "#94FFF7", "#FFAFFA", "#FFAFD2", "#FFB4AF", "#FFDCAF", "#FAFFAF", "#D2FFAF"};
+    private static final String[] colorsArray =
+            {
+                    "#FFC194", "#D2FF94", "#9DFF9", "#94FFC1",
+                    "#94FFF7", "#FFAFFA", "#FFAFD2", "#FFB4AF",
+                    "#FFDCAF", "#FAFFAF", "#D2FFAF"
+            };
 
     private static final Map<Integer, String> colors = new HashMap<>();
 

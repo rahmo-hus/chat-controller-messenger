@@ -8,6 +8,7 @@ import com.mercure.entity.MessageEntity;
 import com.mercure.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 
@@ -22,6 +23,7 @@ public class GroupMapper {
         grpDTO.setId(grp.getId());
         grpDTO.setName(grp.getName());
         grpDTO.setUrl(grp.getUrl());
+        grpDTO.setGroupType(grp.getGroupTypeEnum().toString());
         MessageEntity msg = messageService.findLastMessage(grp.getId());
         if (msg != null) {
             grpDTO.setLastMessage(msg.getMessage());
