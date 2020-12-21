@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
 import './App.css';
 import {createBrowserHistory} from 'history';
-import Header from "./design/partials/header";
 import {
     BrowserRouter as Router,
     Switch,
     Route
 } from "react-router-dom";
-import Login from "./design/login/login";
-import CreateGroup from "./design/groups/create-group";
 import WsContainerGlobal from "./design/websocket/ws-container-global";
 import RegisterForm from "./design/register/register-user";
-import HomePage from "./design/home";
+import CallWindow from "./design/call/call-window";
+import HeaderContainer from "./container/header-container";
+import HomeContainer from "./container/home-container";
+import LoginContainer from "./container/login-container";
+import CreateGroupContainer from "./container/create-group-container";
+import WebSocketMainContainer from "./container/websocket-main-container";
 
 
 const history = createBrowserHistory();
@@ -46,35 +48,24 @@ class App extends Component {
     render() {
         return (
             <Router>
-                <Header history={history} toggleDarkMode={this.toggleDarkMode}
-                        authenticated={this.state.authenticated}
-                        setUserAuthenticated={this.setUserAuthenticated}
-                        wsToken={this.state.wsToken}
-                        setWsToken={this.setWsToken}
-                />
+                <HeaderContainer/>
                 <Switch>
                     <Route exact path="/" render={(props) =>
-                        <HomePage
+                        <HomeContainer
                             {...props}
-                            history={history}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
                     <Route exact path="/create" render={(props) =>
-                        <CreateGroup
+                        <CreateGroupContainer
                             {...props}
-                            history={history}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
                     <Route exact path="/t/messages" render={(props) =>
-                        <WsContainerGlobal
+                        <WebSocketMainContainer
                             {...props}
-                            history={history}
-                            wsToken={this.state.wsToken}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
+
                     <Route exact path="/t/messages/:groupId" render={(props) =>
                         <WsContainerGlobal
                             {...props}
@@ -90,12 +81,24 @@ class App extends Component {
                             isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
+                    {/*<Route exact path="/login" render={(props) =>*/}
+                    {/*    <Login*/}
+                    {/*        {...props}*/}
+                    {/*        history={history}*/}
+                    {/*        isDarkModeEnable={this.state.isDarkModeEnabled}*/}
+                    {/*        setUserAuthenticated={this.setUserAuthenticated}*/}
+                    {/*    />}*/}
+                    {/*/> */}
                     <Route exact path="/login" render={(props) =>
-                        <Login
+                        <LoginContainer
                             {...props}
                             history={history}
+                        />}
+                    />
+                    <Route exact path="/call/:callId" render={(props) =>
+                        <CallWindow
+                            {...props}
                             isDarkModeEnable={this.state.isDarkModeEnabled}
-                            setUserAuthenticated={this.setUserAuthenticated}
                         />}
                     />
                 </Switch>

@@ -3,14 +3,15 @@ package com.mercure.controller;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.UserDTO;
-import com.mercure.entity.FileEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.service.GroupService;
 import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
-import com.mercure.utils.FileNameGenerator;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.MessageTypeEnum;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,6 @@ public class WsController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-
-    @Autowired
-    private FileNameGenerator fileNameGenerator;
 
     @GetMapping
     public String testRoute(HttpServletRequest request) {
@@ -101,33 +99,24 @@ public class WsController {
         return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
     }
 
-    /**
-     * Allow to handle binary files, typically when user send image.
-     * However, this method can't work because STOMPJS does not support binary data
-     *
-     * @param userId int value for userID
-     * @param groupUrl string value for group URL
-     * @param binaryMessage byte data
-     * @return a {@link MessageDTO}
-     */
-    @MessageMapping("/message/blob/{userId}/group/{groupUrl}")
-    @SendTo("/topic/{groupUrl}")
-    @Deprecated
-    public MessageDTO wsBinaryMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, byte[] binaryMessage) {
-        int groupId = groupService.findGroupByUrl(groupUrl);
-        String fileName = fileNameGenerator.getRandomString();
-        MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.FILE.toString(), "text");
-        MessageEntity msg = messageService.save(messageEntity);
-
-        FileEntity fileEntity = new FileEntity();
-        fileEntity.setFilename(fileName);
-        fileEntity.setMessageId(msg.getId());
-
-        NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
-        List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
-        toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
-        return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+    @MessageMapping("/message/call/{userId}")
+    @SendToUser("/queue/reply")
+    public MessageDTO wsCallMessageMapping(@DestinationVariable int userId, MessageDTO messageDTO) {
+        return null;
     }
+
+
+    @MessageMapping("/groups/create/single")
+    @SendToUser("/queue/reply")
+    public MessageDTO wsCreateConversation(String req) throws ParseException {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
+        Long id1 = (Long) jsonObject.get("id1");
+        Long id2 = (Long) jsonObject.get("id2");
+        groupService.createConversation(id1.intValue(), id2.intValue());
+        return null;
+    }
+
 
     /**
      * Return history of group discussion

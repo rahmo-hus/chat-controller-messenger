@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     String getUsernameWithWsToken(@Param(value = "token") String token);
 
     int countAllByFirstNameOrMail(String firstName, String mail);
+
+    int countAllByShortUrl(String shortUrl);
 }

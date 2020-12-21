@@ -21,7 +21,8 @@ class WsContainerGlobal extends Component {
             isComponentMounted: false,
             groups: null,
             userId: null,
-            ws: null
+            ws: null,
+            wsError: false
         };
         this.updateLastMessageInGroups = this.updateLastMessageInGroups.bind(this);
         this.updateGroupsWithLastMessageSent = this.updateGroupsWithLastMessageSent.bind(this);
@@ -86,7 +87,7 @@ class WsContainerGlobal extends Component {
 
     connect() {
         client = initWebSocket(this.props.wsToken);
-        this.setState({ws: client});
+        this.setState({ws: client, wsError: false});
         client.onConnect = function (frame) {
             client.subscribe("/user/queue/reply", (res) => {
                 const data = JSON.parse(res.body);
@@ -110,9 +111,13 @@ class WsContainerGlobal extends Component {
             client.publish({destination: "/app/message", body: this.props.wsToken});
         }.bind(this);
 
-        client.onStompError = function (frame) {
-            console.log('Broker reported error: ' + frame.headers['message']);
-            console.log('Additional details: ' + frame.body);
+        client.onDisconnect = () => {
+            console.log("ERROR DURING HANDSHAKE WITH SERVER")
+            this.setState({wsError: true})
+        }
+
+        client.onStompError = () => {
+            console.log("ERROR DURING HANDSHAKE WITH SERVER")
         };
         client.activate();
     }
@@ -149,6 +154,7 @@ class WsContainerGlobal extends Component {
                 {this.state.isComponentMounted &&
                 <React.Fragment>
                     <SidebarGroups ws={this.state.ws}
+                                   wsError={this.state.wsError}
                                    userId={this.state.userId}
                                    isDarkModeEnable={this.props.isDarkModeEnable}
                                    activate={this.activate}

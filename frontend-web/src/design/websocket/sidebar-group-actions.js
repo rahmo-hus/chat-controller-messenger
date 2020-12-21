@@ -2,11 +2,6 @@ import React, {Component} from "react";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import Avatar from "@material-ui/core/Avatar";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import AuthService from "../../service/auth-service";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import GroupAddIcon from '@material-ui/icons/GroupAdd';
@@ -24,6 +19,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import MenuItem from "@material-ui/core/MenuItem";
 import Toaster from "../utils/toaster";
 import Tooltip from "@material-ui/core/Tooltip";
+import AllUsersDialog from "../dialog/all-users-dialog";
 
 class SidebarGroupActions extends Component {
     constructor(props) {
@@ -47,14 +43,14 @@ class SidebarGroupActions extends Component {
         this.handleClick = this.handleClick.bind(this);
         this.handleTooltipAction = this.handleTooltipAction.bind(this);
         this.handleDisplayUserAction = this.handleDisplayUserAction.bind(this);
+        this.handleAddUserAction = this.handleAddUserAction.bind(this);
         this.addUserInConversation = this.addUserInConversation.bind(this);
         this.closeDisplayUserAction = this.closeDisplayUserAction.bind(this);
         this.leaveGroup = this.leaveGroup.bind(this);
     }
 
 
-    handleAddUserAction(event, action) {
-        event.preventDefault();
+    handleAddUserAction(action) {
         switch (action) {
             case "open":
                 AuthService.fetchAllUsers().then(r => {
@@ -68,7 +64,6 @@ class SidebarGroupActions extends Component {
             default:
                 throw new Error("Cannot handle AddUserAction");
         }
-
     }
 
     handleClick(event, target) {
@@ -217,7 +212,7 @@ class SidebarGroupActions extends Component {
                 <div className={"sidebar"}>
                     <List
                         component="nav">
-                        <ListItem button onClick={(event) => this.handleAddUserAction(event, "open")}>
+                        <ListItem button onClick={() => this.handleAddUserAction("open")}>
                             <ListItemIcon>
                                 <GroupAddIcon style={{color: generateIconColorMode(this.props.isDarkModeEnable)}}/>
                             </ListItemIcon>
@@ -310,41 +305,10 @@ class SidebarGroupActions extends Component {
                         </Collapse>
                     </List>
                 </div>
-                <Dialog onClose={(event) => this.handleAddUserAction(event, "close")}
-                        aria-labelledby="simple-dialog-title"
-                        fullWidth
-                        open={this.state.popupOpen}>
-                    <DialogTitle id="simple-dialog-title">Add people to conversation</DialogTitle>
-                    <List>
-                        {
-                            this.state.popupOpen && this.state.usersList && this.state.usersList.map(data => (
-                                <ListItem button key={data.id}
-                                          onClick={(event => this.addUserInConversation(event, data.id))}>
-                                    <ListItemAvatar>
-                                        <Avatar>
-                                            <AccountCircleIcon
-                                                style={{color: generateIconColorMode(this.props.isDarkModeEnable)}}/>
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText primary={
-                                        <React.Fragment>
-                                                                <span style={{
-                                                                    display: "flex",
-                                                                    justifyContent: "space-around"
-                                                                }}>
-                                                                {data.firstName + " " + data.lastName}
-                                                                    {
-                                                                        data.id === this.props.userId && " (You)"
-                                                                    }
-                                                                </span>
-                                        </React.Fragment>
-                                    }
-                                    />
-                                </ListItem>
-                            ))
-                        }
-                    </List>
-                </Dialog>
+                <AllUsersDialog closeDialog={this.handleAddUserAction}
+                                open={this.state.popupOpen}
+                                dialogTitleText={"Add people to conversation"}
+                                doUserDialogAction={this.addUserInConversation}/>
                 <Toaster toasterOpened={this.state.toasterOpened} text={this.state.toasterText}/>
             </div>
         )

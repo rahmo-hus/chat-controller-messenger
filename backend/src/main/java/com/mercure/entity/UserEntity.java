@@ -46,6 +46,9 @@ public class UserEntity implements UserDetails, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expiration_date;
 
+    @Column(name = "short_url")
+    private String shortUrl;
+
     @Column(name = "email")
     private String mail;
 
@@ -165,6 +168,14 @@ public class UserEntity implements UserDetails, Serializable {
 
     public void setExpiration_date(Date expiration_date) {
         this.expiration_date = expiration_date;
+    }
+
+    public String getShortUrl() {
+        return shortUrl;
+    }
+
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
     }
 
     public String getMail() {

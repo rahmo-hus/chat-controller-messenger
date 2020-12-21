@@ -1,0 +1,21 @@
+export const ADD_ARTICLE = "ADD_ARTICLE";
+
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+
+export const LOGIN_FAILURE = "LOGIN_FAILURE";
+
+export const USER_LOGOUT = "USER_LOGOUT";
+
+export const SET_LIGHT_MODE = "SET_LIGHT_MODE";
+
+export const DARK_MODE_ENABLED = "DARK_MODE_ENABLED";
+
+export const CHANGE_THEME_MODE = "CHANGE_THEME_MODE";
+
+export const INIT_WS_TOKEN = "INIT_WS_TOKEN";
+
+export const INIT_WS_CONNECTION = "INIT_WS_CONNECTION";
+
+export const SET_WS_GROUPS = "SET_WS_GROUPS";
+
+export const WS_CHECK_CONNECTED = "WS_CHECK_CONNECTED";

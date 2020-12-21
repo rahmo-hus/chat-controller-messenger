@@ -1,6 +1,8 @@
 package com.mercure.dto;
 
 
+import com.mercure.utils.GroupTypeEnum;
+
 public class GroupDTO {
 
     public GroupDTO() {
@@ -25,6 +27,8 @@ public class GroupDTO {
     private String url;
 
     private String name;
+
+    private String groupType;
 
     private String lastMessage;
 
@@ -54,6 +58,14 @@ public class GroupDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getGroupType() {
+        return groupType;
+    }
+
+    public void setGroupType(String groupType) {
+        this.groupType = groupType;
     }
 
     public String getLastMessage() {

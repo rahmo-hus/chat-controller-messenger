@@ -11,6 +11,8 @@ import {MessageTypeEnum} from "../../utils/type-message-enum";
 import CustomTextField from "../partials/custom-material-textfield";
 import AuthService from "../../service/auth-service";
 import ImagePreview from "../partials/image-preview";
+import CallIcon from '@material-ui/icons/Call';
+import UUIDv4 from "../../utils/uuid-generator";
 
 class WebSocketContainer extends Component {
     constructor(props) {
@@ -144,6 +146,14 @@ class WebSocketContainer extends Component {
             }
         };
     }
+
+    openCallPage(event) {
+        event.preventDefault();
+        const callUrl = UUIDv4();
+        console.log(callUrl)
+        window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
+    }
+
 
     generateImageRender(message) {
         const data = JSON.parse(message);
@@ -299,14 +309,14 @@ class WebSocketContainer extends Component {
                             type="file"
                             onChange={event => this.previewFile(event)}
                         />
+                        <Button onClick={event => this.openCallPage(event)} variant="text" component="span">
+                            <CallIcon/>
+                        </Button>
                         <label htmlFor="raised-button-file">
                             <Button variant="text" component="span">
                                 <ImageIcon/>
                             </Button>
                         </label>
-                        {/*/!*<img className=" _52mr _1byr _5pf5 img" alt=""*!/*/}
-                        {/*     // src="https://scontent-cdt1-1.xx.fbcdn.net/v/t1.15752-9/124549630_1284129615257188_6846457052693633130_n.png?_nc_cat=109&amp;ccb=2&amp;_nc_sid=ae9488&amp;_nc_ohc=RKFQ99KkdwMAX8e8y1d&amp;_nc_ht=scontent-cdt1-1.xx&amp;oh=2f117e0013acf9ee00c6fb9d1fdbf282&amp;oe=5FD7DBFB"*/}
-                        {/*     // style="max-width: 100%; width: 100%;">*/}
                         <CustomTextField
                             id={"inputChatMessenger"}
                             label={"Write a message"}
@@ -316,18 +326,6 @@ class WebSocketContainer extends Component {
                             keyUp={this.submitMessage}
                             isDarkModeEnable={this.props.isDarkModeEnable}
                         />
-                        {/*<TextField*/}
-                        {/*    id="message"*/}
-                        {/*    variant="outlined"*/}
-                        {/*    onChange={(e) => this.handleChange(e)}*/}
-                        {/*    onKeyDown={(event) => this.submitMessage(event)}*/}
-                        {/*    margin="normal"*/}
-                        {/*    label="Your message"*/}
-                        {/*    name="message"*/}
-                        {/*    value={this.state.message}*/}
-                        {/*    autoFocus*/}
-                        {/*    style={{width: "90%"}}*/}
-                        {/*/>*/}
                         <Button
                             onClick={this.sendMessage}
                             variant="contained"

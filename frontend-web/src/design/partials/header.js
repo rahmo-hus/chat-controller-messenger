@@ -47,7 +47,7 @@ class Header extends Component {
                     this.props.setWsToken(r.data.wsToken);
                 });
             }
-        }).catch(err => {
+        }).catch(() => {
             this.props.setUserAuthenticated(false);
             this.setState({authenticated: false})
         });
