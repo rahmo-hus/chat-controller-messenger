@@ -6,14 +6,13 @@ import {
     Switch,
     Route
 } from "react-router-dom";
-import WsContainerGlobal from "./design/websocket/ws-container-global";
 import RegisterForm from "./design/register/register-user";
-import CallWindow from "./design/call/call-window";
 import HeaderContainer from "./container/header-container";
 import HomeContainer from "./container/home-container";
 import LoginContainer from "./container/login-container";
 import CreateGroupContainer from "./container/create-group-container";
-import WebSocketMainContainer from "./container/websocket-main-container";
+import WebSocketMainContainer from "./container/websocket/websocket-main-container";
+import CallWindowContainerTRASH from "./container/call-window-containerTRASH";
 
 
 const history = createBrowserHistory();
@@ -55,26 +54,11 @@ class App extends Component {
                             {...props}
                         />}
                     />
-                    {/*<Route exact path="/create" render={(props) =>*/}
-                    {/*    <CreateGroup*/}
-                    {/*        {...props}*/}
-                    {/*        history={history}*/}
-                    {/*        isDarkModeEnable={this.state.isDarkModeEnabled}*/}
-                    {/*    />}*/}
-                    {/*/>*/}
                     <Route exact path="/create" render={(props) =>
                         <CreateGroupContainer
                             {...props}
                         />}
                     />
-                    {/*<Route exact path="/t/messages" render={(props) =>*/}
-                    {/*    <WsContainerGlobal*/}
-                    {/*        {...props}*/}
-                    {/*        history={history}*/}
-                    {/*        wsToken={this.state.wsToken}*/}
-                    {/*        isDarkModeEnable={this.state.isDarkModeEnabled}*/}
-                    {/*    />}*/}
-                    {/*/>*/}
                     <Route exact path="/t/messages" render={(props) =>
                         <WebSocketMainContainer
                             {...props}
@@ -82,11 +66,8 @@ class App extends Component {
                     />
 
                     <Route exact path="/t/messages/:groupId" render={(props) =>
-                        <WsContainerGlobal
+                        <WebSocketMainContainer
                             {...props}
-                            history={history}
-                            wsToken={this.state.wsToken}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
                     <Route exact path="/register" render={(props) =>
@@ -96,14 +77,6 @@ class App extends Component {
                             isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
-                    {/*<Route exact path="/login" render={(props) =>*/}
-                    {/*    <Login*/}
-                    {/*        {...props}*/}
-                    {/*        history={history}*/}
-                    {/*        isDarkModeEnable={this.state.isDarkModeEnabled}*/}
-                    {/*        setUserAuthenticated={this.setUserAuthenticated}*/}
-                    {/*    />}*/}
-                    {/*/> */}
                     <Route exact path="/login" render={(props) =>
                         <LoginContainer
                             {...props}
@@ -111,9 +84,8 @@ class App extends Component {
                         />}
                     />
                     <Route exact path="/call/:callId" render={(props) =>
-                        <CallWindow
+                        <CallWindowContainerTRASH
                             {...props}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
                         />}
                     />
                 </Switch>

@@ -5,12 +5,13 @@ public class MessageDTO {
     public MessageDTO() {
     }
 
-    public MessageDTO(int id, String type, String message, int userId, int groupId, String sender, String time, String initials, String color) {
+    public MessageDTO(int id, String type, String message, int userId, int groupId, String groupUrl, String sender, String time, String initials, String color) {
         this.id = id;
         this.type = type;
         this.message = message;
         this.userId = userId;
         this.groupId = groupId;
+        this.groupUrl = groupUrl;
         this.sender = sender;
         this.time = time;
         this.initials = initials;
@@ -26,6 +27,8 @@ public class MessageDTO {
     private int userId;
 
     private int groupId;
+
+    private String groupUrl;
 
     private String sender;
 
@@ -73,6 +76,14 @@ public class MessageDTO {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public String getGroupUrl() {
+        return groupUrl;
+    }
+
+    public void setGroupUrl(String groupUrl) {
+        this.groupUrl = groupUrl;
     }
 
     public String getSender() {

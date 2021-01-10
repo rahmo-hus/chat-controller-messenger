@@ -1,3 +1,4 @@
+import React, {useEffect, useState} from "react";
 import Collapse from "@material-ui/core/Collapse";
 import Alert from "@material-ui/lab/Alert";
 import IconButton from "@material-ui/core/IconButton";
@@ -13,19 +14,52 @@ import {TypeGroupEnum} from "../../utils/type-group-enum";
 import FolderIcon from "@material-ui/icons/Folder";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemText from "@material-ui/core/ListItemText";
-import React, {useEffect} from "react";
 import {useHistory} from "react-router-dom";
+import {dateParser} from "../../utils/date-formater";
 
-export const WebsocketGroupsComponent = ({isDarkModeToggled, currentThemeMode, wsUserGroups, isWsConnected}) => {
-// export const WebsocketGroupsComponent = (props) => {
-    const history = useHistory();
-    // const {wsValue} = getState().WebSocketReducer;
+
+const Clock = ({date}) => {
+    const [currentCount, setCount] = useState(dateParser(date));
+    const [index, setIndex] = useState(0);
+
     useEffect(() => {
 
-    }, [])
+            setIndex(1)
+            const dateInterval = setInterval(() => {
+                setCount(dateParser(date))
+            }, 60000);
+            return () => {
+                setIndex(0)
+                clearInterval(dateInterval);
+            }
+        },
+        [currentCount]
+    );
+    return (
+        <React.Fragment>
+            {index === 0 ?
+                dateParser(date)
+                :
+                currentCount
+            }
+        </React.Fragment>
+    )
+};
+
+
+export const WebsocketGroupsComponent = ({
+                                             isDarkModeToggled,
+                                             currentThemeMode,
+                                             isWsConnected,
+                                             setCurrentActiveGroup,
+                                             currentActiveGroup,
+                                             wsUserGroups
+                                         }) => {
+    const history = useHistory();
 
     function redirectToGroup(id, url) {
-        console.log(id);
+        setCurrentActiveGroup(url);
+        localStorage.setItem("_cAG", url)
         history.push("/t/messages/" + url)
     }
 
@@ -33,13 +67,26 @@ export const WebsocketGroupsComponent = ({isDarkModeToggled, currentThemeMode, w
 
     }
 
-    function styleSelectedGroup() {
-
+    function styleSelectedGroup(selectedUrl) {
+        if (generateColorMode(isDarkModeToggled) === "light") {
+            return selectedUrl === localStorage.getItem("_cAG") ? "selected-group-light" : "";
+        }
+        if (generateColorMode(isDarkModeToggled) === "dark") {
+            return selectedUrl === localStorage.getItem("_cAG") ? "selected-group-dark" : "";
+        }
     }
 
     function styleUnreadMessage() {
 
     }
+
+    function getMessageDate(date) {
+
+        setInterval(() => {
+            return dateParser(date);
+        }, 2000)
+    }
+
 
     return (
         <div
@@ -53,9 +100,9 @@ export const WebsocketGroupsComponent = ({isDarkModeToggled, currentThemeMode, w
             </Collapse>
 
             <div style={{marginTop: "8px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-                    <span style={{marginLeft: "10px", fontSize: "20px", fontWeight: "bold"}}>
-                        Discussions
-                    </span>
+                <span style={{marginLeft: "10px", fontSize: "20px", fontWeight: "bold"}}>
+                Discussions
+                </span>
                 <div>
                     <IconButton onClick={() => handleAddUserAction("open")}>
                         <AddCircleIcon fontSize={"large"}/>
@@ -100,11 +147,10 @@ export const WebsocketGroupsComponent = ({isDarkModeToggled, currentThemeMode, w
                             style={{marginLeft: "5px"}}
                             primary={
                                 <React.Fragment>
-                                        <span className={styleUnreadMessage(data.lastMessageSeen)}>
-                                            {data.name}
-                                        </span>
-                                </React.Fragment>
-                            }
+                                    <span
+                                        className={styleUnreadMessage(data.lastMessageSeen)}>{data.name}
+                                    </span>
+                                </React.Fragment>}
                             secondary={
                                 <React.Fragment>
                                         <span
@@ -113,18 +159,19 @@ export const WebsocketGroupsComponent = ({isDarkModeToggled, currentThemeMode, w
                                                 display: "flex",
                                                 justifyContent: "space-between"
                                             }}>
-                                            <span
-                                                className={"clrcstm"}
-                                                style={{
-                                                    overflowX: "hidden",
-                                                    whiteSpace: "nowrap",
-                                                    textOverflow: "ellipsis"
-                                                }}>
-                                                {data.lastMessage}
-                                            </span>
-                                            <span className={"clrcstm"} style={{fontWeight: "inherit"}}>
-                                                {data.lastMessageDate}
-                                            </span>
+                                        <span
+                                            className={"clrcstm"}
+                                            style={{
+                                                overflowX: "hidden",
+                                                whiteSpace: "nowrap",
+                                                textOverflow: "ellipsis"
+                                            }}>
+                                            {data.lastMessage} <span style={{fontWeight: "bold"}}> · </span><Clock
+                                            date={data.lastMessageDate}/>
+                                        </span>
+                                            {/*<span className={"clrcstm"} style={{fontWeight: "inherit"}}>*/}
+                                            {/*   <Clock date={data.lastMessageDate}/>*/}
+                                            {/*</span>*/}
                                         </span>
                                 </React.Fragment>}
                         />

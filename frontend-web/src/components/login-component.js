@@ -8,11 +8,13 @@ import Button from "@material-ui/core/Button";
 import {Link} from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import AuthService from "../service/auth-service";
-import {userAuthenticated} from "../actions";
+import {setWsUserToken, userAuthenticated} from "../actions";
+import {useHistory} from "react-router-dom";
 
 const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const history = useHistory();
 
     function handleChange(e) {
         e.preventDefault();
@@ -24,7 +26,7 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
                 setPassword(e.target.value);
                 break;
             default:
-                throw Error("OUPSI");
+                throw Error("Whoops ! Something went wrong...");
         }
     }
 
@@ -39,14 +41,16 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     }
 
     function login() {
-        AuthService.authenticate(username, password).then(
-            res => {
+        AuthService.authenticate(username, password).then(async function (res) {
                 if (res.status === 200) {
-                    console.log(res.data)
-                    dispatch(userAuthenticated(res.data))
+                    await dispatch(userAuthenticated(res.data))
+                    await dispatch(setWsUserToken(res.data.wsToken))
+                    history.push("/");
                 }
             }
-        ).catch()
+        ).catch(err => {
+            console.log(err)
+        })
     }
 
     return (

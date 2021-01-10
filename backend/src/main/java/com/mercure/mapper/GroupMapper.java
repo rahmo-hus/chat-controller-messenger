@@ -27,8 +27,8 @@ public class GroupMapper {
         MessageEntity msg = messageService.findLastMessage(grp.getId());
         if (msg != null) {
             grpDTO.setLastMessage(msg.getMessage());
-            String formattedDate = new SimpleDateFormat("HH:mm").format(msg.getCreatedAt());
-            grpDTO.setLastMessageDate(formattedDate);
+//            String formattedDate = new SimpleDateFormat("HH:mm").format(msg.getCreatedAt());
+            grpDTO.setLastMessageDate(msg.getCreatedAt().toString());
             grpDTO.setLastMessageSeen(false);
         }
         return grpDTO;

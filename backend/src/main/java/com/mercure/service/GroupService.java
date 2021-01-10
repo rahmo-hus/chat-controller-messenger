@@ -46,7 +46,7 @@ public class GroupService {
         groupRepository.save(groupEntity.orElse(null));
     }
 
-    public void createGroup(int userId, String name) {
+    public GroupUser createGroup(int userId, String name) {
         GroupUser groupUser = new GroupUser();
         GroupEntity group = new GroupEntity(name);
         group.setName(name);
@@ -61,7 +61,7 @@ public class GroupService {
         groupUser.setRole(1);
         groupUser.setUserMapping(user);
         groupUser.setGroupMapping(group);
-        groupUserJoinService.save(groupUser);
+        return groupUserJoinService.save(groupUser);
     }
 
     public Optional<GroupEntity> findById(int groupId) {

@@ -99,12 +99,35 @@ public class WsController {
         return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
     }
 
-    @MessageMapping("/message/call/{userId}")
-    @SendToUser("/queue/reply")
-    public MessageDTO wsCallMessageMapping(@DestinationVariable int userId, MessageDTO messageDTO) {
-        return null;
+    @MessageMapping("/message/call/{userId}/group/{groupUrl}")
+    @SendTo("/topic/call/reply/{groupUrl}")
+    public String wsCallMessageMapping(@DestinationVariable int userId, String req) throws ParseException {
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
+        log.info("Receiving RTC data, sending back to user ...");
+        JSONObject json = new JSONObject();
+        try {
+            json.put("userIn", userId);
+            json.put("rtc", jsonObject);
+        } catch (Exception e) {
+            log.info(String.valueOf(json));
+            log.info("Error during JSON creation : {}", e.getMessage());
+        }
+        return req;
     }
 
+//    @SubscribeMapping("/message/call/{userId}/group/{groupUrl}")
+//    public JSONObject onCallMessageSubscribeCallback(@DestinationVariable int userId) throws ParseException {
+//        log.info("User id {} is subscribed to channel",userId);
+//        JSONObject json = new JSONObject();
+//        try {
+//            json.put("userIn", userId);
+//            json.put("rtc", jsonObject);
+//        } catch (Exception e) {
+//            log.info("Error during JSON creation : {}", e.getMessage());
+//        }
+//        return json;
+//    }
 
     @MessageMapping("/groups/create/single")
     @SendToUser("/queue/reply")

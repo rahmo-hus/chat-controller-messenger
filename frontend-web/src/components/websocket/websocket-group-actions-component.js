@@ -12,13 +12,16 @@ import SecurityIcon from "@material-ui/icons/Security";
 import PersonIcon from "@material-ui/icons/Person";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Tooltip from "@material-ui/core/Tooltip";
-import React from "react";
+import React, {useState} from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import AuthService from "../../service/auth-service";
+import AllUsersDialog from "../../design/dialog/all-users-dialog";
 
 export const WebSocketGroupActionComponent = (props) => {
-    const paramsOpen = false;
+    const [paramsOpen, setParamsOpen] = useState(false);
+    const [popupOpen, setPopupOpen] = useState(false);
     const toolTipAction = false;
     const usersInConversationList = [];
     const openTooltipId = 2;
@@ -36,12 +39,41 @@ export const WebSocketGroupActionComponent = (props) => {
 
     }
 
-    function handleClick() {
-
+    function handleClick(event, target) {
+        event.preventDefault();
+        switch (target) {
+            case "param":
+                const groupUrl = localStorage.getItem("_cAG")
+                usersInConversationList.length === 0 && AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
+                    console.log(r.data)
+                    r.data.forEach((val) => {
+                        if (val.userId === props.userId && val.admin) {
+                            // this.setState({isCurrentUserAdmin: true})
+                        }
+                    })
+                    // this.setState({usersInConversationList: r.data})
+                })
+                setParamsOpen(!paramsOpen);
+                break
+            default:
+                throw new Error("Error, please refresh page")
+        }
     }
 
-    function handleAddUserAction() {
-
+    function handleAddUserAction(action) {
+        switch (action) {
+            case "open":
+                // AuthService.fetchAllUsers().then(r => {
+                //     this.setState({usersList: r.data})
+                // });
+                setPopupOpen(true)
+                break;
+            case "close":
+                setPopupOpen(false)
+                break;
+            default:
+                throw new Error("Cannot handle AddUserAction");
+        }
     }
 
     function leaveGroup() {
@@ -53,6 +85,10 @@ export const WebSocketGroupActionComponent = (props) => {
     }
 
     function grantUserAdminInConversation() {
+
+    }
+
+    function addUserInConversation() {
 
     }
 
@@ -159,6 +195,10 @@ export const WebSocketGroupActionComponent = (props) => {
                     </Collapse>
                 </List>
             </div>
+            <AllUsersDialog closeDialog={handleAddUserAction}
+                            open={popupOpen}
+                            dialogTitleText={"Add people to conversation"}
+                            doUserDialogAction={addUserInConversation}/>
         </div>
     )
 }

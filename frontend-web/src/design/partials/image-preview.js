@@ -38,14 +38,6 @@ class ImagePreview extends Component {
         }
     }
 
-    // componentDidMount() {
-    //     document.addEventListener("keydown", this.closeDisplayImagePreview, false);
-    // }
-    //
-    // componentWillUnmount() {
-    //     document.removeEventListener("keydown", this.closeDisplayImagePreview, false);
-    // }
-
     closeDisplayImagePreview(event) {
         event.preventDefault();
         if (event.key === "Escape") {

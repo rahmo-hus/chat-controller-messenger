@@ -10,7 +10,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import {Link, withRouter} from "react-router-dom";
 import {generateColorMode, generateLinkColorMode} from "../style/enable-dark-mode";
-import "./websocketStyle.css";
+import "../../components/websocket/websocketStyle.css";
 import IconButton from "@material-ui/core/IconButton";
 import Alert from "@material-ui/lab/Alert";
 import Collapse from "@material-ui/core/Collapse";

@@ -96,7 +96,7 @@ public class MessageService {
             jsonObject.put("name", fileEntity.getFilename());
             messageToReturn = jsonObject.toJSONString();
         }
-        return new MessageDTO(id, type, messageToReturn, userId, group_id, sender, date, initials, colors.get(userId));
+        return new MessageDTO(id, type, messageToReturn, userId, group_id, null, sender, date, initials, colors.get(userId));
     }
 
     @Transactional
@@ -106,7 +106,8 @@ public class MessageService {
         Optional<GroupEntity> optionalGroupEntity = groupService.findById(groupId);
         if (optionalGroupEntity.isPresent()) {
             GroupEntity groupEntity = optionalGroupEntity.get();
-            groupEntity.getUserEntities().stream().filter(user -> user.getId() != userId).forEach(userEntity -> toSend.add(userEntity.getId()));
+//            groupEntity.getUserEntities().stream().filter(user -> user.getId() != userId).forEach(userEntity -> toSend.add(userEntity.getId()));
+            groupEntity.getUserEntities().forEach(userEntity -> toSend.add(userEntity.getId()));
         }
         return toSend;
     }

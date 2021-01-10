@@ -1,11 +1,11 @@
 export default class MessageModel {
-    userId;
-    groupId;
+    userId;;
+    groupUrl;
     message;
 
-    constructor(userId, groupId, message) {
+    constructor(userId, groupUrl, message) {
         this.userId = userId;
-        this.groupId = groupId;
+        this.groupUrl = groupUrl;
         this.message = message;
     }
 }
