@@ -8,6 +8,8 @@
 
 This web application is a project that I made myself to practice in Java and ReactJS. Please do not hesitate to contact me if you see any errors (small or big).
 
+### Note : WIP ! I am refactoring the application with Redux, some features may not be available.
+
 #### Project Requirements
 
 - JDK 8
