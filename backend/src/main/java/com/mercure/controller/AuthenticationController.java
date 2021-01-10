@@ -50,9 +50,10 @@ public class AuthenticationController {
     private GroupService groupService;
 
     @PostMapping(value = "/auth")
-    public String createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
+    public UserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails);
         Cookie jwtAuthToken = new Cookie(StaticVariable.SECURE_COOKIE, token);
         jwtAuthToken.setHttpOnly(true);
@@ -62,8 +63,7 @@ public class AuthenticationController {
 //         7 days
         jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(jwtAuthToken);
-
-        return userDetails.getUsername();
+        return userMapper.toUserDTO(user);
     }
 
     @GetMapping(value = "/logout")

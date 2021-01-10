@@ -2,50 +2,140 @@ import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import Button from "@material-ui/core/Button";
-import CallIcon from "@material-ui/icons/Call";
 import ImageIcon from "@material-ui/icons/Image";
+import AcUnitIcon from '@material-ui/icons/AcUnit';
 import CustomTextField from "../../design/partials/custom-material-textfield";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
-import React from "react";
+import React, {useEffect} from "react";
+import ImagePreview from "../../design/partials/image-preview";
+import CallWindowContainer from "../../container/call-window-container";
+import UUIDv4 from "../../utils/uuid-generator";
+import MessageModel from "../../model/message-model";
 
-export const WebSocketChatComponent = (props) => {
-    const message = "";
-    const imageLoaded = false;
+export const WebSocketChatComponent = ({
+                                           isDarkModeEnable,
+                                           isDarkModeToggled,
+                                           currentActiveGroup,
+                                           sendWsMessage,
+                                           fetchMessages,
+                                           chatHistory,
+                                           userId
+                                       }) => {
+
+    const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false);
+    const [imgSrc, setImgSrc] = React.useState("");
+    const [file, setFile] = React.useState(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = React.useState(null);
+    const [imageLoaded, setImageLoaded] = React.useState(false);
+    const [message, setMessage] = React.useState("");
+
+    const currentUrl = window.location.pathname.split("/").slice(-1)[0];
+    useEffect(() => {
+        // console.log(currentUrl)
+        fetchMessages(currentUrl);
+    }, [currentUrl])
 
     function styleSelectedMessage() {
-
+        return isDarkModeToggled ? "hover-msg-dark" : "hover-msg-light";
     }
 
-    function generateImageRender() {
-
+    function generateImageRender(message) {
+        const data = JSON.parse(message);
+        if (data.url === undefined) {
+            return null;
+        }
+        return (
+            <div>
+                <img src={data.url} height={"200px"} alt={data.name}
+                     onClick={event => handleImagePreview(event, "OPEN", data.url)}
+                     style={{border: "1px solid #c8c8c8", borderRadius: "7%"}}/>
+            </div>)
     }
 
-    function resetImageBuffer() {
-
+    function resetImageBuffer(event) {
+        event.preventDefault();
+        console.log(file)
+        setFile(null);
+        setImagePreviewUrl("");
+        setImageLoaded(false);
     }
 
-    function previewFile() {
+    function previewFile(event) {
+        resetImageBuffer(event);
+        let reader = new FileReader();
+        let file = event.target.files[0];
+        reader.readAsDataURL(file)
 
+        reader.onload = (e) => {
+            if (e.target.readyState === FileReader.DONE) {
+                setFile(file);
+                setImagePreviewUrl(reader.result);
+                setImageLoaded(true);
+            }
+        };
     }
 
-    function submitMessage() {
-
+    function submitMessage(event) {
+        if (message !== "") {
+            if (event.key === undefined || event.key === 'Enter') {
+                sendMessage();
+                setMessage("");
+            }
+        }
     }
 
-    function openCallPage() {
-
-    }
-
-    function handleChange() {
-
+    function handleChange(event) {
+        setMessage(event.target.value);
     }
 
     function sendMessage() {
-        chatHistory.push("")
+        const groupUrl = localStorage.getItem("_cAG");
+        if (userId === null || undefined) {
+            console.warn("userId is null !")
+        }
+        if (message !== "") {
+            // console.log("Publishing text");
+            // this.props.updateGroupWhenUserSendMessage(this.props.location.groupUrl, this.state.message, MessageTypeEnum.text);
+            const toSend = new MessageModel(userId, groupUrl, message)
+            sendWsMessage(toSend)
+        }
+        // if (file !== "") {
+        //     console.log("Publishing file");
+        //     const formData = new FormData();
+        //     formData.append("file", file)
+        //     formData.append("userId", userId)
+        //     formData.append("groupUrl", groupUrl)
+        //     AuthService.uploadFile(formData).then().catch(err => {
+        //         console.log(err)
+        //     })
+        //     this.props.updateGroupWhenUserSendMessage(this.props.location.groupId, this.state.message, MessageTypeEnum.image);
+        //     // this.props.updateGroupsArrayOnMessage(this.props.location.groupUrl);
+        //     setMessage("")
+        //     setImageLoaded(false)
+        //     setFile("")
+        //     setImagePreviewUrl("")
+        // }
     }
 
-    const imagePreviewUrl = "";
-    const chatHistory = [];
+    function handleImagePreview(event, action, src) {
+        event.preventDefault();
+        switch (action) {
+            case "OPEN":
+                setImgSrc(src)
+                setPreviewImageOpen(true)
+                break;
+            case "CLOSE":
+                setPreviewImageOpen(false)
+                break;
+            default:
+                throw new Error("handleImagePreview failed");
+        }
+    }
+
+    function openCallPage() {
+        const callUrl = UUIDv4();
+        window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
+    }
 
     return (
         <div style={{display: "flex", flex: "1", flexDirection: "column"}}>
@@ -55,11 +145,11 @@ export const WebSocketChatComponent = (props) => {
                 height: "calc(100% - 56px)",
                 overflowY: "scroll"
             }}>
-                {/*<ImagePreview displayImagePreview={displayImagePreview}*/}
-                {/*              changeDisplayImagePreview={handleImagePreview}*/}
-                {/*              isDarkModeEnable={props.isDarkModeEnable}*/}
-                {/*              imgSrc={imgSrc}*/}
-                {/*/>*/}
+                <ImagePreview displayImagePreview={isPreviewImageOpen}
+                              changeDisplayImagePreview={handleImagePreview}
+                              isDarkModeEnable={isDarkModeEnable}
+                              imgSrc={imgSrc}
+                />
                 {chatHistory && chatHistory.map((val, index, array) => (
                     <Tooltip
                         key={index}
@@ -131,7 +221,6 @@ export const WebSocketChatComponent = (props) => {
                             position: "relative",
                             borderRadius: "10%"
                         }}>
-                            {/*<img src={imagePreviewUrl} alt={"whu"}/>*/}
                             <IconButton style={{
                                 height: "20px",
                                 position: "absolute",
@@ -161,9 +250,13 @@ export const WebSocketChatComponent = (props) => {
                         type="file"
                         onChange={event => previewFile(event)}
                     />
+                    {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
+                    {/*    <CallIcon/>*/}
+                    {/*</Button>*/}
                     <Button onClick={event => openCallPage(event)} variant="text" component="span">
-                        <CallIcon/>
+                        <AcUnitIcon/>
                     </Button>
+                    <CallWindowContainer/>
                     <label htmlFor="raised-button-file">
                         <Button variant="text" component="span">
                             <ImageIcon/>
@@ -173,10 +266,10 @@ export const WebSocketChatComponent = (props) => {
                         id={"inputChatMessenger"}
                         label={"Write a message"}
                         value={message}
-                        handleChange={handleChange}
+                        handleChange={(event) => handleChange(event)}
                         type={"text"}
                         keyUp={submitMessage}
-                        isDarkModeEnable={props.isDarkModeEnable}
+                        isDarkModeEnable={isDarkModeToggled}
                     />
                     <Button
                         onClick={sendMessage}
@@ -186,7 +279,6 @@ export const WebSocketChatComponent = (props) => {
                             marginLeft: "3px",
                             maxWidth: "20px"
                         }}
-                        // disabled={message === "" || !imageLoaded}
                         disabled={!imageLoaded && message === ""}
                     >
                         <DoubleArrowIcon/>

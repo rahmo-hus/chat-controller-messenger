@@ -1,50 +1,56 @@
 import React, {useEffect} from "react";
 import {generateColorMode} from "../../design/style/enable-dark-mode";
-import {WebSocketChatComponent} from "./websocket-chat-component";
 import {WebSocketGroupActionComponent} from "./websocket-group-actions-component";
+import WebSocketGroupsContainer from "../../container/websocket/websocket-groups-container";
+import WebSocketChatContainer from "../../container/websocket/websocket-chat-container";
+import "./websocketStyle.css"
 import {initWebSocket} from "../../config/websocket-config";
-import {useHistory} from "react-router-dom";
-import WebSocketGroupsContainer from "../../container/websocket-groups-container";
 
 export const WebSocketMainComponent = ({
                                            wsUserTokenValue,
                                            isDarkModeToggled,
-                                           isUserLoggedIn,
                                            setWsObject,
                                            wsCheckConnected,
-                                           wsUserGroups
+                                           initCallWebRTC,
                                        }) => {
-    const history = useHistory();
+
+    const groupUrl = localStorage.getItem("_cAG");
     useEffect(() => {
-        if (isUserLoggedIn !== null && !isUserLoggedIn) {
-            history.push("/");
-        }
+        console.log("INIT_WS_CONNECTION")
         if (wsUserTokenValue !== null) {
-            init();
+            initWs()
+            //     .then(() => {
+            //     console.log("initCallWebRTC({event: \"init\"})")
+            //     initCallWebRTC({event: "init"})
+            // });
         }
+
         return () => {
             setWsObject(null);
             wsCheckConnected(false);
+            //TODO wsClient.deactivate()
+            console.log("Disconnected")
         }
 
     }, [wsUserTokenValue])
 
-    function init() {
-        if (wsUserTokenValue !== undefined) {
-            const server = initWebSocket(wsUserTokenValue);
-            const toSend = {wsToken: wsUserTokenValue, wsClient: server}
-            setWsObject(toSend);
-        }
+    useEffect(() => {
+        console.log("Changing webRT WS subscribe")
+        initCallWebRTC({event: "init"})
+    }, [groupUrl])
+
+    async function initWs() {
+        const wsClient = await initWebSocket(wsUserTokenValue);
+        const toSend = {stomp: wsClient, token: wsUserTokenValue}
+        await setWsObject(toSend);
     }
 
     return (
         <div className={generateColorMode(isDarkModeToggled)}
              style={{height: "calc(100% - 64px)", display: "flex", justifyContent: "space-between"}}>
-            <React.Fragment>
-                <WebSocketGroupsContainer/>
-                <WebSocketChatComponent/>
-                <WebSocketGroupActionComponent/>
-            </React.Fragment>
+            <WebSocketGroupsContainer/>
+            <WebSocketChatContainer/>
+            <WebSocketGroupActionComponent/>
         </div>
     )
 }

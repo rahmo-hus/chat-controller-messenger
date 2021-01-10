@@ -25,7 +25,7 @@ export const HeaderComponent = ({
 
     function dispatchLogout(event) {
         event.preventDefault();
-        userLogout()
+        userLogout();
         AuthService.logout().then(() => {
             history.push("/");
         })
@@ -43,7 +43,7 @@ export const HeaderComponent = ({
                 <nav className={"lnk clrcstm"}>
                     {
                         isUserLoggedIn &&
-                        <RouterLink className={"lnk clrcstm"} to={"/t/messages"}>
+                        <RouterLink className={"lnk clrcstm"} to={"/t/messages/" + localStorage.getItem("_cAG")}>
                             <Button className={"clrcstm"} variant="outlined"
                                     style={{margin: "8px 12px"}}>
                                 Messages

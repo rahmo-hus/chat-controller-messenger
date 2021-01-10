@@ -1,10 +1,13 @@
 import {
     CHANGE_THEME_MODE,
-    DARK_MODE_ENABLED, INIT_WS_CONNECTION, INIT_WS_TOKEN,
+    DARK_MODE_ENABLED,
+    INIT_WS_TOKEN,
     LOGIN_FAILURE,
-    LOGIN_SUCCESS, SET_WS_GROUPS,
-    USER_LOGOUT, WS_CHECK_CONNECTED
+    LOGIN_SUCCESS,
+    USER_LOGOUT
 } from "../utils/redux-constants";
+import "./webSocketActions";
+import "./webRtcActions";
 import AuthService from "../service/auth-service";
 
 export const changeThemeMode = () => ({
@@ -15,17 +18,29 @@ export const changeCurrentThemeMode = () => ({
     type: CHANGE_THEME_MODE,
 })
 
-export const userAuthenticated = (usernameLoggedIn) => ({
+export const setWsUserToken = (token) => ({
+    type: INIT_WS_TOKEN,
+    payload: token
+})
+
+export const userAuthenticated = (data) => ({
     type: LOGIN_SUCCESS,
-    payload: usernameLoggedIn
+    payload: {
+        username: data.firstName,
+        userId: data.id
+    }
 })
 
 export const initUserData = () => (dispatch) => {
     return AuthService.testRoute().then(
         (res) => {
+            localStorage.setItem("_cAG", res.data.groupSet[0].url)
             dispatch({
                 type: LOGIN_SUCCESS,
-                payload: res.data.firstName
+                payload: {
+                    username: res.data.firstName,
+                    userId: res.data.id
+                }
             })
             dispatch({
                 type: INIT_WS_TOKEN,
@@ -46,17 +61,3 @@ export const userLogout = () => ({
     type: USER_LOGOUT
 })
 
-export const initWsConnection = (client) => ({
-    type: INIT_WS_CONNECTION,
-    payload: client
-})
-
-export const wsHealthCheckConnected = (bool) => ({
-    type: WS_CHECK_CONNECTED,
-    payload: bool
-})
-
-export const setWsUserGroups = (groupsArray) => ({
-    type: SET_WS_GROUPS,
-    payload: groupsArray
-})

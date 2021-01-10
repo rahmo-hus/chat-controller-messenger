@@ -9,9 +9,9 @@ export function initWebSocket(userToken) {
         brokerURL: "ws://" + WS_URL + "messenger/websocket?token=" + userToken,
         // Uncomment lines to activate WS debug
 
-        // debug: function (str) {
-        //     console.log(str);
-        // },
+        debug: function (str) {
+            console.log(str);
+        },
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

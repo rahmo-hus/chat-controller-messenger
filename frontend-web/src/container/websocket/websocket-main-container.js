@@ -1,17 +1,19 @@
 import {connect} from 'react-redux'
-import {WebSocketMainComponent} from "../components/websocket/websocket-main-component";
-import {initWsConnection, wsHealthCheckConnected} from "../actions";
+import {WebSocketMainComponent} from "../../components/websocket/websocket-main-component";
+import {initWsConnection, setCurrentActiveGroup, wsHealthCheckConnected} from "../../actions/webSocketActions";
+import {initCallWebRTC} from "../../actions/webRtcActions";
 
 const mapStateToProps = (state) => {
     const {isDarkModeToggled, currentThemeMode} = state.ThemeReducer;
     const {isUserLoggedIn} = state.AuthReducer;
-    const {wsUserTokenValue, wsUserGroups, isWsConnected} = state.WebSocketReducer;
+    const {wsUserTokenValue, wsUserGroups, isWsConnected, currentActiveGroup} = state.WebSocketReducer;
     return {
         isDarkModeToggled,
         currentThemeMode,
         isUserLoggedIn,
         wsUserTokenValue,
         isWsConnected,
+        currentActiveGroup,
         wsUserGroups
     };
 }
@@ -19,7 +21,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => {
     return {
         wsCheckConnected: (bool) => dispatch(wsHealthCheckConnected(bool)),
-        setWsObject: (data) => dispatch(initWsConnection(data))
+        setCurrentActiveGroup: (url) => dispatch(setCurrentActiveGroup(url)),
+        setWsObject: (data) => dispatch(initWsConnection(data)),
+        initCallWebRTC: (data) => dispatch(initCallWebRTC(data))
     }
 }
 

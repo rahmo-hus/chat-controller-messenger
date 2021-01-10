@@ -22,7 +22,7 @@ const mapDispatchToProps = dispatch => {
             dispatch(changeCurrentThemeMode())
         },
         changeCurrentThemeMode: () => dispatch(changeCurrentThemeMode()),
-        dispatchThemeMode: () => dispatch(userLogout())
+        userLogout: () => dispatch(userLogout())
     }
 }
 
