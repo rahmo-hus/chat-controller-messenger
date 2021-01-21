@@ -1,10 +1,10 @@
 import React, {useEffect} from "react";
 import {generateColorMode} from "../../design/style/enable-dark-mode";
-import {WebSocketGroupActionComponent} from "./websocket-group-actions-component";
 import WebSocketGroupsContainer from "../../container/websocket/websocket-groups-container";
 import WebSocketChatContainer from "../../container/websocket/websocket-chat-container";
 import "./websocketStyle.css"
 import {initWebSocket} from "../../config/websocket-config";
+import WebSocketGroupsActionContainer from "../../container/websocket/websocket-group-actions-container";
 
 export const WebSocketMainComponent = ({
                                            wsUserTokenValue,
@@ -49,7 +49,7 @@ export const WebSocketMainComponent = ({
              style={{height: "calc(100% - 64px)", display: "flex", justifyContent: "space-between"}}>
             <WebSocketGroupsContainer/>
             <WebSocketChatContainer/>
-            <WebSocketGroupActionComponent/>
+            <WebSocketGroupsActionContainer/>
         </div>
     )
 }

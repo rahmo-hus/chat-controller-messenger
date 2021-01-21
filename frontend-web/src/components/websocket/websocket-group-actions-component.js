@@ -19,7 +19,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import AuthService from "../../service/auth-service";
 import AllUsersDialog from "../../design/dialog/all-users-dialog";
 
-export const WebSocketGroupActionComponent = (props) => {
+export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, currentActiveGroup}) => {
     const [paramsOpen, setParamsOpen] = useState(false);
     const [popupOpen, setPopupOpen] = useState(false);
     const [usersInConversation, setUsersInConversation] = useState([]);
@@ -28,10 +28,11 @@ export const WebSocketGroupActionComponent = (props) => {
     const [openTooltipId, setToolTipId] = useState(null);
 
     useEffect(() => {
+        clearData()
         return () => {
             clearData()
         }
-    }, [])
+    }, [currentActiveGroup])
 
 
     function handleTooltipAction(event, action) {
@@ -73,7 +74,7 @@ export const WebSocketGroupActionComponent = (props) => {
                 usersInConversation.length === 0 && AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
                     console.log(r.data)
                     r.data.forEach((val) => {
-                        if (val.userId === props.userId && val.admin) {
+                        if (val.userId === userId && val.admin) {
                             setCurrentUserIsAdmin(true);
                         }
                     })
@@ -130,13 +131,13 @@ export const WebSocketGroupActionComponent = (props) => {
                     component="nav">
                     <ListItem button onClick={() => handleAddUserAction("open")}>
                         <ListItemIcon>
-                            <GroupAddIcon style={{color: generateIconColorMode(props.isDarkModeEnable)}}/>
+                            <GroupAddIcon style={{color: generateIconColorMode(isDarkModeToggled)}}/>
                         </ListItemIcon>
                         <ListItemText primary="Add user to group"/>
                     </ListItem>
                     <ListItem button onClick={(event) => handleClick(event, "param")}>
                         <ListItemIcon>
-                            <GroupIcon style={{color: generateIconColorMode(props.isDarkModeEnable)}}/>
+                            <GroupIcon style={{color: generateIconColorMode(isDarkModeToggled)}}/>
                         </ListItemIcon>
                         <ListItemText primary="Members"/>
                         {paramsOpen ? <ExpandLess/> : <ExpandMore/>}
@@ -150,9 +151,9 @@ export const WebSocketGroupActionComponent = (props) => {
                                     <ListItemIcon>
                                         {
                                             value.admin ? <SecurityIcon
-                                                    style={{color: generateIconColorMode(props.isDarkModeEnable)}}/> :
+                                                    style={{color: generateIconColorMode(isDarkModeToggled)}}/> :
                                                 <PersonIcon
-                                                    style={{color: generateIconColorMode(props.isDarkModeEnable)}}/>
+                                                    style={{color: generateIconColorMode(isDarkModeToggled)}}/>
                                         }
                                     </ListItemIcon>
                                     <ListItemText primary={value.firstName + " " + value.lastName}/>
@@ -190,13 +191,13 @@ export const WebSocketGroupActionComponent = (props) => {
                                                                     administrator</MenuItem>
                                                             }
                                                             {
-                                                                !(props.userId === value.userId) &&
+                                                                !(userId === value.userId) &&
                                                                 <MenuItem
                                                                     onClick={event => removeUserFromConversation(event, value.userId)}
                                                                     dense={true}>Remove from group</MenuItem>
                                                             }
                                                             {
-                                                                props.userId === value.userId &&
+                                                                userId === value.userId &&
                                                                 <MenuItem
                                                                     onClick={event => leaveGroup(event)}
                                                                     dense={true}>Leave group</MenuItem>
@@ -206,7 +207,7 @@ export const WebSocketGroupActionComponent = (props) => {
                                                 }>
                                                 <IconButton
                                                     onClick={event => handleTooltipAction(event, "open")}
-                                                    style={{color: generateIconColorMode(props.isDarkModeEnable)}}>
+                                                    style={{color: generateIconColorMode(isDarkModeToggled)}}>
                                                     <MoreHorizIcon/>
                                                 </IconButton>
                                             </Tooltip>
