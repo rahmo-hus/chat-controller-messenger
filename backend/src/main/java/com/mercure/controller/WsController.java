@@ -1,14 +1,18 @@
 package com.mercure.controller;
 
+import com.mercure.dto.GroupDTO;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.MessageEntity;
+import com.mercure.entity.UserEntity;
 import com.mercure.service.GroupService;
 import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
+import com.mercure.utils.ComparatorListGroupDTO;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.MessageTypeEnum;
+import liquibase.pro.packaged.G;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -69,13 +73,16 @@ public class WsController {
      */
     @MessageMapping("/message")
     @SendToUser("/queue/reply")
-    public UserDTO initUserProfile(String token) {
+    public List<GroupDTO> initUserProfile(String token) {
         String username = userService.findUsernameWithWsToken(token);
         if (StringUtils.isEmpty(username)) {
             log.warn("Username not found");
             return null;
         }
-        return userService.getUserInformation(username);
+        UserDTO user = userService.getUserInformation(username);
+        List<GroupDTO> toReturn = user.getGroupList();
+        toReturn.sort(new ComparatorListGroupDTO());
+        return toReturn;
     }
 
 

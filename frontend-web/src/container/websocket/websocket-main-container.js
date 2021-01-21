@@ -1,6 +1,11 @@
 import {connect} from 'react-redux'
 import {WebSocketMainComponent} from "../../components/websocket/websocket-main-component";
-import {initWsConnection, setCurrentActiveGroup, wsHealthCheckConnected} from "../../actions/webSocketActions";
+import {
+    initWsConnection,
+    setCurrentActiveGroup,
+    unsubscribeAll,
+    wsHealthCheckConnected
+} from "../../actions/webSocketActions";
 import {initCallWebRTC} from "../../actions/webRtcActions";
 
 const mapStateToProps = (state) => {
@@ -23,7 +28,8 @@ const mapDispatchToProps = dispatch => {
         wsCheckConnected: (bool) => dispatch(wsHealthCheckConnected(bool)),
         setCurrentActiveGroup: (url) => dispatch(setCurrentActiveGroup(url)),
         setWsObject: (data) => dispatch(initWsConnection(data)),
-        initCallWebRTC: (data) => dispatch(initCallWebRTC(data))
+        initCallWebRTC: (data) => dispatch(initCallWebRTC(data)),
+        unsubscribeAll: () => dispatch(unsubscribeAll())
     }
 }
 

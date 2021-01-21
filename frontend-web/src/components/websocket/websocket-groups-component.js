@@ -23,7 +23,6 @@ const Clock = ({date}) => {
     const [index, setIndex] = useState(0);
 
     useEffect(() => {
-
             setIndex(1)
             const dateInterval = setInterval(() => {
                 setCount(dateParser(date))
@@ -36,12 +35,13 @@ const Clock = ({date}) => {
         [currentCount]
     );
     return (
-        <React.Fragment>
-            {index === 0 ?
-                dateParser(date)
-                :
-                currentCount
-            }
+            <React.Fragment>
+            {/*{index === 0 ?*/}
+            {/*    dateParser(date)*/}
+            {/*    :*/}
+            {/*    currentCount*/}
+            {/*}*/}
+                {dateParser(date)}
         </React.Fragment>
     )
 };
@@ -76,17 +76,9 @@ export const WebsocketGroupsComponent = ({
         }
     }
 
-    function styleUnreadMessage() {
-
+    function styleUnreadMessage(isLastMessageSeen) {
+        return isLastMessageSeen ? isDarkModeToggled ? "bold-unread-message-light" : "bold-unread-message-dark" : "";
     }
-
-    function getMessageDate(date) {
-
-        setInterval(() => {
-            return dateParser(date);
-        }, 2000)
-    }
-
 
     return (
         <div

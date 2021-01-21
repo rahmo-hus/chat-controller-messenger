@@ -8,9 +8,6 @@ import com.mercure.entity.MessageEntity;
 import com.mercure.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.text.SimpleDateFormat;
 
 @Service
 public class GroupMapper {
@@ -27,7 +24,6 @@ public class GroupMapper {
         MessageEntity msg = messageService.findLastMessage(grp.getId());
         if (msg != null) {
             grpDTO.setLastMessage(msg.getMessage());
-//            String formattedDate = new SimpleDateFormat("HH:mm").format(msg.getCreatedAt());
             grpDTO.setLastMessageDate(msg.getCreatedAt().toString());
             grpDTO.setLastMessageSeen(false);
         }

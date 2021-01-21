@@ -126,8 +126,7 @@ public class MessageService {
             jsonObject.put("name", fileEntity.getFilename());
             notificationDTO.setMessage(jsonObject.toString());
         }
-        String formattedDate = new SimpleDateFormat("HH:mm").format(msg.getCreatedAt());
-        notificationDTO.setLastMessageDate(formattedDate);
+        notificationDTO.setLastMessageDate(msg.getCreatedAt().toString());
         notificationDTO.setSenderName(userService.findUsernameById(msg.getUser_id()));
         return notificationDTO;
     }

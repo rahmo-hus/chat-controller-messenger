@@ -12,6 +12,7 @@ export const WebSocketMainComponent = ({
                                            setWsObject,
                                            wsCheckConnected,
                                            initCallWebRTC,
+                                           unsubscribeAll,
                                        }) => {
 
     const groupUrl = localStorage.getItem("_cAG");
@@ -28,7 +29,7 @@ export const WebSocketMainComponent = ({
         return () => {
             setWsObject(null);
             wsCheckConnected(false);
-            //TODO wsClient.deactivate()
+            unsubscribeAll()
             console.log("Disconnected")
         }
 

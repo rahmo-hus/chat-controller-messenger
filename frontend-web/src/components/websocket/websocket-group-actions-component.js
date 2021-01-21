@@ -12,7 +12,7 @@ import SecurityIcon from "@material-ui/icons/Security";
 import PersonIcon from "@material-ui/icons/Person";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import Tooltip from "@material-ui/core/Tooltip";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
@@ -22,21 +22,47 @@ import AllUsersDialog from "../../design/dialog/all-users-dialog";
 export const WebSocketGroupActionComponent = (props) => {
     const [paramsOpen, setParamsOpen] = useState(false);
     const [popupOpen, setPopupOpen] = useState(false);
-    const toolTipAction = false;
-    const usersInConversationList = [];
-    const openTooltipId = 2;
-    const isCurrentUserAdmin = true;
+    const [usersInConversation, setUsersInConversation] = useState([]);
+    const [isCurrentUserAdmin, setCurrentUserIsAdmin] = useState(false);
+    const [toolTipAction, setToolTipAction] = useState(false);
+    const [openTooltipId, setToolTipId] = useState(null);
 
-    function handleTooltipAction() {
-        usersInConversationList.push("");
+    useEffect(() => {
+        return () => {
+            clearData()
+        }
+    }, [])
+
+
+    function handleTooltipAction(event, action) {
+        event.preventDefault();
+        if (action === "open") {
+            setToolTipAction(true)
+        }
+        if (action === "close") {
+            setToolTipAction(false)
+            setToolTipId(null)
+        }
     }
 
-    function handleDisplayUserAction() {
-
+    function clearData() {
+        setToolTipAction(false)
+        setToolTipId(null)
+        setCurrentUserIsAdmin(false)
+        setUsersInConversation([])
+        setPopupOpen(false)
+        setParamsOpen(false)
     }
 
-    function closeDisplayUserAction() {
+    function handleDisplayUserAction(event, id) {
+        event.preventDefault();
+        setToolTipId(id)
+    }
 
+    function closeDisplayUserAction(event) {
+        event.preventDefault();
+        setToolTipAction(false)
+        setToolTipId(null)
     }
 
     function handleClick(event, target) {
@@ -44,14 +70,14 @@ export const WebSocketGroupActionComponent = (props) => {
         switch (target) {
             case "param":
                 const groupUrl = localStorage.getItem("_cAG")
-                usersInConversationList.length === 0 && AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
+                usersInConversation.length === 0 && AuthService.fetchAllUsersInConversation(groupUrl).then(r => {
                     console.log(r.data)
                     r.data.forEach((val) => {
                         if (val.userId === props.userId && val.admin) {
-                            // this.setState({isCurrentUserAdmin: true})
+                            setCurrentUserIsAdmin(true);
                         }
                     })
-                    // this.setState({usersInConversationList: r.data})
+                    setUsersInConversation(r.data)
                 })
                 setParamsOpen(!paramsOpen);
                 break
@@ -117,7 +143,7 @@ export const WebSocketGroupActionComponent = (props) => {
                     </ListItem>
                     <Collapse in={paramsOpen}>
                         <List component="div" disablePadding>
-                            {paramsOpen && usersInConversationList.map((value, index) => (
+                            {paramsOpen && usersInConversation.map((value, index) => (
                                 <ListItem key={index}
                                           onMouseEnter={event => handleDisplayUserAction(event, index)}
                                           onMouseLeave={event => closeDisplayUserAction(event)}>

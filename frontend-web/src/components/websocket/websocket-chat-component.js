@@ -11,14 +11,17 @@ import ImagePreview from "../../design/partials/image-preview";
 import CallWindowContainer from "../../container/call-window-container";
 import UUIDv4 from "../../utils/uuid-generator";
 import MessageModel from "../../model/message-model";
+import AuthService from "../../service/auth-service";
 
 export const WebSocketChatComponent = ({
                                            isDarkModeEnable,
                                            isDarkModeToggled,
                                            currentActiveGroup,
+                                           updateGroupsOnMessage,
                                            sendWsMessage,
                                            fetchMessages,
                                            chatHistory,
+                                           wsUserGroups,
                                            userId
                                        }) => {
 
@@ -32,7 +35,6 @@ export const WebSocketChatComponent = ({
 
     const currentUrl = window.location.pathname.split("/").slice(-1)[0];
     useEffect(() => {
-        // console.log(currentUrl)
         fetchMessages(currentUrl);
     }, [currentUrl])
 
@@ -104,26 +106,25 @@ export const WebSocketChatComponent = ({
             sendWsMessage(toSend)
             setMessage("")
         }
-        // if (file !== "") {
-        //     console.log("Publishing file");
-        //     const formData = new FormData();
-        //     formData.append("file", file)
-        //     formData.append("userId", userId)
-        //     formData.append("groupUrl", groupUrl)
-        //     AuthService.uploadFile(formData).then().catch(err => {
-        //         console.log(err)
-        //     })
-        //     this.props.updateGroupWhenUserSendMessage(this.props.location.groupId, this.state.message, MessageTypeEnum.image);
-        //     // this.props.updateGroupsArrayOnMessage(this.props.location.groupUrl);
-        //     setMessage("")
-        //     setImageLoaded(false)
-        //     setFile("")
-        //     setImagePreviewUrl("")
-        // }
+        if (file !== null) {
+            console.log("Publishing file");
+            const formData = new FormData();
+            formData.append("file", file)
+            formData.append("userId", userId)
+            formData.append("groupUrl", groupUrl)
+            AuthService.uploadFile(formData).then().catch(err => {
+                console.log(err)
+            })
+            setMessage("")
+            setImageLoaded(false)
+            setFile("")
+            setImagePreviewUrl("")
+        }
+        updateGroupsOnMessage(groupUrl, wsUserGroups)
     }
 
     function scrollToEnd() {
-        messageEnd.scrollIntoView({behavior: "smooth"});
+        messageEnd.scrollIntoView({behavior: "auto"});
     }
 
     function handleImagePreview(event, action, src) {
@@ -144,6 +145,10 @@ export const WebSocketChatComponent = ({
     function openCallPage() {
         const callUrl = UUIDv4();
         window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
+    }
+
+    function markMessageAsSeen() {
+
     }
 
     return (
@@ -275,6 +280,7 @@ export const WebSocketChatComponent = ({
                         id={"inputChatMessenger"}
                         label={"Write a message"}
                         value={message}
+                        onClick={markMessageAsSeen}
                         handleChange={(event) => handleChange(event)}
                         type={"text"}
                         keyUp={submitMessage}

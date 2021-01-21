@@ -7,7 +7,7 @@ import {
 } from "../utils/redux-constants";
 
 const initialState = {
-    isWsConnected: null,
+    isWsConnected: true,
     wsObject: null,
     wsUserTokenValue: null,
     wsUserGroups: [],

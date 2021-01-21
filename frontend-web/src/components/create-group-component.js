@@ -21,6 +21,7 @@ export const CreateGroupComponent = (props) => {
     function createGroup(event) {
         event.preventDefault();
         AuthService.createGroup(groupName).then(r => {
+            localStorage.setItem("_cAG", r.data)
             history.push({
                 pathname: "/t/messages/" + r.data
             })

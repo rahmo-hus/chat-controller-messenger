@@ -1,7 +1,9 @@
 package com.mercure.dto;
 
+import java.util.Date;
+
 /**
- * Class used to send Notification to GroupSideBar
+ * POJO class used to send Notification to GroupSideBar
  */
 public class NotificationDTO {
 
