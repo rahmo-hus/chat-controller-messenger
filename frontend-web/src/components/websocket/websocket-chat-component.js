@@ -18,6 +18,7 @@ export const WebSocketChatComponent = ({
                                            isDarkModeToggled,
                                            currentActiveGroup,
                                            sendWsMessage,
+                                           markMessageAsSeen,
                                            fetchMessages,
                                            chatHistory,
                                            wsUserGroups,
@@ -30,9 +31,10 @@ export const WebSocketChatComponent = ({
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState(null);
     const [imageLoaded, setImageLoaded] = React.useState(false);
     const [message, setMessage] = React.useState("");
+    const groupUrl = localStorage.getItem("_cAG");
+    const currentUrl = window.location.pathname.split("/").slice(-1)[0];
     let messageEnd;
 
-    const currentUrl = window.location.pathname.split("/").slice(-1)[0];
     useEffect(() => {
         fetchMessages(currentUrl);
     }, [currentUrl])
@@ -94,7 +96,6 @@ export const WebSocketChatComponent = ({
     }
 
     function sendMessage() {
-        const groupUrl = localStorage.getItem("_cAG");
         if (userId === null || undefined) {
             console.warn("userId is null !")
         }
@@ -146,9 +147,8 @@ export const WebSocketChatComponent = ({
         window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
     }
 
-    function markMessageAsSeen() {
-
-
+    function markMessageSeen() {
+        markMessageAsSeen(currentUrl)
     }
 
     return (
@@ -267,10 +267,10 @@ export const WebSocketChatComponent = ({
                     {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
                     {/*    <CallIcon/>*/}
                     {/*</Button>*/}
-                    <Button onClick={event => openCallPage(event)} variant="text" component="span">
-                        <AcUnitIcon/>
-                    </Button>
-                    <CallWindowContainer/>
+                    {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
+                    {/*    <AcUnitIcon/>*/}
+                    {/*</Button>*/}
+                    {/*<CallWindowContainer/>*/}
                     <label htmlFor="raised-button-file">
                         <Button variant="text" component="span">
                             <ImageIcon/>
@@ -280,7 +280,7 @@ export const WebSocketChatComponent = ({
                         id={"inputChatMessenger"}
                         label={"Write a message"}
                         value={message}
-                        onClick={markMessageAsSeen}
+                        onClick={markMessageSeen}
                         handleChange={(event) => handleChange(event)}
                         type={"text"}
                         keyUp={submitMessage}

@@ -17,7 +17,6 @@ export const WebSocketMainComponent = ({
 
     const groupUrl = localStorage.getItem("_cAG");
     useEffect(() => {
-        console.log("INIT_WS_CONNECTION")
         if (wsUserTokenValue !== null) {
             initWs()
             //     .then(() => {
@@ -36,7 +35,6 @@ export const WebSocketMainComponent = ({
     }, [wsUserTokenValue])
 
     useEffect(() => {
-        console.log("Changing webRT WS subscribe")
         initCallWebRTC({event: "init"})
     }, [groupUrl])
 

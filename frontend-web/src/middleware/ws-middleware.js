@@ -1,8 +1,16 @@
 import {
-    FETCH_GROUP_MESSAGES, HANDLE_RTC_OFFER, HANDLE_RTC_ACTIONS,
+    FETCH_GROUP_MESSAGES,
+    HANDLE_RTC_OFFER,
+    HANDLE_RTC_ACTIONS,
     INIT_WS_CONNECTION,
     SET_CHAT_HISTORY,
-    SET_WS_GROUPS, HANDLE_RTC_ANSWER, SEND_TO_SERVER, SEND_GROUP_MESSAGE, ADD_CHAT_HISTORY, UNSUBSCRIBE_ALL
+    SET_WS_GROUPS,
+    HANDLE_RTC_ANSWER,
+    SEND_TO_SERVER,
+    SEND_GROUP_MESSAGE,
+    ADD_CHAT_HISTORY,
+    UNSUBSCRIBE_ALL,
+    MARK_MESSAGE_AS_SEEN
 } from "../utils/redux-constants";
 import {wsHealthCheckConnected} from "../actions/webSocketActions";
 import {handleRTCActions, handleRTCSubscribeEvents} from "./webRTC-middleware";
@@ -96,6 +104,9 @@ const WsClientMiddleWare = () => {
                     });
                 }
                 break;
+            case MARK_MESSAGE_AS_SEEN:
+                markMessageAsSeen(store, groupUrl)
+                break;
             case UNSUBSCRIBE_ALL:
                 if (wsClient !== null) {
                     if (userQueueReplySubscribe !== undefined) {
@@ -144,24 +155,10 @@ const WsClientMiddleWare = () => {
 
 /**
  * Update groups sidebar with new messages
+ *
  * @param store
  * @param value
- * @param groups
  */
-function updateLastMessageInGroups(store, value, groups) {
-    let groupToUpdateIndex = groups.findIndex(elt => elt.id === value.groupId)
-    let groupsArray = [...groups];
-    let item = {...groupsArray[groupToUpdateIndex]};
-    item.lastMessage = value.message;
-    item.lastMessageDate = value.lastMessageDate;
-    item.lastMessageSeen = true;
-    groupsArray[groupToUpdateIndex] = item;
-    store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
-    // this.setState({groups: groupsArray}, () => {
-    //     playNotificationSound();
-    // });
-}
-
 function updateGroupsWithLastMessageSent(store, value) {
     const groupIdToUpdate = value.groupId;
     const groups = store.getState().WebSocketReducer.wsUserGroups;
@@ -177,6 +174,22 @@ function updateGroupsWithLastMessageSent(store, value) {
     item.lastMessageSeen = true;
     groupsArray.splice(groupToPlaceInFirstPosition, 1);
     groupsArray.unshift(item);
+    store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
+}
+
+function markMessageAsSeen(store, groupUrl) {
+    const groups = store.getState().WebSocketReducer.wsUserGroups;
+    const groupToUpdateIndex = groups.findIndex(elt => elt.url === groupUrl);
+    if (groupToUpdateIndex === -1) {
+        return;
+    }
+    if (groups[groupToUpdateIndex].lastMessageSeen === false) {
+        return;
+    }
+    let groupsArray = [...groups];
+    console.log(groupsArray)
+    groupsArray[groupToUpdateIndex].lastMessageSeen = false;
+    console.log(groupsArray)
     store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
 }
 
