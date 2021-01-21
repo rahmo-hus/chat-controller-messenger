@@ -34,18 +34,9 @@ export const userAuthenticated = (data) => ({
 export const initUserData = () => (dispatch) => {
     return AuthService.testRoute().then(
         (res) => {
-            localStorage.setItem("_cAG", res.data.groupSet[0].url)
-            dispatch({
-                type: LOGIN_SUCCESS,
-                payload: {
-                    username: res.data.firstName,
-                    userId: res.data.id
-                }
-            })
-            dispatch({
-                type: INIT_WS_TOKEN,
-                payload: res.data.wsToken
-            })
+            // localStorage.setItem("_cAG", res.data.groupSet[0].url)
+            dispatch(userAuthenticated(res.data))
+            dispatch(setWsUserToken(res.data.wsToken))
             return Promise.resolve();
         },
         () => {

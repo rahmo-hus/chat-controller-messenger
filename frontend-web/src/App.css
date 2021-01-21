@@ -28,9 +28,14 @@ body {
     padding: 2px 0 2px 5px;
 }
 
-.bold-unread-message {
+.bold-unread-message-light {
     font-weight: bold !important;
     color: white !important;
+}
+
+.bold-unread-message-dark {
+    font-weight: bold !important;
+    color: black !important;
 }
 
 .hover-msg-light:hover {

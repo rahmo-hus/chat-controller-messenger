@@ -4,7 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 public class UserDTO {
 
@@ -20,7 +20,7 @@ public class UserDTO {
 
     private String wsToken;
 
-    private Set<GroupDTO> groupSet;
+    private List<GroupDTO> groupList;
 
     private Date expiration_date;
 
@@ -102,12 +102,12 @@ public class UserDTO {
         this.wsToken = wsToken;
     }
 
-    public Set<GroupDTO> getGroupSet() {
-        return groupSet;
+    public List<GroupDTO> getGroupList() {
+        return groupList;
     }
 
-    public void setGroupSet(Set<GroupDTO> groupSet) {
-        this.groupSet = groupSet;
+    public void setGroupList(List<GroupDTO> groupList) {
+        this.groupList = groupList;
     }
 
     public Date getExpiration_date() {

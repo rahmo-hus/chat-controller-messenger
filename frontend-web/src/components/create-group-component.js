@@ -20,9 +20,10 @@ export const CreateGroupComponent = (props) => {
 
     function createGroup(event) {
         event.preventDefault();
-        AuthService.createGroup(this.state.groupName).then(r => {
+        AuthService.createGroup(groupName).then(r => {
+            localStorage.setItem("_cAG", r.data)
             history.push({
-                pathname: "/t/messages"
+                pathname: "/t/messages/" + r.data
             })
         }).catch(err => {
             console.log(err)
@@ -31,7 +32,7 @@ export const CreateGroupComponent = (props) => {
 
     function submitGroupCreation(event) {
         if (event.key === undefined || event.key === 'Enter') {
-            if (this.state.groupName === "") {
+            if (groupName === "") {
                 return;
             }
             createGroup(event)

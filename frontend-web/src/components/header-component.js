@@ -25,9 +25,11 @@ export const HeaderComponent = ({
 
     function dispatchLogout(event) {
         event.preventDefault();
-        userLogout();
         AuthService.logout().then(() => {
+            userLogout();
             history.push("/");
+        }).catch(err => {
+            console.log(err)
         })
     }
 

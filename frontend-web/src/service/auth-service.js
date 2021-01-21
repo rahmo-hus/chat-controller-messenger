@@ -69,7 +69,6 @@ class AuthService {
     }
 
     uploadFile(data) {
-        console.log("Call axios post")
         return instance.post(API_URL + "upload", data);
     }
 }

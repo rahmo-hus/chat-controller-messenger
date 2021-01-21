@@ -35,7 +35,6 @@ class Toaster extends Component {
                     horizontal: 'left',
                 }}
                 open={this.state.toasterOpened}
-                // open={true}
                 autoHideDuration={5000}
                 onClose={this.closeDeleteUserToaster}>
                 <Alert onClose={this.closeDeleteUserToaster}

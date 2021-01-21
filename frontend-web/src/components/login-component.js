@@ -10,10 +10,12 @@ import Box from "@material-ui/core/Box";
 import AuthService from "../service/auth-service";
 import {setWsUserToken, userAuthenticated} from "../actions";
 import {useHistory} from "react-router-dom";
+import {Toaster} from "../utils/alert-snackbar";
 
 const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [alertOpened, setAlertOpened] = useState(false);
     const history = useHistory();
 
     function handleChange(e) {
@@ -33,7 +35,6 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     function submitLogin(event) {
         if (event.key === undefined || event.key === 'Enter') {
             if (!username || !password) {
-                // this.setState({error: true});
                 return;
             }
             login(username, password)
@@ -41,14 +42,19 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     }
 
     function login() {
-        AuthService.authenticate(username, password).then(async function (res) {
+        AuthService.authenticate(username, password).then(function (res) {
                 if (res.status === 200) {
-                    await dispatch(userAuthenticated(res.data))
-                    await dispatch(setWsUserToken(res.data.wsToken))
+                    // localStorage.setItem("_cAG", res.data.groupSet[0].url)
+                    dispatch(userAuthenticated(res.data))
+                    dispatch(setWsUserToken(res.data.wsToken))
                     history.push("/");
                 }
             }
         ).catch(err => {
+            setUsername("");
+            setPassword("");
+            setAlertOpened(true)
+                // snackBarText
             console.log(err)
         })
     }
@@ -130,6 +136,8 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
                     </Typography>
                 </Box>
             </div>
+            <Toaster toasterOpened={alertOpened} text={"Error : bad credentials"}
+                     severity={"error"}/>
         </div>
     )
 }

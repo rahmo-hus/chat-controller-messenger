@@ -1,7 +1,10 @@
 package com.mercure.controller;
 
 import com.mercure.dto.JwtDTO;
+import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
+import com.mercure.entity.GroupEntity;
+import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.service.CustomUserDetailsService;
@@ -50,7 +53,7 @@ public class AuthenticationController {
     private GroupService groupService;
 
     @PostMapping(value = "/auth")
-    public UserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
+    public LightUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
@@ -63,7 +66,7 @@ public class AuthenticationController {
 //         7 days
         jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(jwtAuthToken);
-        return userMapper.toUserDTO(user);
+        return userMapper.toLightUserDTO(user);
     }
 
     @GetMapping(value = "/logout")
@@ -78,8 +81,8 @@ public class AuthenticationController {
     }
 
     @GetMapping(value = "/fetch")
-    public UserDTO fetchInformation(HttpServletRequest request) {
-        return userMapper.toUserDTO(getUserEntity(request));
+    public LightUserDTO fetchInformation(HttpServletRequest request) {
+        return userMapper.toLightUserDTO(getUserEntity(request));
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -93,14 +96,14 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/create")
-    public ResponseEntity<?> createGroupChat(HttpServletRequest request, @RequestBody String payload) throws ParseException {
+    public String createGroupChat(HttpServletRequest request, @RequestBody String payload) throws ParseException {
         UserEntity user = getUserEntity(request);
         int userId;
         userId = user.getId();
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(payload);
-        groupService.createGroup(userId, (String) json.get("name"));
-        return ResponseEntity.ok().build();
+        GroupUser groupUser = groupService.createGroup(userId, (String) json.get("name"));
+        return groupUser.getGroupMapping().getUrl();
     }
 
     private UserEntity getUserEntity(HttpServletRequest request) {

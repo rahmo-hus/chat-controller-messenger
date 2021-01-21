@@ -7,11 +7,12 @@ import {
 } from "../utils/redux-constants";
 
 const initialState = {
-    isWsConnected: null,
+    isWsConnected: true,
     wsObject: null,
     wsUserTokenValue: null,
     wsUserGroups: [],
     currentActiveGroup: null,
+    usersInConversationList: [],
     chatHistory: []
 }
 
@@ -22,7 +23,6 @@ const WebSocketReducer = (state = initialState, action) => {
         case INIT_WS_CONNECTION:
             return {...state, wsObject: action.payload};
         case SET_WS_GROUPS:
-            console.log(action.payload);
             return {...state, wsUserGroups: action.payload};
         case WS_CHECK_CONNECTED:
             return {...state, isWsConnected: action.payload};

@@ -2,11 +2,16 @@ import {
     FETCH_GROUP_MESSAGES, HANDLE_RTC_OFFER, HANDLE_RTC_ACTIONS,
     INIT_WS_CONNECTION,
     SET_CHAT_HISTORY,
-    SET_WS_GROUPS, HANDLE_RTC_ANSWER, SEND_TO_SERVER, SEND_GROUP_MESSAGE, ADD_CHAT_HISTORY
+    SET_WS_GROUPS, HANDLE_RTC_ANSWER, SEND_TO_SERVER, SEND_GROUP_MESSAGE, ADD_CHAT_HISTORY, UNSUBSCRIBE_ALL
 } from "../utils/redux-constants";
 import {wsHealthCheckConnected} from "../actions/webSocketActions";
 import {handleRTCActions, handleRTCSubscribeEvents} from "./webRTC-middleware";
 
+let userQueueReplySubscribe;
+let topicNotificationSubscribe;
+let topicCallReplySubscribe;
+let appGroupGetSubscribe;
+let topicGroupSubscribe;
 
 function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
     const groupUrl = localStorage.getItem("_cAG");
@@ -15,18 +20,21 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
     wsClient.onConnect = () => {
         store.dispatch(store.dispatch(wsHealthCheckConnected(true)))
 
-        wsClient.subscribe("/user/queue/reply", (res) => {
+        userQueueReplySubscribe = wsClient.subscribe("/user/queue/reply", (res) => {
             const data = JSON.parse(res.body)
             // retrieveUserData(res);
             store.dispatch({
                 type: SET_WS_GROUPS,
-                payload: data.groupSet
+                payload: data
             });
         })
 
-        wsClient.subscribe("/topic/notification/" + userId, (res) => {
+        topicNotificationSubscribe = wsClient.subscribe("/topic/notification/" + userId, (res) => {
             console.log("RECEIVEING NOTIFICATION")
-            updateLastMessageInGroups(store, JSON.parse(res.body));
+            // updateLastMessageInGroups(store, JSON.parse(res.body), groups);
+            console.log(groupUrl)
+            console.log(JSON.parse(res.body))
+            updateGroupsWithLastMessageSent(store, JSON.parse(res.body));
         })
 
         wsClient.subscribe("/topic/call/reply/" + groupUrl, (res) => {
@@ -34,7 +42,7 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
             handleRTCSubscribeEvents(data, store);
         });
 
-        wsClient.publish({destination: "/app/message", body: wsUserTokenValue});
+        topicCallReplySubscribe = wsClient.publish({destination: "/app/message", body: wsUserTokenValue});
         console.log("On récupère les messages du groupe actif")
         store.dispatch({
             type: FETCH_GROUP_MESSAGES,
@@ -69,15 +77,13 @@ const WsClientMiddleWare = () => {
                 // console.log(groupUrl)
 
                 if (wsClient !== null) {
-                    wsClient.subscribe("/app/groups/get/" + groupUrl, (res) => {
+                    appGroupGetSubscribe = wsClient.subscribe("/app/groups/get/" + groupUrl, (res) => {
                         const data = JSON.parse(res.body);
-                        console.log(data)
                         store.dispatch({type: SET_CHAT_HISTORY, payload: data})
                     });
 
-                    wsClient.subscribe("/topic/" + groupUrl, (res) => {
+                    topicGroupSubscribe = wsClient.subscribe("/topic/" + groupUrl, (res) => {
                         const data = JSON.parse(res.body);
-                        console.log(data)
                         store.dispatch({type: ADD_CHAT_HISTORY, payload: data})
                     });
                 }
@@ -87,6 +93,31 @@ const WsClientMiddleWare = () => {
                     wsClient.publish({
                         destination: "/app/message/text/" + userId + "/group/" + groupUrl,
                         body: JSON.stringify(action.payload)
+                    });
+                }
+                break;
+            case UNSUBSCRIBE_ALL:
+                if (wsClient !== null) {
+                    if (userQueueReplySubscribe !== undefined) {
+                        wsClient.unsubscribe(userQueueReplySubscribe.id);
+                    }
+                    if (topicNotificationSubscribe !== undefined) {
+                        wsClient.unsubscribe(topicNotificationSubscribe.id);
+                    }
+                    if (topicCallReplySubscribe !== undefined) {
+                        wsClient.unsubscribe(topicCallReplySubscribe.id);
+                    }
+                    if (appGroupGetSubscribe !== undefined) {
+                        wsClient.unsubscribe(appGroupGetSubscribe.id);
+                    }
+                    if (topicGroupSubscribe !== undefined) {
+                        wsClient.unsubscribe(topicGroupSubscribe.id);
+                    }
+                    wsClient.deactivate().then(r => {
+                        console.log(r)
+                        wsClient = null;
+                    }).catch(err => {
+                        console.log(err)
                     });
                 }
                 break;
@@ -115,9 +146,9 @@ const WsClientMiddleWare = () => {
  * Update groups sidebar with new messages
  * @param store
  * @param value
+ * @param groups
  */
-function updateLastMessageInGroups(store, value) {
-    const groups = store.getState().WebSocketReducer.wsUserGroups;
+function updateLastMessageInGroups(store, value, groups) {
     let groupToUpdateIndex = groups.findIndex(elt => elt.id === value.groupId)
     let groupsArray = [...groups];
     let item = {...groupsArray[groupToUpdateIndex]};
@@ -129,6 +160,24 @@ function updateLastMessageInGroups(store, value) {
     // this.setState({groups: groupsArray}, () => {
     //     playNotificationSound();
     // });
+}
+
+function updateGroupsWithLastMessageSent(store, value) {
+    const groupIdToUpdate = value.groupId;
+    const groups = store.getState().WebSocketReducer.wsUserGroups;
+
+    let groupToPlaceInFirstPosition = groups.findIndex(elt => elt.id === groupIdToUpdate);
+    if (groupToPlaceInFirstPosition === -1) {
+        return
+    }
+    let groupsArray = [...groups];
+    let item = {...groupsArray[groupToPlaceInFirstPosition]};
+    item.lastMessage = value.message;
+    item.lastMessageDate = value.lastMessageDate;
+    item.lastMessageSeen = true;
+    groupsArray.splice(groupToPlaceInFirstPosition, 1);
+    groupsArray.unshift(item);
+    store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
 }
 
 export default WsClientMiddleWare();

@@ -1,8 +1,6 @@
 package com.mercure.dto;
 
 
-import com.mercure.utils.GroupTypeEnum;
-
 public class GroupDTO {
 
     public GroupDTO() {

@@ -18,7 +18,7 @@ export function dateParser(date) {
         return moment(date, "YYYY-MM-DD HH:mm:ss").fromNow(true).replace("an", "1");
     }
     if (messageDate.includes("minutes") || messageDate.includes("minute")) {
-        return moment(date, "YYYY-MM-DD HH:mm:ss").fromNow(true).replace("minutes", "min");
+        return moment(date, "YYYY-MM-DD HH:mm:ss").fromNow(true);
     }
     if (messageDate.includes("seconds")) {
         return "1 min"

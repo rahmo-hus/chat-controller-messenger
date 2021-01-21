@@ -4,14 +4,12 @@ import com.mercure.dto.GroupDTO;
 import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.UserEntity;
-import com.mercure.utils.ComparatorListGroupDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserMapper {
@@ -31,7 +29,7 @@ public class UserMapper {
     public UserDTO toUserDTO(UserEntity userEntity) {
         // Init
         UserDTO userDTO = new UserDTO();
-        Set<GroupDTO> groupEntitySet = new HashSet<>();
+        List<GroupDTO> groupEntitySet = new ArrayList<>();
 
         // Main user infos
         userDTO.setId(userEntity.getId());
@@ -50,9 +48,7 @@ public class UserMapper {
         userDTO.setJwt(userEntity.getJwt());
         userDTO.setAuthorities(userEntity.getAuthorities());
         userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(groupEntity)));
-        List<GroupDTO> sortedList = new ArrayList<>(groupEntitySet);
-        sortedList.sort(new ComparatorListGroupDTO());
-        userDTO.setGroupSet(groupEntitySet);
+        userDTO.setGroupList(groupEntitySet);
         return userDTO;
     }
 
@@ -60,6 +56,7 @@ public class UserMapper {
     public LightUserDTO toLightUserDTO(UserEntity userEntity) {
         LightUserDTO toSend = new LightUserDTO();
         toSend.setId(userEntity.getId());
+        toSend.setWsToken(userEntity.getWsToken());
         toSend.setFirstName(userEntity.getFirstName());
         toSend.setLastName(userEntity.getLastName());
         return toSend;

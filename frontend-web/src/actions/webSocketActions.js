@@ -1,9 +1,8 @@
 import {
     CURRENT_ACTIVE_GROUP,
     FETCH_GROUP_MESSAGES,
-    INIT_WS_CONNECTION, SEND_GROUP_MESSAGE,
-    SET_WS_GROUPS,
-    WS_CHECK_CONNECTED
+    INIT_WS_CONNECTION, MARK_MESSAGE_AS_SEEN, SEND_GROUP_MESSAGE,
+    SET_WS_GROUPS, UNSUBSCRIBE_ALL, WS_CHECK_CONNECTED
 } from "../utils/redux-constants";
 
 export const initWsConnection = (client) => ({
@@ -34,4 +33,13 @@ export const fetchGroupMessages = (groupUrl) => ({
 export const sendWsMessage = (message) => ({
     type: SEND_GROUP_MESSAGE,
     payload: message
+})
+
+export const unsubscribeAll = () => ({
+    type: UNSUBSCRIBE_ALL
+})
+
+export const markMessageAsSeen = (groupUrl) => ({
+    type: MARK_MESSAGE_AS_SEEN,
+    payload: groupUrl
 })

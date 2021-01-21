@@ -19,6 +19,8 @@ public class LightUserDTO {
 
     private int groupRole;
 
+    private String wsToken;
+
     public int getId() {
         return id;
     }
@@ -49,5 +51,13 @@ public class LightUserDTO {
 
     public void setGroupRole(int groupRole) {
         this.groupRole = groupRole;
+    }
+
+    public String getWsToken() {
+        return wsToken;
+    }
+
+    public void setWsToken(String wsToken) {
+        this.wsToken = wsToken;
     }
 }
