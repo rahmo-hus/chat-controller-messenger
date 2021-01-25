@@ -24,27 +24,27 @@ export function handleRTCActions(wsClient, store, payload) {
     const groupUrl = localStorage.getItem("_cAG");
     const userId = store.getState().AuthReducer.userId;
     switch (payload.type) {
-        // case "init":
-        //     if (wsClient !== null) {
-        //         wsClient.subscribe("/topic/call/reply/" + groupUrl, (res) => {
-        //             const data = JSON.parse(res.body);
-        //             console.log(data)
-        //             console.log("data.userIn !== userId ? ", data.userIn !== userId)
-        //             if (data.userIn !== userId) {
-        //                 if (data.rtc.event === "offer") {
-        //                     store.dispatch(handleOffer(data))
-        //                 }
-        //                 if (data.rtc.event === "answer") {
-        //                     store.dispatch(handleAnswer(data))
-        //                 }
-        //                 if (data.rtc.event === "candidate") {
-        //                     // console.log("CANDIDATE")
-        //                     store.dispatch(handleRtCandidate(data))
-        //                 }
-        //             }
-        //         });
-        //     }
-        //     break;
+        case "init":
+            // if (wsClient !== null) {
+            //     wsClient.subscribe("/topic/call/reply/" + groupUrl, (res) => {
+            //         const data = JSON.parse(res.body);
+            //         console.log(data)
+            //         console.log("data.userIn !== userId ? ", data.userIn !== userId)
+            //         if (data.userIn !== userId) {
+            //             if (data.rtc.event === "offer") {
+            //                 store.dispatch(handleOffer(data))
+            //             }
+            //             if (data.rtc.event === "answer") {
+            //                 store.dispatch(handleAnswer(data))
+            //             }
+            //             if (data.rtc.event === "candidate") {
+            //                 // console.log("CANDIDATE")
+            //                 store.dispatch(handleRtCandidate(data))
+            //             }
+            //         }
+            //     });
+            // }
+            break;
         case "offer":
             console.log("CASE OFFER")
             if (wsClient !== null) {

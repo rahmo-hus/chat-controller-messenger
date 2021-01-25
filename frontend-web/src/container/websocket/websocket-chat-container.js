@@ -1,10 +1,9 @@
 import {connect} from 'react-redux'
 import {WebSocketChatComponent} from "../../components/websocket/websocket-chat-component";
 import {
-    fetchGroupMessages,
+    fetchGroupMessages, markMessageAsSeen,
     sendWsMessage,
-    setCurrentActiveGroup,
-    updateGroupsOnMessage
+    setCurrentActiveGroup
 } from "../../actions/webSocketActions";
 
 const mapStateToProps = (state) => {
@@ -28,7 +27,7 @@ const mapDispatchToProps = dispatch => {
         fetchMessages: (groupUrl) => dispatch(fetchGroupMessages(groupUrl)),
         setCurrentActiveGroup: (bool) => dispatch(setCurrentActiveGroup(bool)),
         sendWsMessage: (message) => dispatch(sendWsMessage(message)),
-        updateGroupsOnMessage: (groupUrl, userGroups) => dispatch(updateGroupsOnMessage(groupUrl, userGroups))
+        markMessageAsSeen: (groupUrl) => dispatch(markMessageAsSeen(groupUrl))
     }
 }
 

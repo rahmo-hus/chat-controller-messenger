@@ -42,6 +42,7 @@ export default function CustomTextField(props) {
                 value={props.value}
                 autoFocus={false}
                 name={props.name}
+                onClick={props.onClick}
                 onChange={handleChange}
                 type={props.type}
                 onKeyUp={event => submitForm(event)}

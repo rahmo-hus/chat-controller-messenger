@@ -18,13 +18,11 @@ export const CallWindowComponent = ({
     const [acceptCall, setAcceptCall] = React.useState(null);
 
     const peerConnectionInit = () => {
-        console.log(acceptCall)
         return new RTCPeerConnection();
     }
 
     useEffect(() => {
         if (isWsConnected) {
-            console.log("isWsConnected : ", isWsConnected)
             setPeerConnection(peerConnectionInit())
         }
     }, [isWsConnected])

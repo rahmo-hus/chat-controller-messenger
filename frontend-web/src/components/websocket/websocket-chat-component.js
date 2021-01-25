@@ -3,12 +3,10 @@ import IconButton from "@material-ui/core/IconButton";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import Button from "@material-ui/core/Button";
 import ImageIcon from "@material-ui/icons/Image";
-import AcUnitIcon from '@material-ui/icons/AcUnit';
 import CustomTextField from "../../design/partials/custom-material-textfield";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import React, {useEffect} from "react";
 import ImagePreview from "../../design/partials/image-preview";
-import CallWindowContainer from "../../container/call-window-container";
 import UUIDv4 from "../../utils/uuid-generator";
 import MessageModel from "../../model/message-model";
 import AuthService from "../../service/auth-service";
@@ -17,8 +15,8 @@ export const WebSocketChatComponent = ({
                                            isDarkModeEnable,
                                            isDarkModeToggled,
                                            currentActiveGroup,
-                                           updateGroupsOnMessage,
                                            sendWsMessage,
+                                           markMessageAsSeen,
                                            fetchMessages,
                                            chatHistory,
                                            wsUserGroups,
@@ -31,9 +29,10 @@ export const WebSocketChatComponent = ({
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState(null);
     const [imageLoaded, setImageLoaded] = React.useState(false);
     const [message, setMessage] = React.useState("");
+    const groupUrl = localStorage.getItem("_cAG");
+    const currentUrl = window.location.pathname.split("/").slice(-1)[0];
     let messageEnd;
 
-    const currentUrl = window.location.pathname.split("/").slice(-1)[0];
     useEffect(() => {
         fetchMessages(currentUrl);
     }, [currentUrl])
@@ -95,7 +94,6 @@ export const WebSocketChatComponent = ({
     }
 
     function sendMessage() {
-        const groupUrl = localStorage.getItem("_cAG");
         if (userId === null || undefined) {
             console.warn("userId is null !")
         }
@@ -120,7 +118,7 @@ export const WebSocketChatComponent = ({
             setFile("")
             setImagePreviewUrl("")
         }
-        updateGroupsOnMessage(groupUrl, wsUserGroups)
+        // updateGroupsOnMessage(groupUrl, wsUserGroups)
     }
 
     function scrollToEnd() {
@@ -147,8 +145,8 @@ export const WebSocketChatComponent = ({
         window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
     }
 
-    function markMessageAsSeen() {
-
+    function markMessageSeen() {
+        markMessageAsSeen(currentUrl)
     }
 
     return (
@@ -267,10 +265,10 @@ export const WebSocketChatComponent = ({
                     {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
                     {/*    <CallIcon/>*/}
                     {/*</Button>*/}
-                    <Button onClick={event => openCallPage(event)} variant="text" component="span">
-                        <AcUnitIcon/>
-                    </Button>
-                    <CallWindowContainer/>
+                    {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
+                    {/*    <AcUnitIcon/>*/}
+                    {/*</Button>*/}
+                    {/*<CallWindowContainer/>*/}
                     <label htmlFor="raised-button-file">
                         <Button variant="text" component="span">
                             <ImageIcon/>
@@ -280,7 +278,7 @@ export const WebSocketChatComponent = ({
                         id={"inputChatMessenger"}
                         label={"Write a message"}
                         value={message}
-                        onClick={markMessageAsSeen}
+                        onClick={markMessageSeen}
                         handleChange={(event) => handleChange(event)}
                         type={"text"}
                         keyUp={submitMessage}

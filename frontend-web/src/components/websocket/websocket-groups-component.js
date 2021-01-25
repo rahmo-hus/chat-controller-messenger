@@ -16,6 +16,8 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import ListItemText from "@material-ui/core/ListItemText";
 import {useHistory} from "react-router-dom";
 import {dateParser} from "../../utils/date-formater";
+import {Skeleton} from "@material-ui/lab";
+import {SkeletonLoader} from "../skeleten-loader";
 
 
 const Clock = ({date}) => {
@@ -35,13 +37,13 @@ const Clock = ({date}) => {
         [currentCount]
     );
     return (
-            <React.Fragment>
+        <React.Fragment>
             {/*{index === 0 ?*/}
             {/*    dateParser(date)*/}
             {/*    :*/}
             {/*    currentCount*/}
             {/*}*/}
-                {dateParser(date)}
+            {dateParser(date)}
         </React.Fragment>
     )
 };
@@ -56,6 +58,14 @@ export const WebsocketGroupsComponent = ({
                                              wsUserGroups
                                          }) => {
     const history = useHistory();
+    const [loading, setLoading] = React.useState(true);
+
+    useEffect(() => {
+        console.log(wsUserGroups)
+        if (wsUserGroups.length !== 0) {
+            setLoading(false);
+        }
+    }, [wsUserGroups])
 
     function redirectToGroup(id, url) {
         setCurrentActiveGroup(url);
@@ -102,7 +112,7 @@ export const WebsocketGroupsComponent = ({
                 </div>
             </div>
             {
-                wsUserGroups && wsUserGroups.length === 0 &&
+                !loading && wsUserGroups && wsUserGroups.length === 0 &&
                 <div
                     className={generateColorMode(isDarkModeToggled)}
                     style={{
@@ -124,7 +134,7 @@ export const WebsocketGroupsComponent = ({
                 </div>
             }
             <List>
-                {wsUserGroups && wsUserGroups.map(data => (
+                {!loading && wsUserGroups && wsUserGroups.map(data => (
                     <ListItem className={styleSelectedGroup(data.url)} button key={data.id}
                               onClick={() => redirectToGroup(data.id, data.url)}>
                         <Avatar>
@@ -169,6 +179,9 @@ export const WebsocketGroupsComponent = ({
                         />
                     </ListItem>
                 ))}
+                {
+                    loading && <SkeletonLoader/>
+                }
             </List>
             {/*<AllUsersDialog closeDialog={handleAddUserAction}*/}
             {/*                doUserDialogAction={createConversation}*/}
