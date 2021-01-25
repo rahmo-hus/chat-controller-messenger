@@ -38,11 +38,9 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
         })
 
         topicNotificationSubscribe = wsClient.subscribe("/topic/notification/" + userId, (res) => {
-            console.log("RECEIVEING NOTIFICATION")
-            // updateLastMessageInGroups(store, JSON.parse(res.body), groups);
-            console.log(groupUrl)
+            console.log("RECEIVING NOTIFICATION")
             console.log(JSON.parse(res.body))
-            updateGroupsWithLastMessageSent(store, JSON.parse(res.body));
+            updateGroupsWithLastMessageSent(store, JSON.parse(res.body), userId);
         })
 
         wsClient.subscribe("/topic/call/reply/" + groupUrl, (res) => {
@@ -158,8 +156,9 @@ const WsClientMiddleWare = () => {
  *
  * @param store
  * @param value
+ * @param userId
  */
-function updateGroupsWithLastMessageSent(store, value) {
+function updateGroupsWithLastMessageSent(store, value, userId) {
     const groupIdToUpdate = value.groupId;
     const groups = store.getState().WebSocketReducer.wsUserGroups;
 
@@ -171,7 +170,7 @@ function updateGroupsWithLastMessageSent(store, value) {
     let item = {...groupsArray[groupToPlaceInFirstPosition]};
     item.lastMessage = value.message;
     item.lastMessageDate = value.lastMessageDate;
-    item.lastMessageSeen = true;
+    item.lastMessageSeen = value.fromUserId !== userId;
     groupsArray.splice(groupToPlaceInFirstPosition, 1);
     groupsArray.unshift(item);
     store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
@@ -187,9 +186,7 @@ function markMessageAsSeen(store, groupUrl) {
         return;
     }
     let groupsArray = [...groups];
-    console.log(groupsArray)
     groupsArray[groupToUpdateIndex].lastMessageSeen = false;
-    console.log(groupsArray)
     store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
 }
 

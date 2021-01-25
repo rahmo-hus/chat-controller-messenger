@@ -126,6 +126,7 @@ public class MessageService {
             jsonObject.put("name", fileEntity.getFilename());
             notificationDTO.setMessage(jsonObject.toString());
         }
+        notificationDTO.setFromUserId(msg.getUser_id());
         notificationDTO.setLastMessageDate(msg.getCreatedAt().toString());
         notificationDTO.setSenderName(userService.findUsernameById(msg.getUser_id()));
         return notificationDTO;

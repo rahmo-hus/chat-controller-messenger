@@ -5,6 +5,8 @@ package com.mercure.dto;
  */
 public class NotificationDTO {
 
+    private int fromUserId;
+
     private String senderName;
 
     private String message;
@@ -14,6 +16,14 @@ public class NotificationDTO {
     private String groupUrl;
 
     private int groupId;
+
+    public int getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(int fromUserId) {
+        this.fromUserId = fromUserId;
+    }
 
     public String getSenderName() {
         return senderName;
