@@ -61,7 +61,6 @@ export const WebsocketGroupsComponent = ({
     const [loading, setLoading] = React.useState(true);
 
     useEffect(() => {
-        console.log(wsUserGroups)
         if (wsUserGroups.length !== 0) {
             setLoading(false);
         }
@@ -103,13 +102,8 @@ export const WebsocketGroupsComponent = ({
 
             <div style={{marginTop: "8px", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                 <span style={{marginLeft: "10px", fontSize: "20px", fontWeight: "bold"}}>
-                Discussions
+                Groups and discussions
                 </span>
-                <div>
-                    <IconButton onClick={() => handleAddUserAction("open")}>
-                        <AddCircleIcon fontSize={"large"}/>
-                    </IconButton>
-                </div>
             </div>
             {
                 !loading && wsUserGroups && wsUserGroups.length === 0 &&

@@ -26,6 +26,7 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
     const [isCurrentUserAdmin, setCurrentUserIsAdmin] = useState(false);
     const [toolTipAction, setToolTipAction] = useState(false);
     const [openTooltipId, setToolTipId] = useState(null);
+    const [usersList, setUsersList] = useState([]);
 
     useEffect(() => {
         clearData()
@@ -90,9 +91,9 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
     function handleAddUserAction(action) {
         switch (action) {
             case "open":
-                // AuthService.fetchAllUsers().then(r => {
-                //     this.setState({usersList: r.data})
-                // });
+                AuthService.fetchAllUsers().then(r => {
+                    setUsersList(r.data);
+                });
                 setPopupOpen(true)
                 break;
             case "close":
@@ -103,27 +104,30 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
         }
     }
 
-    function leaveGroup() {
-
+    async function leaveGroup() {
+        await AuthService.leaveConversation(userId, localStorage.getItem("_cAG"));
+        window.location.reload();
     }
 
-    function removeUserFromAdminListInConversation() {
-
+    async function addUserInConversation(event, id) {
+        let usersInConversationTemp = usersInConversation;
+        usersInConversationTemp.push(usersList.find(user => user.id === id));
+        setUsersInConversation(usersInConversationTemp);
+        await AuthService.addUserToGroup(id, localStorage.getItem('_cAG'));
     }
 
-    function grantUserAdminInConversation() {
+    async function removeUserFromConversation(event, id){
+        const user = usersInConversation.find(user => userId !== user.id);
+        if(user.admin){
+            console.log('cannot delete admin from conversation');
+        }
+        else{
+            const usersInConversationTemp = usersInConversation.find(currentUser => currentUser !== user);
+            setUsersInConversation(usersInConversationTemp);
+            await AuthService.removeUserFromConversation(id, localStorage.getItem("_cAG"));
+        }
 
     }
-
-    function addUserInConversation() {
-
-    }
-
-    function removeUserFromConversation() {
-
-    }
-
-
     return (
         <div>
             <div className={"sidebar"}>
@@ -176,22 +180,7 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
                                                     <React.Fragment>
                                                         <div>
                                                             {
-                                                                isCurrentUserAdmin && value.admin &&
-                                                                <MenuItem
-                                                                    onClick={event => removeUserFromAdminListInConversation(event, value.userId)}
-                                                                    dense={true}>Remove from
-                                                                    administrator
-                                                                </MenuItem>
-                                                            }
-                                                            {
-                                                                isCurrentUserAdmin && !value.admin &&
-                                                                <MenuItem
-                                                                    onClick={event => grantUserAdminInConversation(event, value.userId)}
-                                                                    dense={true}>Grant
-                                                                    administrator</MenuItem>
-                                                            }
-                                                            {
-                                                                !(userId === value.userId) &&
+                                                                !(userId === value.userId) && isCurrentUserAdmin &&
                                                                 <MenuItem
                                                                     onClick={event => removeUserFromConversation(event, value.userId)}
                                                                     dense={true}>Remove from group</MenuItem>

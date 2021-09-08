@@ -45,40 +45,40 @@ export const WebSocketChatComponent = ({
         return isDarkModeToggled ? "hover-msg-dark" : "hover-msg-light";
     }
 
-    function generateImageRender(message) {
-        const data = JSON.parse(message);
-        if (data.url === undefined) {
-            return null;
-        }
-        return (
-            <div>
-                <img src={data.url} height={"200px"} alt={data.name}
-                     onClick={event => handleImagePreview(event, "OPEN", data.url)}
-                     style={{border: "1px solid #c8c8c8", borderRadius: "7%"}}/>
-            </div>)
-    }
+    // function generateImageRender(message) {
+    //     const data = JSON.parse(message);
+    //     if (data.url === undefined) {
+    //         return null;
+    //     }
+    //     return (
+    //         <div>
+    //             <img src={data.url} height={"200px"} alt={data.name}
+    //                  onClick={event => handleImagePreview(event, "OPEN", data.url)}
+    //                  style={{border: "1px solid #c8c8c8", borderRadius: "7%"}}/>
+    //         </div>)
+    // }
 
-    function resetImageBuffer(event) {
-        event.preventDefault();
-        setFile(null);
-        setImagePreviewUrl("");
-        setImageLoaded(false);
-    }
+    // function resetImageBuffer(event) {
+    //     event.preventDefault();
+    //     setFile(null);
+    //     setImagePreviewUrl("");
+    //     setImageLoaded(false);
+    // }
 
-    function previewFile(event) {
-        resetImageBuffer(event);
-        let reader = new FileReader();
-        let file = event.target.files[0];
-        reader.readAsDataURL(file)
-
-        reader.onload = (e) => {
-            if (e.target.readyState === FileReader.DONE) {
-                setFile(file);
-                setImagePreviewUrl(reader.result);
-                setImageLoaded(true);
-            }
-        };
-    }
+    // function previewFile(event) {
+    //     resetImageBuffer(event);
+    //     let reader = new FileReader();
+    //     let file = event.target.files[0];
+    //     reader.readAsDataURL(file)
+    //
+    //     reader.onload = (e) => {
+    //         if (e.target.readyState === FileReader.DONE) {
+    //             setFile(file);
+    //             setImagePreviewUrl(reader.result);
+    //             setImageLoaded(true);
+    //         }
+    //     };
+    // }
 
     function submitMessage(event) {
         if (message !== "") {
@@ -104,46 +104,46 @@ export const WebSocketChatComponent = ({
             sendWsMessage(toSend)
             setMessage("")
         }
-        if (file !== null) {
-            console.log("Publishing file");
-            const formData = new FormData();
-            formData.append("file", file)
-            formData.append("userId", userId)
-            formData.append("groupUrl", groupUrl)
-            AuthService.uploadFile(formData).then().catch(err => {
-                console.log(err)
-            })
-            setMessage("")
-            setImageLoaded(false)
-            setFile("")
-            setImagePreviewUrl("")
-        }
-        // updateGroupsOnMessage(groupUrl, wsUserGroups)
+        // if (file !== null) {
+        //     console.log("Publishing file");
+        //     const formData = new FormData();
+        //     formData.append("file", file)
+        //     formData.append("userId", userId)
+        //     formData.append("groupUrl", groupUrl)
+        //     AuthService.uploadFile(formData).then().catch(err => {
+        //         console.log(err)
+        //     })
+        //     setMessage("")
+        //     setImageLoaded(false)
+        //     setFile("")
+        //     setImagePreviewUrl("")
+        // }
+        // // updateGroupsOnMessage(groupUrl, wsUserGroups)
     }
 
     function scrollToEnd() {
         messageEnd.scrollIntoView({behavior: "auto"});
     }
 
-    function handleImagePreview(event, action, src) {
-        event.preventDefault();
-        switch (action) {
-            case "OPEN":
-                setImgSrc(src)
-                setPreviewImageOpen(true)
-                break;
-            case "CLOSE":
-                setPreviewImageOpen(false)
-                break;
-            default:
-                throw new Error("handleImagePreview failed");
-        }
-    }
+    // function handleImagePreview(event, action, src) {
+    //     event.preventDefault();
+    //     switch (action) {
+    //         case "OPEN":
+    //             setImgSrc(src)
+    //             setPreviewImageOpen(true)
+    //             break;
+    //         case "CLOSE":
+    //             setPreviewImageOpen(false)
+    //             break;
+    //         default:
+    //             throw new Error("handleImagePreview failed");
+    //     }
+    // }
 
-    function openCallPage() {
-        const callUrl = UUIDv4();
-        window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
-    }
+    // function openCallPage() {
+    //     const callUrl = UUIDv4();
+    //     window.open("http://localhost:3000/call/" + callUrl, '_blank', "location=yes,height=570,width=520,scrollbars=yes,status=yes");
+    // }
 
     function markMessageSeen() {
         markMessageAsSeen(currentUrl)
@@ -157,11 +157,6 @@ export const WebSocketChatComponent = ({
                 height: "calc(100% - 56px)",
                 overflowY: "scroll"
             }}>
-                <ImagePreview displayImagePreview={isPreviewImageOpen}
-                              changeDisplayImagePreview={handleImagePreview}
-                              isDarkModeEnable={isDarkModeEnable}
-                              imgSrc={imgSrc}
-                />
                 {chatHistory && chatHistory.map((val, index, array) => (
                     <Tooltip
                         key={index}
@@ -199,17 +194,7 @@ export const WebSocketChatComponent = ({
                                         <b>{val.sender} </b>
                                     </div>
                                 }
-                                {
-                                    val.type === "TEXT" ?
-                                        <div>
-                                            {val.message}
-                                        </div>
-                                        :
-                                        <div>
-                                            {generateImageRender(val.message)}
-                                        </div>
-                                }
-                                {/*<div>{val.message}</div>*/}
+                                <div>{val.message}</div>
                             </div>
                         </div>
                     </Tooltip>
@@ -221,31 +206,31 @@ export const WebSocketChatComponent = ({
                 </div>
             </div>
             <div style={{display: "flex", flexDirection: "column"}}>
-                <div style={{boxSizing: "border-box", borderBottom: "0.5px solid #C8C8C8"}}>
-                    {
-                        imagePreviewUrl &&
-                        <div style={{
-                            padding: "10px",
-                            height: "120px",
-                            maxWidth: "120px",
-                            background: "url('" + imagePreviewUrl + "')",
-                            backgroundSize: "cover",
-                            position: "relative",
-                            borderRadius: "10%"
-                        }}>
-                            <IconButton style={{
-                                height: "20px",
-                                position: "absolute",
-                                right: " 8px",
-                                top: "8px",
-                                width: "20px"
-                            }}
-                                        onClick={event => resetImageBuffer(event)}>
-                                <HighlightOffIcon/>
-                            </IconButton>
-                        </div>
-                    }
-                </div>
+                {/*<div style={{boxSizing: "border-box", borderBottom: "0.5px solid #C8C8C8"}}>*/}
+                {/*    {*/}
+                {/*        imagePreviewUrl &&*/}
+                {/*        <div style={{*/}
+                {/*            padding: "10px",*/}
+                {/*            height: "120px",*/}
+                {/*            maxWidth: "120px",*/}
+                {/*            background: "url('" + imagePreviewUrl + "')",*/}
+                {/*            backgroundSize: "cover",*/}
+                {/*            position: "relative",*/}
+                {/*            borderRadius: "10%"*/}
+                {/*        }}>*/}
+                {/*            <IconButton style={{*/}
+                {/*                height: "20px",*/}
+                {/*                position: "absolute",*/}
+                {/*                right: " 8px",*/}
+                {/*                top: "8px",*/}
+                {/*                width: "20px"*/}
+                {/*            }}*/}
+                {/*                        onClick={event => resetImageBuffer(event)}>*/}
+                {/*                <HighlightOffIcon/>*/}
+                {/*            </IconButton>*/}
+                {/*        </div>*/}
+                {/*    }*/}
+                {/*</div>*/}
                 <div style={{
                     display: "flex",
                     width: "100%",
@@ -254,14 +239,14 @@ export const WebSocketChatComponent = ({
                     bottom: "0",
                     padding: "5px"
                 }}>
-                    <input
-                        accept="image/*"
-                        style={{display: 'none'}}
-                        id="raised-button-file"
-                        multiple
-                        type="file"
-                        onChange={event => previewFile(event)}
-                    />
+                {/*    <input*/}
+                {/*        accept="image/*"*/}
+                {/*        style={{display: 'none'}}*/}
+                {/*        id="raised-button-file"*/}
+                {/*        multiple*/}
+                {/*        type="file"*/}
+                {/*        onChange={event => previewFile(event)}*/}
+                {/*    />*/}
                     {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
                     {/*    <CallIcon/>*/}
                     {/*</Button>*/}
@@ -269,11 +254,11 @@ export const WebSocketChatComponent = ({
                     {/*    <AcUnitIcon/>*/}
                     {/*</Button>*/}
                     {/*<CallWindowContainer/>*/}
-                    <label htmlFor="raised-button-file">
-                        <Button variant="text" component="span">
-                            <ImageIcon/>
-                        </Button>
-                    </label>
+                    {/*<label htmlFor="raised-button-file">*/}
+                    {/*    <Button variant="text" component="span">*/}
+                    {/*        <ImageIcon/>*/}
+                    {/*    </Button>*/}
+                    {/*</label>*/}
                     <CustomTextField
                         id={"inputChatMessenger"}
                         label={"Write a message"}
@@ -292,7 +277,7 @@ export const WebSocketChatComponent = ({
                             marginLeft: "3px",
                             maxWidth: "20px"
                         }}
-                        disabled={!imageLoaded && message === ""}
+                        disabled={message === ""}
                     >
                         <DoubleArrowIcon/>
                     </Button>
