@@ -74,7 +74,7 @@ class App extends Component {
                         <RegisterForm
                             {...props}
                             history={history}
-                            isDarkModeEnable={this.state.isDarkModeEnabled}
+                            isDarkModeToggled={this.state.isDarkModeEnabled}
                         />}
                     />
                     <Route exact path="/login" render={(props) =>

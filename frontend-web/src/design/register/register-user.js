@@ -13,6 +13,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import "./register-form.css";
 import {generateColorMode, generateIconColorMode, generateLinkColorMode} from "../style/enable-dark-mode";
 import CustomTextField from "../partials/custom-material-textfield";
+import {connect} from 'react-redux'
 
 class RegisterForm extends Component {
     constructor(props) {
@@ -25,12 +26,14 @@ class RegisterForm extends Component {
             password: "",
             repeatPassword: "",
 
+            loading:false,
             noMatchPasswordsError: false,
             displayNoMatchPasswordsError: false,
             isEmailNotValid: false,
             displayEmailNotValid: false,
             formValidationError: false,
             displayFormValidationError: false,
+            displayEmailSentSuccess: false,
             formError: []
         };
         this.handleChange = this.handleChange.bind(this)
@@ -65,21 +68,25 @@ class RegisterForm extends Component {
         this.errorArray = [];
         this.checkFormValidation()
         if (this.errorArray.length === 0) {
-            console.log("Registering user ...")
+            this.setState({loading:true});
             AuthService.createUser(this.state.username, this.state.lastName, this.state.email, this.state.password).then(r => {
-                this.props.history.push({
-                    pathname: "/",
-                    openToaster: true,
-                    text: "Your account has been created ! Welcome " + this.state.username + " !",
-                    severity: "success"
-                })
+                // this.props.history.push({
+                //     pathname: "/",
+                //     openToaster: true,
+                //     text: "Your account has been created ! Welcome " + this.state.username + " !",
+                //     severity: "success"
+                // });
+                this.setState({displayEmailSentSuccess: true, loading:false, displayFormValidationError:false});
+                //todo: generate certificate and download it
             }).catch(e => {
-                console.log(e.response)
+                console.log(e.response);
+
                 console.log("Error during registration : ", e.message)
                 if (e.response !== undefined) {
                     this.errorArray.push(e.response.data);
                 }
                 this.setState({displayFormValidationError: true})
+                this.setState({loading:false});
 
             })
         } else {
@@ -161,12 +168,12 @@ class RegisterForm extends Component {
 
     render() {
         return (
-            <div className={generateColorMode(this.props.isDarkModeEnable)}
+            <div className={generateColorMode(this.props.isDarkModeToggled)}
                  style={{height: "calc(100% - 64px)", width: "100%"}}>
                 <div className={"main-register-form"}>
                     <div style={{display: "flex", justifyContent: "center"}}>
                         <AccountCircleIcon fontSize={"large"}
-                                           className={generateIconColorMode(this.props.isDarkModeEnable)}/>
+                                           className={generateIconColorMode(this.props.isDarkModeToggled)}/>
                     </div>
                     <div style={{textAlign: "center"}}>
                         <Typography component="h1" variant="h5">
@@ -188,7 +195,7 @@ class RegisterForm extends Component {
                                             >
                                                 <CloseIcon fontSize="inherit"/>
                                             </IconButton>
-                                        } severity="warning">
+                                        } severity={"warning"}>
                                             <ul>
                                                 {this.errorArray ? this.errorArray.map((error, index) => (
                                                         <li key={index}>
@@ -201,24 +208,39 @@ class RegisterForm extends Component {
                                         </Alert>
                                     </Collapse>
                                 }
+                                <Collapse ref={this.wrapper} in={this.state.displayEmailSentSuccess}
+                                          timeout={500}>
+                                    <Alert action={
+                                        <IconButton
+                                            aria-label="close"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={(e) => this.closeAlert(e, "arrayErrors")}
+                                        >
+                                            <CloseIcon fontSize="inherit"/>
+                                        </IconButton>
+                                    } severity={"success"}>
+                                        Email sent successfully to your address. Use it in the following step of authentication.
+                                    </Alert>
+                                </Collapse>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <CustomTextField id={"firstNameInput"} label={"First Name"} name={"firstName"}
                                                  value={this.state.username}
                                                  handleChange={this.handleChange}
-                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeToggled}/>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                                 <CustomTextField id={"lastNameInput"} label={"Last Name"} name={"lastName"}
                                                  value={this.state.lastName}
                                                  handleChange={this.handleChange}
-                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeToggled}/>
                             </Grid>
                             <Grid item xs={12}>
                                 <CustomTextField id={"emailInput"} label={"Email Address"} name={"email"}
                                                  value={this.state.email}
                                                  handleChange={this.handleChange}
-                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeEnable}/>
+                                                 type={"text"} isDarkModeEnable={this.props.isDarkModeToggled}/>
                                 {
                                     <Collapse in={this.state.displayEmailNotValid} timeout={1500}>
                                         <Alert action={
@@ -238,14 +260,14 @@ class RegisterForm extends Component {
                                 <CustomTextField id={"passwordInput"} label={"Password"} name={"password"}
                                                  handleChange={this.handleChange}
                                                  value={this.state.password}
-                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeEnable}/>
+                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeToggled}/>
                             </Grid>
                             <Grid item xs={12}>
                                 <CustomTextField id={"repeatPasswordInput"} label={"Repeat password"}
                                                  name={"repeatPassword"}
                                                  handleChange={this.handleChange}
                                                  value={this.state.repeatPassword}
-                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeEnable}/>
+                                                 type={"password"} isDarkModeEnable={this.props.isDarkModeToggled}/>
                                 {
                                     <Collapse in={this.state.displayNoMatchPasswordsError} timeout={1500}>
                                         <Alert action={
@@ -267,6 +289,7 @@ class RegisterForm extends Component {
                                 className={"button-register-form"}
                                 type="submit"
                                 fullWidth
+                                disabled={this.state.loading}
                                 variant="contained"
                                 color="primary"
                                 onClick={(e) => this.registerUser(e)}
@@ -277,7 +300,7 @@ class RegisterForm extends Component {
                         <Grid container justify="flex-end">
                             <Grid item>
                                 <Link className={"lnk"}
-                                      style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
+                                      style={{color: generateLinkColorMode(this.props.isDarkModeToggled)}}
                                       to={"/login"} variant="body2">
                                     Already have an account? Sign in
                                 </Link>
@@ -288,9 +311,9 @@ class RegisterForm extends Component {
                 <Box mt={5}>
                     <Typography variant="body2" color="inherit" align="center">
                         {'Copyright © '}
-                        <Link style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}} className={"lnk"}
+                        <Link style={{color: generateLinkColorMode(this.props.isDarkModeEnabled)}} className={"lnk"}
                               color="inherit" to="/">
-                            RS Software
+                            ETFBL
                         </Link>{' '}
                         {new Date().getFullYear()}
                         {'.'}
@@ -301,4 +324,14 @@ class RegisterForm extends Component {
     }
 }
 
-export default withRouter(RegisterForm);
+const mapStateToProps = (state) => {
+    const {isDarkModeToggled, currentThemeMode} = state.ThemeReducer;
+    return {
+        isDarkModeToggled,
+        currentThemeMode
+    };
+}
+
+
+
+export default connect(mapStateToProps, null)(withRouter(RegisterForm));
