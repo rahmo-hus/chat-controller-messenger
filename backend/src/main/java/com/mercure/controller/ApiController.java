@@ -10,6 +10,7 @@ import com.mercure.mapper.GroupUserMapper;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
+import com.mercure.utils.CertificateUtil;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
 import org.json.simple.JSONObject;
@@ -50,6 +51,7 @@ public class ApiController {
 
     @Autowired
     private GroupUserMapper groupUserMapper;
+
 
     @GetMapping(value = "/users/all")
     public List<LightUserDTO> fetchAllUsers() {

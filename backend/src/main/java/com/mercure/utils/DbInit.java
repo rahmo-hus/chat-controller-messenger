@@ -26,7 +26,7 @@ public class DbInit implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         log.info("Nothing to run on DB");
         log.info("Deleting all users ...");
         userService.flush();

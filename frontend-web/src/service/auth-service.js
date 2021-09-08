@@ -10,8 +10,8 @@ const instance = axios.create({
 
 class AuthService {
 
-    authenticate(username, password) {
-        const toSend = new JwtModel(username, password);
+    authenticate(username, password, certificate) {
+        const toSend = new JwtModel(username, password, certificate);
         return instance.post("auth", toSend);
     }
 

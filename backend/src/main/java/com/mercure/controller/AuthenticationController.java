@@ -2,14 +2,13 @@ package com.mercure.controller;
 
 import com.mercure.dto.JwtDTO;
 import com.mercure.dto.LightUserDTO;
-import com.mercure.dto.UserDTO;
-import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
 import com.mercure.service.UserService;
+import com.mercure.utils.CertificateUtil;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
 import org.json.simple.JSONObject;
@@ -28,6 +27,7 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.cert.CertificateException;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -52,9 +52,12 @@ public class AuthenticationController {
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private CertificateUtil certificateUtil;
+
     @PostMapping(value = "/auth")
     public LightUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword(), authenticationRequest.getCertificate());
         UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
         String token = jwtTokenUtil.generateToken(userDetails);
@@ -85,14 +88,19 @@ public class AuthenticationController {
         return userMapper.toLightUserDTO(getUserEntity(request));
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private void authenticate(String username, String password, String certificateURI) throws Exception {
         try {
+            certificateUtil.validateCertificate(certificateURI);
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
+        catch (CertificateException e){
+            throw new Exception("INVALID_CERTIFICATE", e);
+        }
+
     }
 
     @PostMapping(value = "/create")

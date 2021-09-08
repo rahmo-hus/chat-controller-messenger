@@ -55,7 +55,7 @@ class CreateGroup extends Component {
                     <CssBaseline/>
                     <div className={"main-register-form clrcstm"}>
                         <Typography className={"clrcstm"} variant="h6">
-                            Créer un groupe
+                            Create a gruop
                         </Typography>
                     </div>
                     <div className={"clrcstm"}>
@@ -79,7 +79,7 @@ class CreateGroup extends Component {
                                         variant="outlined"
                                         color="primary"
                                     >
-                                        Valider
+                                        Validate
                                     </Button>
                                 </Grid>
                             </div>

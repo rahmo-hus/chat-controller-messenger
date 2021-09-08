@@ -96,7 +96,7 @@ class Login extends Component {
                                   className={generateIconColorMode(this.props.isDarkModeEnable)}/>
                     </div>
                     <Typography component="h1" variant="h5">
-                        S'identifier
+                        Login
                     </Typography>
                     <div>
                         <Grid container spacing={2}>
@@ -125,18 +125,13 @@ class Login extends Component {
                                     variant="contained"
                                     color="primary"
                                 >
-                                    Valider
+                                    Login
                                 </Button>
                             </Grid>
                         </div>
                         <Grid container
                               direction="row"
                               justify="space-between">
-                            <Link className={"lnk"}
-                                  style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
-                                  to={"/forgetpassword"}>
-                                Mot de passe oublié ?
-                            </Link>
                             <Link className={"lnk"}
                                   style={{color: generateLinkColorMode(this.props.isDarkModeEnable)}}
                                   to={"/register"}>

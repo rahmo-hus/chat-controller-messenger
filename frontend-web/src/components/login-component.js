@@ -5,16 +5,17 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import CustomTextField from "../design/partials/custom-material-textfield";
 import Button from "@material-ui/core/Button";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import Box from "@material-ui/core/Box";
 import AuthService from "../service/auth-service";
 import {setWsUserToken, userAuthenticated} from "../actions";
-import {useHistory} from "react-router-dom";
 import {Toaster} from "../utils/alert-snackbar";
+import {Input} from "@material-ui/core";
 
 const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [certificate, setCertificate] = useState(null);
     const [alertOpened, setAlertOpened] = useState(false);
     const history = useHistory();
 
@@ -32,17 +33,38 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
         }
     }
 
+    function readFileDataAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target.result);
+            };
+            reader.onerror = (err) => {
+                reject(err);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
     function submitLogin(event) {
         if (event.key === undefined || event.key === 'Enter') {
-            if (!username || !password) {
+            if (!username || !password || !certificate) {
                 return;
             }
             login(username, password)
         }
     }
 
+
+
+    function selectFile(event){
+        readFileDataAsBase64(event.target.files[0]).then(res =>{
+           setCertificate(res);
+        }).catch();
+    }
+
     function login() {
-        AuthService.authenticate(username, password).then(function (res) {
+        AuthService.authenticate(username, password, certificate).then(function (res) {
                 if (res.status === 200) {
                     // localStorage.setItem("_cAG", res.data.groupSet[0].url)
                     dispatch(userAuthenticated(res.data))
@@ -54,7 +76,7 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
             setUsername("");
             setPassword("");
             setAlertOpened(true)
-                // snackBarText
+            // snackBarText
             console.log(err)
         })
     }
@@ -93,6 +115,26 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
                                              keyUp={submitLogin}
                             />
                         </Grid>
+                        <Grid item xs={12}>
+                            <label htmlFor="certificate-input">
+                                <input
+                                    id="certificate-input"
+                                    name="certificate-input"
+                                    style={{ display: 'none' }}
+                                    type="file"
+                                    accept=".csr,.crt,.pem,.cer"
+                                    onChange={selectFile}
+                                    />
+                                <Button
+                                    className="btn-choose"
+                                    variant="outlined"
+                                    color="secondary"
+                                    component="span" >
+                                    Choose Certificate
+                                </Button>
+                                {certificate && " "+certificate.name}
+                            </label>
+                        </Grid>
                     </Grid>
                     <div>
                         <Grid item xs={12}>
@@ -104,22 +146,17 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
                                 variant="contained"
                                 color="primary"
                             >
-                                Valider
+                                Login
                             </Button>
                         </Grid>
                     </div>
                     <Grid container
                           direction="row"
-                          justify="space-between">
-                        <Link className={"lnk"}
-                              style={{color: generateLinkColorMode(isDarkModeToggled)}}
-                              to={"/forgetpassword"}>
-                            Mot de passe oublié ?
-                        </Link>
+                          justify="center">
                         <Link className={"lnk"}
                               style={{color: generateLinkColorMode(isDarkModeToggled)}}
                               to={"/register"}>
-                            S'enregistrer
+                            Register
                         </Link>
                     </Grid>
                 </div>
@@ -129,7 +166,7 @@ const LoginComponent = ({isDarkModeToggled, currentThemeMode, dispatch}) => {
                         <Link to="/" className={"lnk"}
                               style={{color: generateLinkColorMode(isDarkModeToggled)}}
                         >
-                            Software Technologies
+                            ETFBL
                         </Link>{' '}
                         {new Date().getFullYear()}
                         {'.'}

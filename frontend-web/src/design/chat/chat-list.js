@@ -21,7 +21,7 @@ class ChatList extends Component {
     render() {
         return (
             <div>
-                <h1>Les messages :</h1>
+                <h1>Messages :</h1>
                 <div>
                     {this.state.history && this.state.history.map((data) => (
                         <p>{data.message}</p>

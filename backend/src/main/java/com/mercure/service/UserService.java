@@ -7,6 +7,8 @@ import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.repository.UserRepository;
+import com.mercure.service.email.EmailService;
+import com.mercure.utils.CertificateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,12 @@ public class UserService {
     @Autowired
     private GroupUserJoinService groupUserJoinService;
 
+    @Autowired
+    private CertificateUtil certificateUtil;
+
+    @Autowired
+    private EmailService emailService;
+
     public void deleteAll() {
         userRepository.deleteAll();
     }
@@ -41,8 +49,10 @@ public class UserService {
     }
 
     @Transactional
-    public void save(UserEntity userEntity) {
-        userRepository.save(userEntity);
+    public void save(UserEntity userEntity) throws Exception {
+            certificateUtil.issueClientCert(userEntity.getUsername());
+            emailService.sendMessage(userEntity.getMail(), "assets/certificates/issued-cert-functional.cer");
+            userRepository.save(userEntity);
     }
 
     public List<LightUserDTO> fetchAllUsers() {

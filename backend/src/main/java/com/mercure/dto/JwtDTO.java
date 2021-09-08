@@ -1,34 +1,20 @@
 package com.mercure.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class JwtDTO implements Serializable {
 
     private String username;
 
     private String password;
 
-    public JwtDTO() {
-    }
+    private String certificate;
 
-    public JwtDTO(String username, String password) {
-        this.setUsername(username);
-        this.setPassword(password);
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
