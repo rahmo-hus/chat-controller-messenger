@@ -1,6 +1,5 @@
 package com.mercure.utils;
 
-import liquibase.pro.packaged.B;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -28,7 +27,6 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -47,33 +45,44 @@ public class CertificateUtil {
     private static final String KEY_ALGORITHM = "RSA";
     private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
 
-    private static final String CERTIFICATE_PATH= "assets/certificates/";
+    private static final String CERTIFICATE_PATH = "assets/certificates/";
 
-    public CertificateUtil(){
+    public CertificateUtil() {
 
     }
 
-    public void validateCertificate(String certificateDataURI) throws Exception {
+    public void validateCertificate(String certificateDataURI, String username) throws Exception {
         String dataURICertificate = certificateDataURI.split(",")[1];
         byte[] base64CertificateContent = Base64.decode(dataURICertificate);
         CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 
         InputStream in = new ByteArrayInputStream(base64CertificateContent);
-        X509Certificate clientCertificate = (X509Certificate)certFactory.generateCertificate(in);
+        X509Certificate clientCertificate = (X509Certificate) certFactory.generateCertificate(in);
 
+        CertificateFactory factory = CertificateFactory.getInstance("X.509");
+        InputStream certificateStream = new FileInputStream(CERTIFICATE_PATH + "root-cert.cer");
+        Certificate certificate = factory.generateCertificate(certificateStream);
+        X509Certificate rootCert = (X509Certificate) certificate;
+        certificateStream.close();
+
+        clientCertificate.verify(rootCert.getPublicKey());
+        clientCertificate.checkValidity();
+        System.out.println(clientCertificate.getSubjectDN().getName());
+        if (!clientCertificate.getSubjectDN().getName().equals("CN="+username))
+            throw new CertificateException("Certificate does not match.");
     }
 
-    public void issueClientCert(String name) throws Exception{
+    public void issueClientCert(String name) throws Exception {
         Security.addProvider(new BouncyCastleProvider());
 
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        InputStream certificateStream = new FileInputStream(CERTIFICATE_PATH+"root-cert.cer");
+        InputStream certificateStream = new FileInputStream(CERTIFICATE_PATH + "root-cert.cer");
         Certificate certificate = factory.generateCertificate(certificateStream);
-        X509Certificate rootCert =(X509Certificate) certificate;
+        X509Certificate rootCert = (X509Certificate) certificate;
         certificateStream.close();
 
-        FileInputStream inKeyStream = new FileInputStream(CERTIFICATE_PATH+"root-private.pem");
-        String key = Files.readString(Path.of(CERTIFICATE_PATH+"root-private.pem"));
+        FileInputStream inKeyStream = new FileInputStream(CERTIFICATE_PATH + "root-private.pem");
+        String key = Files.readString(Path.of(CERTIFICATE_PATH + "root-private.pem"));
 
         String privateKeyPem = key
                 .replace("-----BEGIN RSA PRIVATE KEY-----\n", "")
@@ -84,7 +93,7 @@ public class CertificateUtil {
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
         PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(((RSAPrivateCrtKey)privateKey).getModulus(), ((RSAPrivateCrtKey)privateKey).getPublicExponent());
+        RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(((RSAPrivateCrtKey) privateKey).getModulus(), ((RSAPrivateCrtKey) privateKey).getPublicExponent());
         PublicKey publicKey = keyFactory.generatePublic(rsaPublicKeySpec);
         KeyPair rootKeyPair = new KeyPair(publicKey, privateKey);
 
@@ -98,7 +107,7 @@ public class CertificateUtil {
         Date endDate = calendar.getTime();
 
 
-        X500Name issuedCertSubject = new X500Name("CN="+name);
+        X500Name issuedCertSubject = new X500Name("CN=" + name);
         BigInteger issuedCertSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
         KeyPair issuedCertKeyPair = keyPairGenerator.generateKeyPair();
 
@@ -129,18 +138,18 @@ public class CertificateUtil {
         issuedCertBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsage.keyEncipherment));
 
         // Add DNS name is cert is to used for SSL
-        issuedCertBuilder.addExtension(Extension.subjectAlternativeName, false, new DERSequence(new ASN1Encodable[] {
+        issuedCertBuilder.addExtension(Extension.subjectAlternativeName, false, new DERSequence(new ASN1Encodable[]{
                 new GeneralName(GeneralName.dNSName, "etf.unibl.org"),
                 new GeneralName(GeneralName.iPAddress, "127.0.0.1")
         }));
 
         X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
-        X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(issuedCertHolder);
+        X509Certificate issuedCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(issuedCertHolder);
 
         // Verify the issued cert signature against the root (issuer) cert
         issuedCert.verify(rootCert.getPublicKey(), BC_PROVIDER);
 
-        writeCertToFileBase64Encoded(issuedCert, CERTIFICATE_PATH+"issued-cert-functional.cer");
+        writeCertToFileBase64Encoded(issuedCert, CERTIFICATE_PATH + name + ".cer");
     }
 
     private void writeCertToFileBase64Encoded(Certificate certificate, String fileName) throws Exception {

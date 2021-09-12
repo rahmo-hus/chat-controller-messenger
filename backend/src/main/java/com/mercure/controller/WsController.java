@@ -5,7 +5,11 @@ import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.MessageEntity;
+import com.mercure.entity.UserEntity;
+import com.mercure.exception.DoSException;
+import com.mercure.exception.SQLInjectionException;
 import com.mercure.service.GroupService;
+import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.MessageService;
 import com.mercure.service.UserService;
 import com.mercure.utils.ComparatorListGroupDTO;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RestController
 @CrossOrigin
@@ -49,6 +54,9 @@ public class WsController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private GroupUserJoinService groupUserJoinService;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -95,9 +103,26 @@ public class WsController {
     @MessageMapping("/message/text/{userId}/group/{groupUrl}")
     @SendTo("/topic/{groupUrl}")
     public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) {
-        int groupId = groupService.findGroupByUrl(groupUrl);
+        Integer groupId = groupService.findGroupByUrl(groupUrl);
         MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), messageDTO.getMessage());
-        MessageEntity msg = messageService.save(messageEntity);
+        MessageEntity msg;
+        try{
+            msg = messageService.save(messageEntity);
+        }
+        catch (Throwable e){
+            if(e.getMessage().toLowerCase(Locale.ROOT).contains("dos") || e.getMessage().contains("SQL")){
+                messageEntity = new MessageEntity(1, groupId, MessageTypeEnum.TEXT.toString(), "User "+userService.findUsernameById(userId)+" has been banned" );
+                msg = messageService.save(messageEntity);
+                NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
+                List<Integer> toSend = messageService.createNotificationList(1, groupUrl);
+                toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
+                groupUserJoinService.removeUserFromConversation(userId, groupId);
+                //userService.disableUser(userId);
+                return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
+            }
+            else
+                msg = null;
+        }
         NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
         List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
         toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
@@ -146,22 +171,20 @@ public class WsController {
     }
 
 
-    /**
-     * Return history of group discussion
-     *
-     * @param url The group url to map
-     * @return List of message
-     */
     @SubscribeMapping("/groups/get/{url}")
-    public List<MessageDTO> findOne(@DestinationVariable String url) {
+    public List<MessageDTO> findOne(@DestinationVariable(value = "url") String urlAndUserId) {
 //        log.info("Subscription to topic {}", url);
-        if (url != null) {
-            List<MessageDTO> messageDTOS = new ArrayList<>();
-            int groupId = groupService.findGroupByUrl(url);
-            messageService.findByGroupId(groupId).forEach(msg -> {
-                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
-            });
-            return messageDTOS;
+        if(urlAndUserId != null) {
+            String url = urlAndUserId.split("&")[0];
+            Integer userId = Integer.parseInt(urlAndUserId.split("&")[1]);
+            if (groupService.checkIfUserExistsInGroup(userId, url)) {
+                List<MessageDTO> messageDTOS = new ArrayList<>();
+                int groupId = groupService.findGroupByUrl(url);
+                messageService.findByGroupId(groupId).forEach(msg -> {
+                    messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
+                });
+                return messageDTOS;
+            }
         }
         return null;
     }

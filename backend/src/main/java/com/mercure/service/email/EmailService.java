@@ -2,6 +2,7 @@ package com.mercure.service.email;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
-    public void sendMessage(String to, String pathToAttachment) throws MessagingException {
+    public void sendAttachment(String to, String pathToAttachment) throws MessagingException {
         MimeMessage message = emailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -33,6 +34,14 @@ public class EmailService {
                 = new FileSystemResource(new File(pathToAttachment));
         helper.addAttachment("Certificate", file);
 
+        emailSender.send(message);
+    }
+
+    public void sendMessage(String to, String token){
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Verification token");
+        message.setText("Your verification code is shown below:\n"+token);
         emailSender.send(message);
     }
 }

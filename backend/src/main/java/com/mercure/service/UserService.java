@@ -10,6 +10,7 @@ import com.mercure.repository.UserRepository;
 import com.mercure.service.email.EmailService;
 import com.mercure.utils.CertificateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,8 +52,16 @@ public class UserService {
     @Transactional
     public void save(UserEntity userEntity) throws Exception {
             certificateUtil.issueClientCert(userEntity.getUsername());
-            emailService.sendMessage(userEntity.getMail(), "assets/certificates/issued-cert-functional.cer");
+            emailService.sendAttachment(userEntity.getMail(), "assets/certificates/"+userEntity.getUsername()+".cer");
             userRepository.save(userEntity);
+    }
+
+    public void disableUser(int userId){
+        userRepository.disableUser(userId);
+    }
+
+    public UserEntity getUser(int userId){
+        return userRepository.getOne(userId);
     }
 
     public List<LightUserDTO> fetchAllUsers() {

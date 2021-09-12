@@ -28,6 +28,11 @@ public class GroupService {
         return groupRepository.findGroupByUrl(url);
     }
 
+    public boolean checkIfUserExistsInGroup(int userId, String groupUrl){
+        Optional<GroupEntity> group = groupRepository.findByUrl(groupUrl);
+        return group.filter(groupEntity -> groupRepository.userExistsInGroup(userId, groupEntity.getId()) != null).isPresent();
+    }
+
     public void addUserToConversation(int userId, int groupId) {
         Optional<GroupEntity> groupEntity = groupRepository.findById(groupId);
         if (groupEntity.isPresent() && groupEntity.orElse(null).getGroupTypeEnum().equals(GroupTypeEnum.SINGLE)) {

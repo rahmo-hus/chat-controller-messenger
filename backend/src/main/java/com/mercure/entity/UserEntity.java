@@ -67,6 +67,9 @@ public class UserEntity implements UserDetails, Serializable {
     @Column(name = "role_id")
     private int role;
 
+    @Column(name = "strikes")
+    private int strikes;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>();
@@ -208,5 +211,13 @@ public class UserEntity implements UserDetails, Serializable {
 
     public void setRole(int role) {
         this.role = role;
+    }
+
+    public void incrementStrikes(){
+        this.strikes++;
+    }
+
+    public int getStrikes(){
+        return strikes;
     }
 }

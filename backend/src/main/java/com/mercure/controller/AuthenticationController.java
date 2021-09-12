@@ -2,12 +2,14 @@ package com.mercure.controller;
 
 import com.mercure.dto.JwtDTO;
 import com.mercure.dto.LightUserDTO;
+import com.mercure.dto.VerificationRequestDTO;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
 import com.mercure.service.UserService;
+import com.mercure.service.email.EmailService;
 import com.mercure.utils.CertificateUtil;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
@@ -20,6 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
@@ -28,6 +31,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.cert.CertificateException;
+import java.util.Base64;
+import java.util.Locale;
 
 @RestController
 @RequestMapping(value = "/api")
@@ -55,11 +60,25 @@ public class AuthenticationController {
     @Autowired
     private CertificateUtil certificateUtil;
 
-    @PostMapping(value = "/auth")
-    public LightUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
+    @Autowired
+    private EmailService emailService;
+
+    @PostMapping(value = "/auth-one")
+    public ResponseEntity<?> authenticateStepOne(@RequestBody JwtDTO authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword(), authenticationRequest.getCertificate());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
+        emailService.sendMessage(user.getMail(), user.getWsToken());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping(value = "/verify")
+    public ResponseEntity<?> createAuthenticationToken(@RequestBody VerificationRequestDTO verificationRequest, HttpServletResponse response) throws Exception {
+        String username = verificationRequest.getUsername();
+        String verificationCode = verificationRequest.getVerificationCode();
+        UserEntity user = userService.findByNameOrEmail(username, username);
+        if(!verificationCode.equals(user.getWsToken()))
+            throw new Exception("Invalid verification code");
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtTokenUtil.generateToken(userDetails);
         Cookie jwtAuthToken = new Cookie(StaticVariable.SECURE_COOKIE, token);
         jwtAuthToken.setHttpOnly(true);
@@ -69,7 +88,7 @@ public class AuthenticationController {
 //         7 days
         jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(jwtAuthToken);
-        return userMapper.toLightUserDTO(user);
+        return ResponseEntity.ok().body(userMapper.toLightUserDTO(user));
     }
 
     @GetMapping(value = "/logout")
@@ -90,8 +109,8 @@ public class AuthenticationController {
 
     private void authenticate(String username, String password, String certificateURI) throws Exception {
         try {
-            certificateUtil.validateCertificate(certificateURI);
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            certificateUtil.validateCertificate(certificateURI, username);
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

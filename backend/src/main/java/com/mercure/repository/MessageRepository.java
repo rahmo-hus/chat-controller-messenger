@@ -16,4 +16,8 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Integer>
 
     @Query(value = "SELECT * FROM message m1 INNER JOIN (SELECT MAX(m.id) as id FROM message m GROUP BY m.msg_group_id) temp ON temp.id = m1.id WHERE msg_group_id = :idOfGroup", nativeQuery = true)
     MessageEntity findLastMessageByGroupId(@Param(value = "idOfGroup") int groupId);
+
+    @Query(value = "SELECT * from message where msg_user_id = :idOfUser order by id desc limit 1 ;", nativeQuery = true)
+    MessageEntity findLastMessageByUserId(@Param(value="idOfUser") int userId);
+
 }

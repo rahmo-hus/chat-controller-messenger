@@ -71,7 +71,7 @@ public class ApiController {
         JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
         String groupUrl = (String) jsonObject.get("groupUrl");
         List<GroupMemberDTO> toSend = new ArrayList<>();
-        int id = groupService.findGroupByUrl(groupUrl);
+        Integer id = groupService.findGroupByUrl(groupUrl);
         Optional<GroupEntity> optionalGroupEntity = groupService.findById(id);
         if (optionalGroupEntity.isPresent()) {
             GroupEntity group = optionalGroupEntity.get();
