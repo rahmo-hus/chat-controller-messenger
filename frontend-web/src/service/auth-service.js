@@ -12,7 +12,14 @@ class AuthService {
 
     authenticate(username, password, certificate) {
         const toSend = new JwtModel(username, password, certificate);
-        return instance.post("auth", toSend);
+        return instance.post("auth-one", toSend);
+    }
+
+    verify(username, verificationCode){
+        return instance.post("verify", {
+            username: username,
+            verificationCode: verificationCode
+        });
     }
 
     testRoute() {

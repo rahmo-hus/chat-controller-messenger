@@ -83,11 +83,6 @@ class App extends Component {
                             history={history}
                         />}
                     />
-                    <Route exact path="/call/:callId" render={(props) =>
-                        <CallWindowContainerTRASH
-                            {...props}
-                        />}
-                    />
                 </Switch>
             </Router>
         )

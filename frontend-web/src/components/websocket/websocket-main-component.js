@@ -12,7 +12,7 @@ export const WebSocketMainComponent = ({
                                            setWsObject,
                                            wsCheckConnected,
                                            initCallWebRTC,
-                                           unsubscribeAll,
+                                           unsubscribeAll
                                        }) => {
 
     const groupUrl = localStorage.getItem("_cAG");

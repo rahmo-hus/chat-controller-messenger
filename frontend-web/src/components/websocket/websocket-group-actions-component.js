@@ -18,6 +18,7 @@ import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import AuthService from "../../service/auth-service";
 import AllUsersDialog from "../../design/dialog/all-users-dialog";
+import {useHistory} from "react-router-dom";
 
 export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, currentActiveGroup}) => {
     const [paramsOpen, setParamsOpen] = useState(false);
@@ -27,6 +28,7 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
     const [toolTipAction, setToolTipAction] = useState(false);
     const [openTooltipId, setToolTipId] = useState(null);
     const [usersList, setUsersList] = useState([]);
+    const history = useHistory();
 
     useEffect(() => {
         clearData()
@@ -104,9 +106,13 @@ export const WebSocketGroupActionComponent = ({isDarkModeToggled, userId, curren
         }
     }
 
-    async function leaveGroup() {
-        await AuthService.leaveConversation(userId, localStorage.getItem("_cAG"));
-        window.location.reload();
+    function leaveGroup() {
+        AuthService.leaveConversation(userId, localStorage.getItem("_cAG")).then((res)=>{
+            localStorage.removeItem("_cAG");
+            history.push("/t/messages/");
+        }).catch(err=>{
+            console.log(err);
+        });
     }
 
     async function addUserInConversation(event, id) {

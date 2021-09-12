@@ -10,7 +10,7 @@ import {
     SEND_GROUP_MESSAGE,
     ADD_CHAT_HISTORY,
     UNSUBSCRIBE_ALL,
-    MARK_MESSAGE_AS_SEEN
+    MARK_MESSAGE_AS_SEEN, USER_LOGOUT
 } from "../utils/redux-constants";
 import {wsHealthCheckConnected} from "../actions/webSocketActions";
 import {handleRTCActions, handleRTCSubscribeEvents} from "./webRTC-middleware";
@@ -39,7 +39,8 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
 
         topicNotificationSubscribe = wsClient.subscribe("/topic/notification/" + userId, (res) => {
             console.log("RECEIVING NOTIFICATION")
-            console.log(JSON.parse(res.body))
+            console.log(JSON.parse(res.body));
+
             updateGroupsWithLastMessageSent(store, JSON.parse(res.body), userId);
         })
 
@@ -49,7 +50,6 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
         });
 
         topicCallReplySubscribe = wsClient.publish({destination: "/app/message", body: wsUserTokenValue});
-        console.log("On récupère les messages du groupe actif")
         store.dispatch({
             type: FETCH_GROUP_MESSAGES,
             payload: localStorage.getItem("_cAG")
@@ -83,7 +83,7 @@ const WsClientMiddleWare = () => {
                 // console.log(groupUrl)
 
                 if (wsClient !== null) {
-                    appGroupGetSubscribe = wsClient.subscribe("/app/groups/get/" + groupUrl, (res) => {
+                    appGroupGetSubscribe = wsClient.subscribe("/app/groups/get/" + groupUrl+"&"+userId, (res) => {
                         const data = JSON.parse(res.body);
                         store.dispatch({type: SET_CHAT_HISTORY, payload: data})
                     });

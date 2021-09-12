@@ -27,6 +27,7 @@ export const HeaderComponent = ({
         event.preventDefault();
         AuthService.logout().then(() => {
             userLogout();
+            localStorage.removeItem("_cAG");
             history.push("/");
         }).catch(err => {
             console.log(err)
@@ -45,7 +46,7 @@ export const HeaderComponent = ({
                 <nav className={"lnk clrcstm"}>
                     {
                         isUserLoggedIn &&
-                        <RouterLink className={"lnk clrcstm"} to={"/t/messages/" + localStorage.getItem("_cAG")}>
+                        <RouterLink className={"lnk clrcstm"} to={"/t/messages/"}>
                             <Button className={"clrcstm"} variant="outlined"
                                     style={{margin: "8px 12px"}}>
                                 Messages

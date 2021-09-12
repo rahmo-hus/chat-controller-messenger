@@ -1,44 +1,53 @@
 import Tooltip from "@material-ui/core/Tooltip";
-import IconButton from "@material-ui/core/IconButton";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import Button from "@material-ui/core/Button";
-import ImageIcon from "@material-ui/icons/Image";
 import CustomTextField from "../../design/partials/custom-material-textfield";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import React, {useEffect} from "react";
-import ImagePreview from "../../design/partials/image-preview";
-import UUIDv4 from "../../utils/uuid-generator";
 import MessageModel from "../../model/message-model";
-import AuthService from "../../service/auth-service";
+import AuthService from "../../service/auth-service"
+import {useHistory} from "react-router-dom";
 
 export const WebSocketChatComponent = ({
                                            isDarkModeEnable,
                                            isDarkModeToggled,
                                            currentActiveGroup,
+                                           usernameLoggedIn,
                                            sendWsMessage,
                                            markMessageAsSeen,
+                                           userLogout,
                                            fetchMessages,
                                            chatHistory,
                                            wsUserGroups,
                                            userId
                                        }) => {
 
-    const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false);
-    const [imgSrc, setImgSrc] = React.useState("");
-    const [file, setFile] = React.useState(null);
-    const [imagePreviewUrl, setImagePreviewUrl] = React.useState(null);
-    const [imageLoaded, setImageLoaded] = React.useState(false);
     const [message, setMessage] = React.useState("");
     const groupUrl = localStorage.getItem("_cAG");
     const currentUrl = window.location.pathname.split("/").slice(-1)[0];
+    const history = useHistory();
     let messageEnd;
 
     useEffect(() => {
-        fetchMessages(currentUrl);
+        fetchMessages(currentUrl, userId);
     }, [currentUrl])
 
     useEffect(() => {
-        scrollToEnd()
+        scrollToEnd();
+        const lastMessage = chatHistory[chatHistory.length - 1];
+        console.log(lastMessage);
+        if(lastMessage && lastMessage.userId === 1 && lastMessage.message.includes("User "+usernameLoggedIn)){
+            // AuthService.logout().then(() => {
+            //     userLogout();
+            //     localStorage.removeItem("_cAG");
+            //     console.log("logged out");
+            //     history.push("/login");
+            // }).catch(err => {
+            //     console.log(err)
+            // });
+            localStorage.removeItem("_cAG");
+            window.location.reload();
+        }
+
     }, [chatHistory])
 
     function styleSelectedMessage() {
@@ -100,9 +109,9 @@ export const WebSocketChatComponent = ({
         if (message !== "") {
             // console.log("Publishing text");
             // this.props.updateGroupWhenUserSendMessage(this.props.location.groupUrl, this.state.message, MessageTypeEnum.text);
-            const toSend = new MessageModel(userId, groupUrl, message)
-            sendWsMessage(toSend)
-            setMessage("")
+            const toSend = new MessageModel(userId, groupUrl, message);
+            sendWsMessage(toSend);
+            setMessage("");
         }
         // if (file !== null) {
         //     console.log("Publishing file");
@@ -239,14 +248,14 @@ export const WebSocketChatComponent = ({
                     bottom: "0",
                     padding: "5px"
                 }}>
-                {/*    <input*/}
-                {/*        accept="image/*"*/}
-                {/*        style={{display: 'none'}}*/}
-                {/*        id="raised-button-file"*/}
-                {/*        multiple*/}
-                {/*        type="file"*/}
-                {/*        onChange={event => previewFile(event)}*/}
-                {/*    />*/}
+                    {/*    <input*/}
+                    {/*        accept="image/*"*/}
+                    {/*        style={{display: 'none'}}*/}
+                    {/*        id="raised-button-file"*/}
+                    {/*        multiple*/}
+                    {/*        type="file"*/}
+                    {/*        onChange={event => previewFile(event)}*/}
+                    {/*    />*/}
                     {/*<Button onClick={event => openCallPage(event)} variant="text" component="span">*/}
                     {/*    <CallIcon/>*/}
                     {/*</Button>*/}

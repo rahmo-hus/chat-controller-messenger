@@ -4,7 +4,7 @@ import {initWsConnection, wsHealthCheckConnected} from "../actions";
 
 const mapStateToProps = (state) => {
     const {isDarkModeToggled, currentThemeMode} = state.ThemeReducer;
-    const {isUserLoggedIn} = state.AuthReducer;
+    const {isUserLoggedIn, usernameLoggedIn} = state.AuthReducer;
     const {wsUserTokenValue, wsUserGroups, isWsConnected} = state.WebSocketReducer;
     return {
         isDarkModeToggled,
@@ -12,7 +12,8 @@ const mapStateToProps = (state) => {
         isUserLoggedIn,
         wsUserTokenValue,
         isWsConnected,
-        wsUserGroups
+        wsUserGroups,
+        usernameLoggedIn
     };
 }
 

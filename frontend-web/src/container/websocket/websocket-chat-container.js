@@ -5,11 +5,12 @@ import {
     sendWsMessage,
     setCurrentActiveGroup
 } from "../../actions/webSocketActions";
+import {userLogout} from "../../actions";
 
 const mapStateToProps = (state) => {
     const {isDarkModeToggled, currentThemeMode} = state.ThemeReducer;
     const {isWsConnected, currentActiveGroup, chatHistory, wsObject, wsUserGroups} = state.WebSocketReducer;
-    const {userId} = state.AuthReducer
+    const {userId, usernameLoggedIn} = state.AuthReducer
     return {
         isDarkModeToggled,
         currentThemeMode,
@@ -17,6 +18,7 @@ const mapStateToProps = (state) => {
         chatHistory,
         wsUserGroups,
         wsObject,
+        usernameLoggedIn,
         userId,
         isWsConnected
     };
@@ -24,9 +26,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        fetchMessages: (groupUrl) => dispatch(fetchGroupMessages(groupUrl)),
+        fetchMessages: (groupUrl, userId) => dispatch(fetchGroupMessages(groupUrl, userId)),
         setCurrentActiveGroup: (bool) => dispatch(setCurrentActiveGroup(bool)),
         sendWsMessage: (message) => dispatch(sendWsMessage(message)),
+        userLogout : () => dispatch(userLogout()),
         markMessageAsSeen: (groupUrl) => dispatch(markMessageAsSeen(groupUrl))
     }
 }
