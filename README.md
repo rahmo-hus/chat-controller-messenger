@@ -6,17 +6,7 @@
 
 # Messenger project : real time chat with React and Spring Boot
 
-Real time chat application group oriented. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls ! (coming soon)
-
-## Next version preview : 
-
-Changelog for next version : 
-
-- Change project from javascript to typescript
-- Use of react Context instead of Redux for basic tasks (like theme)
-- Improve websocket reliability (one topic to subscribe instead of 5)
-- Fix bugs
-- Cookies to store theme preference
+Real time chat application group oriented. Talk with your friends, create and add users to conversation, set groups administrators!
 
 ## Start-up :
 
@@ -44,7 +34,6 @@ Changelog for next version :
 ![Project overview](assets/messenger.jpg?raw=true "Project overview")
 
 * Simple chat group application based on websocket
-* Send images
 * Secure user account based on Spring Security JWT
 * Room discussion with STOMP and SockJS
 * Chat group administrators
