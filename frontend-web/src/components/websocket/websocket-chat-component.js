@@ -28,6 +28,7 @@ export const WebSocketChatComponent = ({
     let messageEnd;
 
     useEffect(() => {
+        if(!chatHistory)
         fetchMessages(currentUrl, userId);
     }, [currentUrl])
 
