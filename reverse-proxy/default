@@ -1,0 +1,43 @@
+
+#default http server -> redirect to https
+server {
+     listen 80;
+	 listen [::]:80;
+     server_name chat.messenger.com;
+     return 301 https://localhost$request_uri;
+}
+
+server {
+
+    listen 443 ssl;
+	listen [::]:443 ssl;
+	server_name chat.messenger.com;
+
+    ssl_certificate /mnt/c/Users/username/IdeaProjects/react-spring-messenger-project/reverse-proxy/login.chat.example.com.crt;
+    ssl_certificate_key /mnt/c/Users/username/IdeaProjects/react-spring-messenger-project/reverse-proxy/login.chat.example.com.key;
+
+	ssl_protocols     TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+	ssl_prefer_server_ciphers off;
+	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;	
+    access_log /var/log/nginx/reverse-access.log;
+    error_log /var/log/nginx/reverse-error.log;
+	
+	location /api {	
+	        proxy_pass http://127.0.0.1:9090;		
+	}
+
+	location /messenger{
+		proxy_pass http://127.0.0.1:9090;
+		proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+    	proxy_set_header Connection "Upgrade";
+    	proxy_set_header Host $host;
+	}
+	
+	root /var/www/build;
+        index index.html;
+	    location / {
+           try_files $uri $uri/ /index.html?/$request_uri;
+	}
+}
+
