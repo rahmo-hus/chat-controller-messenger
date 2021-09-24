@@ -5,9 +5,6 @@ import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.MessageEntity;
-import com.mercure.entity.UserEntity;
-import com.mercure.exception.DoSException;
-import com.mercure.exception.SQLInjectionException;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.MessageService;
@@ -41,7 +38,7 @@ import java.util.Locale;
 @CrossOrigin
 public class WsController {
 
-    private Logger log = LoggerFactory.getLogger(WsController.class);
+    private final Logger log = LoggerFactory.getLogger(WsController.class);
 
     @Autowired
     private UserService userService;
@@ -70,13 +67,6 @@ public class WsController {
         return jwtUtil.getUserNameFromJwtToken(requestTokenHeader.substring(7));
     }
 
-    /**
-     * Used this to retrieve user information (without password)
-     * and all groups attached to the user
-     *
-     * @param token the String request from client
-     * @return {@link UserDTO}
-     */
     @MessageMapping("/message")
     @SendToUser("/queue/reply")
     public List<GroupDTO> initUserProfile(String token) {
@@ -91,36 +81,24 @@ public class WsController {
         return toReturn;
     }
 
-
-    /**
-     * Receive message from user and dispatch to all users subscribed to conversation
-     *
-     * @param userId     the int userId for mapping message to a user
-     * @param groupUrl   the string groupUrl for mapping message to a group
-     * @param messageDTO the payload received
-     * @return a messageDTO with all informations
-     */
     @MessageMapping("/message/text/{userId}/group/{groupUrl}")
     @SendTo("/topic/{groupUrl}")
     public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) {
         Integer groupId = groupService.findGroupByUrl(groupUrl);
         MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), messageDTO.getMessage());
         MessageEntity msg;
-        try{
+        try {
             msg = messageService.save(messageEntity);
-        }
-        catch (Throwable e){
-            if(e.getMessage().toLowerCase(Locale.ROOT).contains("dos") || e.getMessage().contains("SQL")){
-                messageEntity = new MessageEntity(1, groupId, MessageTypeEnum.TEXT.toString(), "User "+userService.findUsernameById(userId)+" has been banned" );
+        } catch (Throwable e) {
+            if (e.getMessage().toLowerCase(Locale.ROOT).contains("dos") || e.getMessage().contains("SQL")) {
+                messageEntity = new MessageEntity(1, groupId, MessageTypeEnum.TEXT.toString(), "User " + userService.findUsernameById(userId) + " has been banned");
                 msg = messageService.save(messageEntity);
                 NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
                 List<Integer> toSend = messageService.createNotificationList(1, groupUrl);
                 toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
                 groupUserJoinService.removeUserFromConversation(userId, groupId);
-                //userService.disableUser(userId);
                 return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
-            }
-            else
+            } else
                 msg = null;
         }
         NotificationDTO notificationDTO = messageService.createNotificationDTO(msg);
@@ -146,35 +124,9 @@ public class WsController {
         return req;
     }
 
-//    @SubscribeMapping("/message/call/{userId}/group/{groupUrl}")
-//    public JSONObject onCallMessageSubscribeCallback(@DestinationVariable int userId) throws ParseException {
-//        log.info("User id {} is subscribed to channel",userId);
-//        JSONObject json = new JSONObject();
-//        try {
-//            json.put("userIn", userId);
-//            json.put("rtc", jsonObject);
-//        } catch (Exception e) {
-//            log.info("Error during JSON creation : {}", e.getMessage());
-//        }
-//        return json;
-//    }
-
-    @MessageMapping("/groups/create/single")
-    @SendToUser("/queue/reply")
-    public MessageDTO wsCreateConversation(String req) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
-        Long id1 = (Long) jsonObject.get("id1");
-        Long id2 = (Long) jsonObject.get("id2");
-        groupService.createConversation(id1.intValue(), id2.intValue());
-        return null;
-    }
-
-
     @SubscribeMapping("/groups/get/{url}")
     public List<MessageDTO> findOne(@DestinationVariable(value = "url") String urlAndUserId) {
-//        log.info("Subscription to topic {}", url);
-        if(urlAndUserId != null) {
+        if (urlAndUserId != null) {
             String url = urlAndUserId.split("&")[0];
             Integer userId = Integer.parseInt(urlAndUserId.split("&")[1]);
             if (groupService.checkIfUserExistsInGroup(userId, url)) {

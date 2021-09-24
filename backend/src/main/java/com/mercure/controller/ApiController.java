@@ -10,7 +10,6 @@ import com.mercure.mapper.GroupUserMapper;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
-import com.mercure.utils.CertificateUtil;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
 import org.json.simple.JSONObject;
@@ -32,7 +31,7 @@ import java.util.*;
 @RequestMapping(value = "/api")
 public class ApiController {
 
-    private Logger log = LoggerFactory.getLogger(ApiController.class);
+    private final Logger log = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
     private UserService userService;
@@ -58,13 +57,7 @@ public class ApiController {
         return userService.fetchAllUsers();
     }
 
-    /**
-     * Fetch all users in a conversation
-     *
-     * @param req string
-     * @return List of {@link GroupMemberDTO}
-     * @throws ParseException if json is null
-     */
+
     @PostMapping(value = "/users/group/all")
     public List<GroupMemberDTO> fetchAllUsers(@RequestBody String req) throws ParseException {
         JSONParser jsonParser = new JSONParser();
@@ -82,13 +75,6 @@ public class ApiController {
         return toSend;
     }
 
-    /**
-     * Add user to a group conversation
-     *
-     * @param userId   int value for user ID
-     * @param groupUrl String value for the group url
-     * @return {@link ResponseEntity}, 200 if everything is ok or 500 if an error occurred
-     */
     @GetMapping(value = "/user/add/{userId}/{groupUrl}")
     public ResponseEntity<?> addUserToConversation(@PathVariable int userId, @PathVariable String groupUrl) {
         int groupId = groupService.findGroupByUrl(groupUrl);
@@ -157,16 +143,10 @@ public class ApiController {
         return ResponseEntity.status(401).build();
     }
 
-
-    /**
-     * Register User
-     *
-     * @param data string req
-     * @return a {@link ResponseEntity}
-     * @throws ParseException if req is mal formed
-     */
     @PostMapping(value = "/user/register")
     public ResponseEntity<?> createUser(@RequestBody String data) throws ParseException {
+        System.out.println("User register triggered");
+
         JSONParser jsonParser = new JSONParser();
         JSONObject json = (JSONObject) jsonParser.parse(data);
 

@@ -1,6 +1,9 @@
 package com.mercure.service;
 
-import com.mercure.entity.*;
+import com.mercure.entity.GroupEntity;
+import com.mercure.entity.GroupRoleKey;
+import com.mercure.entity.GroupUser;
+import com.mercure.entity.UserEntity;
 import com.mercure.repository.GroupRepository;
 import com.mercure.utils.GroupTypeEnum;
 import org.slf4j.Logger;
@@ -8,12 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class GroupService {
 
-    private static Logger log = LoggerFactory.getLogger(GroupService.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupService.class);
 
     @Autowired
     private GroupRepository groupRepository;
@@ -24,11 +28,11 @@ public class GroupService {
     @Autowired
     private GroupUserJoinService groupUserJoinService;
 
-    public int findGroupByUrl(String url) {
+    public Integer findGroupByUrl(String url) {
         return groupRepository.findGroupByUrl(url);
     }
 
-    public boolean checkIfUserExistsInGroup(int userId, String groupUrl){
+    public boolean checkIfUserExistsInGroup(int userId, String groupUrl) {
         Optional<GroupEntity> group = groupRepository.findByUrl(groupUrl);
         return group.filter(groupEntity -> groupRepository.userExistsInGroup(userId, groupEntity.getId()) != null).isPresent();
     }

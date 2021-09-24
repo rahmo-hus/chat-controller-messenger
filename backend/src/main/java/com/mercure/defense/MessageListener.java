@@ -9,7 +9,6 @@ import com.mercure.repository.MessageRepository;
 import com.mercure.repository.UserRepository;
 import com.mercure.utils.ApplicationContextProvider;
 import com.mercure.utils.SafeUtil;
-import liquibase.datatype.DatabaseDataType;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.PostPersist;
@@ -48,24 +47,23 @@ public class MessageListener {
         Timestamp lastMessageTimeStamp = lastMessageByUser != null ? lastMessageByUser.getCreatedAt() : currentMessageTimestamp;
         if ((currentMessageTimestamp.getTime() - lastMessageTimeStamp.getTime()) < STRIKE_TIME_MILLIS) {
             currentUser.incrementStrikes();
-            if(currentUser.getStrikes() > 5){
+            if (currentUser.getStrikes() > 5) {
                 throw new DoSException();
             }
-            //todo: handle somehow
         }
     }
 
     private void performSQLInjectionDetection(MessageEntity target) throws SQLInjectionException {
         String message = target.getMessage();
         boolean isMalicious = !SafeUtil.isSqlInjectionSafe(message);
-        if(isMalicious){
-            throw  new SQLInjectionException();
+        if (isMalicious) {
+            throw new SQLInjectionException();
         }
     }
 
     private void performXSSDetection(MessageEntity target) throws XSSException {
         String message = target.getMessage();
         boolean isMalicious = message.matches(XSS_REGEX_1) || message.matches(XSS_REGEX_2) || message.matches(XSS_REGEX_3);
-        if(isMalicious) throw new XSSException();
+        if (isMalicious) throw new XSSException();
     }
 }

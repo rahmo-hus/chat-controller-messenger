@@ -2,34 +2,19 @@ package com.mercure.service;
 
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
-import com.mercure.entity.FileEntity;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.repository.MessageRepository;
 import com.mercure.utils.MessageTypeEnum;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
 public class MessageService {
-
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private GroupService groupService;
-
-    @Autowired
-    private FileService fileService;
 
     private static final String[] colorsArray =
             {
@@ -37,8 +22,13 @@ public class MessageService {
                     "#94FFF7", "#FFAFFA", "#FFAFD2", "#FFB4AF",
                     "#FFDCAF", "#FAFFAF", "#D2FFAF"
             };
-
     private static final Map<Integer, String> colors = new HashMap<>();
+    @Autowired
+    private MessageRepository messageRepository;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private GroupService groupService;
 
     public String getRandomColor() {
         return colorsArray[new Random().nextInt(colorsArray.length)];
@@ -65,17 +55,6 @@ public class MessageService {
         return messageRepository.findLastMessageByGroupId(groupId);
     }
 
-    /**
-     * Create a MessageDTO
-     * Sent with user's initials
-     *
-     * @param id       of the message saved in DB
-     * @param userId   int value for user ID
-     * @param date     String of message sending date
-     * @param group_id int value for group ID
-     * @param message  string for the message content
-     * @return a {@link MessageDTO}
-     */
     public MessageDTO createMessageDTO(int id, String type, int userId, String date, int group_id, String message) {
         colors.putIfAbsent(userId, getRandomColor());
         String str = userService.findUsernameById(userId);
@@ -87,14 +66,6 @@ public class MessageService {
                 StringUtils.capitalize(arr[1]);
         if (type.equals(MessageTypeEnum.TEXT.toString())) {
             messageToReturn = message;
-        }
-        if (type.equals(MessageTypeEnum.FILE.toString())) {
-            FileEntity fileEntity = fileService.findByFkMessageId(id);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", fileEntity.getUrl());
-            jsonObject.put("date", fileEntity.getCreatedAt().toString());
-            jsonObject.put("name", fileEntity.getFilename());
-            messageToReturn = jsonObject.toJSONString();
         }
         return new MessageDTO(id, type, messageToReturn, userId, group_id, null, sender, date, initials, colors.get(userId));
     }
@@ -117,14 +88,6 @@ public class MessageService {
         notificationDTO.setGroupId(msg.getGroup_id());
         if (msg.getType().equals(MessageTypeEnum.TEXT.toString())) {
             notificationDTO.setMessage(msg.getMessage());
-        }
-        if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
-            FileEntity fileEntity = fileService.findByFkMessageId(msg.getId());
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", fileEntity.getUrl());
-            jsonObject.put("date", fileEntity.getCreatedAt());
-            jsonObject.put("name", fileEntity.getFilename());
-            notificationDTO.setMessage(jsonObject.toString());
         }
         notificationDTO.setFromUserId(msg.getUser_id());
         notificationDTO.setLastMessageDate(msg.getCreatedAt().toString());
