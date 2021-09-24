@@ -145,7 +145,6 @@ public class ApiController {
 
     @PostMapping(value = "/user/register")
     public ResponseEntity<?> createUser(@RequestBody String data) throws ParseException {
-        System.out.println("User register triggered");
 
         JSONParser jsonParser = new JSONParser();
         JSONObject json = (JSONObject) jsonParser.parse(data);
