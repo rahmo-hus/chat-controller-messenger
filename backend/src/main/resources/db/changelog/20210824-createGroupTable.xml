@@ -7,7 +7,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet id="createGroupTable" author="TMN">
+    <changeSet id="createGroupTable" author="rhuseinagic">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="chat_group"/>

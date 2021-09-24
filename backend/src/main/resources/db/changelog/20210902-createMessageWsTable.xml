@@ -7,50 +7,52 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet id="createUserTable" author="TMN">
+    <changeSet id="createMessageTable" author="rhuseinagic">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="user"/>
+                <tableExists tableName="message"/>
             </not>
         </preConditions>
-        <createTable tableName="user">
+        <createTable tableName="message">
             <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="firstname" type="varchar(50)">
+            <column name="message" type="MEDIUMTEXT">
                 <constraints nullable="false"/>
             </column>
-            <column name="lastname" type="varchar(50)">
+            <column name="msg_group_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="short_url" type="varchar(255)"/>
-            <column name="email" type="varchar(255)"/>
-
-            <column name="jwt" type="varchar(255)"/>
-            <column name="expiration_date" type="datetime"/>
-
-            <column name="password" type="varchar(255)">
+            <column name="msg_user_id" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="wstoken" type="varchar(255)">
+            <column name="type" type="varchar(20)">
                 <constraints nullable="false"/>
             </column>
-            <column name="role_id" type="int">
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="account_non_expired" type="boolean" defaultValueBoolean="false"/>
-            <column name="account_non_locked" type="boolean" defaultValueBoolean="false"/>
-            <column name="credentials_non_expired" type="boolean" defaultValueBoolean="false"/>
-            <column name="enabled" type="boolean" defaultValueBoolean="false"/>
         </createTable>
         <addAutoIncrement columnDataType="int"
                           columnName="id"
                           defaultOnNull="false"
                           generationType="ALWAYS"
                           incrementBy="1"
-                          tableName="user"/>
+                          tableName="message"/>
+        <addForeignKeyConstraint
+                baseColumnNames="msg_user_id"
+                baseTableName="message"
+                constraintName="fk_message_user"
+                referencedColumnNames="id"
+                referencedTableName="user"/>
+        <addForeignKeyConstraint
+                baseColumnNames="msg_group_id"
+                baseTableName="message"
+                constraintName="fk_message_group"
+                referencedColumnNames="id"
+                referencedTableName="chat_group"/>
         <rollback>
-            <dropTable tableName="user"/>
+            <dropTable tableName="message"/>
         </rollback>
     </changeSet>
 
