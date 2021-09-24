@@ -67,7 +67,6 @@ public class CertificateUtil {
 
         clientCertificate.verify(rootCert.getPublicKey());
         clientCertificate.checkValidity();
-        System.out.println(clientCertificate.getSubjectDN().getName());
         if (!clientCertificate.getSubjectDN().getName().equals("CN="+username))
             throw new CertificateException("Certificate does not match.");
     }
@@ -81,7 +80,6 @@ public class CertificateUtil {
         X509Certificate rootCert = (X509Certificate) certificate;
         certificateStream.close();
 
-        FileInputStream inKeyStream = new FileInputStream(CERTIFICATE_PATH + "root-private.pem");
         String key = Files.readString(Path.of(CERTIFICATE_PATH + "root-private.pem"));
 
         String privateKeyPem = key

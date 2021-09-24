@@ -32,7 +32,7 @@ public class EmailService {
 
         FileSystemResource file
                 = new FileSystemResource(new File(pathToAttachment));
-        helper.addAttachment("Certificate", file);
+        helper.addAttachment("Certificate.cer", file);
 
         emailSender.send(message);
     }
