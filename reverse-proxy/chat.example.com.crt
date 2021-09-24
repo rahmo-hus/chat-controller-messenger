@@ -1,0 +1,87 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            bf:2b:89:b6:c2:fd:9b:1c:12:d5:f0:e4:dd:f7:5f:b4
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=ca.chat.example.com
+        Validity
+            Not Before: Feb 17 15:34:47 2021 GMT
+            Not After : May 23 15:34:47 2023 GMT
+        Subject: CN=chat.example.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:bd:69:76:92:e9:bb:69:58:3d:d0:1a:93:40:70:
+                    52:5b:3d:76:a3:78:a3:02:d1:82:21:9b:d1:e6:57:
+                    8b:75:e6:00:6f:ed:59:67:47:c0:93:9a:85:12:3c:
+                    e5:51:c0:66:a0:cd:8e:e8:c2:3d:cf:05:2b:c9:e4:
+                    89:e6:e0:6b:fe:cb:fb:e1:cf:34:fe:46:ef:9c:f7:
+                    fe:02:12:0e:b3:a8:81:ce:fc:52:0d:6b:5c:75:e6:
+                    d1:23:1a:17:06:87:42:ab:9f:bd:ca:63:e7:1a:74:
+                    c2:22:7b:c4:68:50:86:a8:4a:67:a4:30:3d:74:e5:
+                    a2:fe:61:dd:87:f6:1f:cb:4f:cd:01:54:1d:fb:9b:
+                    69:23:a9:3d:c2:ef:3b:5a:6f:ee:8c:17:71:27:87:
+                    06:29:52:af:4b:85:99:f7:a6:85:4b:28:f5:11:a0:
+                    9e:38:e3:b8:b2:b0:44:b2:fb:09:99:4c:e6:fe:79:
+                    d5:de:70:3f:bf:45:e7:67:4a:24:78:cd:54:71:03:
+                    27:34:35:98:45:38:0e:2d:4e:9e:71:73:ac:e6:e2:
+                    cc:ce:e9:d0:68:66:58:6d:cc:94:4c:56:c2:01:16:
+                    92:82:e7:86:f1:57:29:45:ae:fb:dc:6d:d5:2f:b2:
+                    d3:83:d3:7c:28:45:88:d7:96:8f:79:ed:ea:9f:b0:
+                    6d:49
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                F6:F3:EA:8E:42:D1:BE:54:11:43:B1:D6:AD:7B:DE:C2:B6:68:73:E0
+            X509v3 Authority Key Identifier: 
+                keyid:2A:38:DE:AE:D4:65:6D:31:9B:67:2E:7F:FD:2C:05:07:CB:DE:D8:CB
+                DirName:/CN=ca.chat.example.com
+                serial:47:A2:73:94:64:EE:75:C6:F9:29:73:4E:A7:8E:EE:7A:91:15:38:7F
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name: 
+                DNS:chat.example.com
+    Signature Algorithm: sha256WithRSAEncryption
+         3c:01:18:d0:86:d7:6a:a6:dd:10:14:2d:a2:af:2f:6d:15:4d:
+         08:2e:81:65:2a:41:db:9d:91:a0:4c:ff:ac:b6:54:6b:0a:02:
+         59:2e:e4:26:4c:61:88:b4:52:71:88:28:61:4e:88:94:c0:df:
+         27:3c:9e:d1:84:c8:90:a2:78:77:42:18:36:4a:99:97:86:04:
+         8f:2e:bf:c4:c9:17:b9:fe:6e:d6:98:05:02:56:d4:d4:d9:5d:
+         8f:57:09:dd:69:33:04:4c:b0:80:55:ac:a9:27:a2:07:75:17:
+         86:c2:71:51:7d:bd:1f:f6:da:77:7b:57:95:23:b5:76:c2:50:
+         e7:bc:f4:03:f7:69:e1:67:58:4a:85:89:01:d7:52:20:e0:0e:
+         37:e8:d8:35:0d:89:37:43:88:89:34:2f:80:cf:59:12:89:56:
+         b0:4f:5a:10:0d:11:06:0d:b5:49:25:ee:45:c6:1b:34:80:b4:
+         c4:7c:3e:a7:0e:1d:40:6a:39:44:93:6c:39:22:c2:bc:7f:f0:
+         78:24:bc:f9:24:a1:6c:55:88:a0:1b:03:6d:be:9f:fa:7a:20:
+         c4:32:89:2a:ee:a2:27:96:b7:6f:4c:d8:2c:66:8d:86:45:ea:
+         ae:08:19:cc:e1:8b:c3:89:ff:ad:42:62:51:6f:cc:6f:7a:4b:
+         ff:3d:01:01
+-----BEGIN CERTIFICATE-----
+MIIDjDCCAnSgAwIBAgIRAL8ribbC/ZscEtXw5N33X7QwDQYJKoZIhvcNAQELBQAw
+HjEcMBoGA1UEAwwTY2EuY2hhdC5leGFtcGxlLmNvbTAeFw0yMTAyMTcxNTM0NDda
+Fw0yMzA1MjMxNTM0NDdaMBsxGTAXBgNVBAMMEGNoYXQuZXhhbXBsZS5jb20wggEi
+MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC9aXaS6btpWD3QGpNAcFJbPXaj
+eKMC0YIhm9HmV4t15gBv7VlnR8CTmoUSPOVRwGagzY7owj3PBSvJ5Inm4Gv+y/vh
+zzT+Ru+c9/4CEg6zqIHO/FINa1x15tEjGhcGh0Krn73KY+cadMIie8RoUIaoSmek
+MD105aL+Yd2H9h/LT80BVB37m2kjqT3C7ztab+6MF3EnhwYpUq9LhZn3poVLKPUR
+oJ4447iysESy+wmZTOb+edXecD+/RednSiR4zVRxAyc0NZhFOA4tTp5xc6zm4szO
+6dBoZlhtzJRMVsIBFpKC54bxVylFrvvcbdUvstOD03woRYjXlo957eqfsG1JAgMB
+AAGjgccwgcQwCQYDVR0TBAIwADAdBgNVHQ4EFgQU9vPqjkLRvlQRQ7HWrXvewrZo
+c+AwWQYDVR0jBFIwUIAUKjjertRlbTGbZy5//SwFB8ve2MuhIqQgMB4xHDAaBgNV
+BAMME2NhLmNoYXQuZXhhbXBsZS5jb22CFEeic5Rk7nXG+SlzTqeO7nqRFTh/MBMG
+A1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDAbBgNVHREEFDASghBjaGF0
+LmV4YW1wbGUuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQA8ARjQhtdqpt0QFC2iry9t
+FU0ILoFlKkHbnZGgTP+stlRrCgJZLuQmTGGItFJxiChhToiUwN8nPJ7RhMiQonh3
+Qhg2SpmXhgSPLr/EyRe5/m7WmAUCVtTU2V2PVwndaTMETLCAVaypJ6IHdReGwnFR
+fb0f9tp3e1eVI7V2wlDnvPQD92nhZ1hKhYkB11Ig4A436Ng1DYk3Q4iJNC+Az1kS
+iVawT1oQDREGDbVJJe5Fxhs0gLTEfD6nDh1AajlEk2w5IsK8f/B4JLz5JKFsVYig
+GwNtvp/6eiDEMokq7qInlrdvTNgsZo2GRequCBnM4YvDif+tQmJRb8xvekv/PQEB
+-----END CERTIFICATE-----
