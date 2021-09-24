@@ -1,8 +1,7 @@
 import axios from 'axios';
 import JwtModel from "../model/jwt-model";
 
-const API_URL = process.env.NODE_ENV === "development" ? 'http://localhost:9090/api/' : "http://192.168.1.2:9090/api/";
-
+const API_URL = process.env.NODE_ENV === "development" ? 'http://localhost:9090/api/' : "https://"+window.location.hostname+"/api/";
 const instance = axios.create({
     withCredentials: true,
     baseURL: API_URL
@@ -73,10 +72,6 @@ class AuthService {
 
     grantUserAdminInConversation(userIdToRemove, groupId) {
         return instance.get(API_URL + "user/grant/" + userIdToRemove + "/group/" + groupId);
-    }
-
-    uploadFile(data) {
-        return instance.post(API_URL + "upload", data);
     }
 }
 

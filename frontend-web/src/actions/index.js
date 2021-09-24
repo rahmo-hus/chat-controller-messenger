@@ -7,7 +7,6 @@ import {
     USER_LOGOUT
 } from "../utils/redux-constants";
 import "./webSocketActions";
-import "./webRtcActions";
 import AuthService from "../service/auth-service";
 
 export const changeThemeMode = () => ({

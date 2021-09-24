@@ -24,19 +24,16 @@ export const WebSocketMainComponent = ({
             //     initCallWebRTC({event: "init"})
             // });
         }
-
-        return () => {
-            setWsObject(null);
-            wsCheckConnected(false);
-            unsubscribeAll()
-            console.log("Disconnected")
+        else {
+            return () => {
+                setWsObject(null);
+                wsCheckConnected(false);
+                unsubscribeAll()
+                console.log("Disconnected")
+            }
         }
 
     }, [wsUserTokenValue])
-
-    useEffect(() => {
-        initCallWebRTC({event: "init"})
-    }, [groupUrl])
 
     async function initWs() {
         const wsClient = await initWebSocket(wsUserTokenValue);

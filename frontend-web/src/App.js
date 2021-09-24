@@ -12,7 +12,6 @@ import HomeContainer from "./container/home-container";
 import LoginContainer from "./container/login-container";
 import CreateGroupContainer from "./container/create-group-container";
 import WebSocketMainContainer from "./container/websocket/websocket-main-container";
-import CallWindowContainerTRASH from "./container/call-window-containerTRASH";
 
 
 const history = createBrowserHistory();

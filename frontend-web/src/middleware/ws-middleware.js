@@ -1,19 +1,14 @@
 import {
     FETCH_GROUP_MESSAGES,
-    HANDLE_RTC_OFFER,
-    HANDLE_RTC_ACTIONS,
     INIT_WS_CONNECTION,
     SET_CHAT_HISTORY,
     SET_WS_GROUPS,
-    HANDLE_RTC_ANSWER,
-    SEND_TO_SERVER,
     SEND_GROUP_MESSAGE,
     ADD_CHAT_HISTORY,
     UNSUBSCRIBE_ALL,
     MARK_MESSAGE_AS_SEEN, USER_LOGOUT
 } from "../utils/redux-constants";
 import {wsHealthCheckConnected} from "../actions/webSocketActions";
-import {handleRTCActions, handleRTCSubscribeEvents} from "./webRTC-middleware";
 
 let userQueueReplySubscribe;
 let topicNotificationSubscribe;
@@ -43,11 +38,6 @@ function initWsAndSubscribe(wsClient, store, wsUserTokenValue) {
 
             updateGroupsWithLastMessageSent(store, JSON.parse(res.body), userId);
         })
-
-        wsClient.subscribe("/topic/call/reply/" + groupUrl, (res) => {
-            const data = JSON.parse(res.body);
-            handleRTCSubscribeEvents(data, store);
-        });
 
         topicCallReplySubscribe = wsClient.publish({destination: "/app/message", body: wsUserTokenValue});
         store.dispatch({
@@ -129,20 +119,6 @@ const WsClientMiddleWare = () => {
                         console.log(err)
                     });
                 }
-                break;
-            case HANDLE_RTC_ACTIONS:
-                handleRTCActions(wsClient, store, action.payload);
-                break;
-            case HANDLE_RTC_OFFER:
-                console.log("Create offer ...")
-                handleRTCActions(wsClient, store, action.payload);
-                break;
-            case HANDLE_RTC_ANSWER:
-                console.log("Create answer ...")
-                handleRTCActions(wsClient, store, action.payload);
-                break;
-            case SEND_TO_SERVER:
-                handleRTCActions(wsClient, store, action.payload);
                 break;
             default:
                 return next(action);

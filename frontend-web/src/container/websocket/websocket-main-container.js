@@ -6,7 +6,6 @@ import {
     unsubscribeAll,
     wsHealthCheckConnected
 } from "../../actions/webSocketActions";
-import {initCallWebRTC} from "../../actions/webRtcActions";
 
 const mapStateToProps = (state) => {
     const {isDarkModeToggled, currentThemeMode} = state.ThemeReducer;
@@ -28,7 +27,6 @@ const mapDispatchToProps = dispatch => {
         wsCheckConnected: (bool) => dispatch(wsHealthCheckConnected(bool)),
         setCurrentActiveGroup: (url) => dispatch(setCurrentActiveGroup(url)),
         setWsObject: (data) => dispatch(initWsConnection(data)),
-        initCallWebRTC: (data) => dispatch(initCallWebRTC(data)),
         unsubscribeAll: () => dispatch(unsubscribeAll())
     }
 }

@@ -1,17 +1,12 @@
 import {Client} from "@stomp/stompjs";
 
-let client
+let client;
 
-const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "192.168.1.2:9090/";
-
+const WS_URL = process.env.NODE_ENV === "development" ? window.location.hostname+":9090/" : window.location.hostname+"/";
+const BROKER_URL_PREFIX = process.env.NODE_ENV === "development" ? "ws://" : "wss://";
 export function initWebSocket(userToken) {
     client = new Client({
-        brokerURL: "ws://" + WS_URL + "messenger/websocket?token=" + userToken,
-        // Uncomment lines to activate WS debug
-
-        // debug: function (str) {
-        //     console.log(str);
-        // },
+        brokerURL: BROKER_URL_PREFIX + WS_URL + "messenger/websocket?token=" + userToken,
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,

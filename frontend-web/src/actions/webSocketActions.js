@@ -15,11 +15,6 @@ export const wsHealthCheckConnected = (bool) => ({
     payload: bool
 })
 
-export const setWsUserGroups = (groupsArray) => ({
-    type: SET_WS_GROUPS,
-    payload: groupsArray
-})
-
 export const setCurrentActiveGroup = (groupUrl) => ({
     type: CURRENT_ACTIVE_GROUP,
     payload: groupUrl

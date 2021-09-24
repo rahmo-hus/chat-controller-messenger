@@ -10,7 +10,6 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import {MessageTypeEnum} from "../../utils/type-message-enum";
 import CustomTextField from "../partials/custom-material-textfield";
 import AuthService from "../../service/auth-service";
-import ImagePreview from "../partials/image-preview";
 import CallIcon from '@material-ui/icons/Call';
 import UUIDv4 from "../../utils/uuid-generator";
 
@@ -203,11 +202,6 @@ class WebSocketContainer extends Component {
                     height: "calc(100% - 56px)",
                     overflowY: "scroll"
                 }}>
-                    <ImagePreview displayImagePreview={this.state.displayImagePreview}
-                                  changeDisplayImagePreview={this.handleImagePreview}
-                                  isDarkModeEnable={this.props.isDarkModeEnable}
-                                  imgSrc={this.state.imgSrc}
-                    />
                     {this.state.history && this.state.history.map((val, index, array) => (
                         <Tooltip
                             key={index}

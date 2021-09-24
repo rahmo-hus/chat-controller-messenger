@@ -3,21 +3,15 @@ import Button from "@material-ui/core/Button";
 import CustomTextField from "../../design/partials/custom-material-textfield";
 import DoubleArrowIcon from "@material-ui/icons/DoubleArrow";
 import React, {useEffect} from "react";
-import MessageModel from "../../model/message-model";
-import AuthService from "../../service/auth-service"
-import {useHistory} from "react-router-dom";
+import MessageModel from "../../model/message-model";import {useHistory} from "react-router-dom";
 
 export const WebSocketChatComponent = ({
-                                           isDarkModeEnable,
                                            isDarkModeToggled,
-                                           currentActiveGroup,
                                            usernameLoggedIn,
                                            sendWsMessage,
                                            markMessageAsSeen,
-                                           userLogout,
                                            fetchMessages,
                                            chatHistory,
-                                           wsUserGroups,
                                            userId
                                        }) => {
 
@@ -28,14 +22,14 @@ export const WebSocketChatComponent = ({
     let messageEnd;
 
     useEffect(() => {
-        if(!chatHistory)
-        fetchMessages(currentUrl, userId);
+        //if(!chatHistory) {
+            fetchMessages(currentUrl, userId);
+      //  }
     }, [currentUrl])
 
     useEffect(() => {
         scrollToEnd();
         const lastMessage = chatHistory[chatHistory.length - 1];
-        console.log(lastMessage);
         if(lastMessage && lastMessage.userId === 1 && lastMessage.message.includes("User "+usernameLoggedIn)){
             // AuthService.logout().then(() => {
             //     userLogout();
