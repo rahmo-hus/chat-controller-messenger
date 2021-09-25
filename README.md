@@ -5,9 +5,9 @@
    <img src="https://miro.medium.com/max/1400/1*MbZY_t47eV_ZMATRT-q_LQ.jpeg" height="100">
 </div>
 
-# Messenger project : real time chat with React and Spring Boot
+# Chat Controller - Secure Messenger project : real time chat with React and Spring Boot
 
-Real time chat application group oriented. Talk with your friends, create and add users to conversation, set groups administrators!
+Secure, group oriented chat application. Malicious messages such as SQL Injection, XSS, DoS messages won't pass undetected! 
 
 ## Start-up :
 
@@ -40,6 +40,8 @@ To start the application without HTTPS, just take the following steps
 ![Project overview](assets/messenger.jpg?raw=true "Project overview")
 
 * Simple chat group application based on websocket
+* Malicious messages detection (SQL Injection, XSS...)
+* Login requirements: username, password, SSL certificate (will be delivered to e-mail address after registration process)
 * Secure user account based on Spring Security JWT
 * HTTPS support
 * Room discussion with STOMP and SockJS
