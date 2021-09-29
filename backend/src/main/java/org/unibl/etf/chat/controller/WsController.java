@@ -1,20 +1,5 @@
 package org.unibl.etf.chat.controller;
 
-import org.unibl.etf.chat.service.GroupService;
-import org.unibl.etf.chat.service.GroupUserJoinService;
-import org.unibl.etf.chat.service.MessageService;
-import org.unibl.etf.chat.service.UserService;
-import org.unibl.etf.chat.dto.GroupDTO;
-import org.unibl.etf.chat.dto.MessageDTO;
-import org.unibl.etf.chat.dto.NotificationDTO;
-import org.unibl.etf.chat.dto.UserDTO;
-import org.unibl.etf.chat.entity.MessageEntity;
-import org.unibl.etf.chat.utils.ComparatorListGroupDTO;
-import org.unibl.etf.chat.utils.JwtUtil;
-import org.unibl.etf.chat.utils.MessageTypeEnum;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +13,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.unibl.etf.chat.dto.GroupDTO;
+import org.unibl.etf.chat.dto.MessageDTO;
+import org.unibl.etf.chat.dto.NotificationDTO;
+import org.unibl.etf.chat.dto.UserDTO;
+import org.unibl.etf.chat.entity.MessageEntity;
+import org.unibl.etf.chat.service.GroupService;
+import org.unibl.etf.chat.service.GroupUserJoinService;
+import org.unibl.etf.chat.service.MessageService;
+import org.unibl.etf.chat.service.UserService;
+import org.unibl.etf.chat.utils.ComparatorListGroupDTO;
+import org.unibl.etf.chat.utils.JwtUtil;
+import org.unibl.etf.chat.utils.MessageTypeEnum;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -83,7 +80,7 @@ public class WsController {
 
     @MessageMapping("/message/text/{userId}/group/{groupUrl}")
     @SendTo("/topic/{groupUrl}")
-    public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) {
+    public MessageDTO wsMessageMapping(@DestinationVariable int userId, @DestinationVariable String groupUrl, MessageDTO messageDTO) throws Exception {
         Integer groupId = groupService.findGroupByUrl(groupUrl);
         MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), messageDTO.getMessage());
         MessageEntity msg;
@@ -105,23 +102,6 @@ public class WsController {
         List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
         toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/notification/" + toUserId, notificationDTO));
         return messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
-    }
-
-    @MessageMapping("/message/call/{userId}/group/{groupUrl}")
-    @SendTo("/topic/call/reply/{groupUrl}")
-    public String wsCallMessageMapping(@DestinationVariable int userId, String req) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
-        log.info("Receiving RTC data, sending back to user ...");
-        JSONObject json = new JSONObject();
-        try {
-            json.put("userIn", userId);
-            json.put("rtc", jsonObject);
-        } catch (Exception e) {
-            log.info(String.valueOf(json));
-            log.info("Error during JSON creation : {}", e.getMessage());
-        }
-        return req;
     }
 
     @SubscribeMapping("/groups/get/{url}")

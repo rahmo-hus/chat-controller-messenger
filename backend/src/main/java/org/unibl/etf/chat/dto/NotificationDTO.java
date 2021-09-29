@@ -1,8 +1,5 @@
 package org.unibl.etf.chat.dto;
 
-/**
- * POJO class used to send Notification to GroupSideBar
- */
 public class NotificationDTO {
 
     private int fromUserId;

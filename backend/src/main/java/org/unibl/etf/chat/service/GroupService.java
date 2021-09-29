@@ -77,29 +77,4 @@ public class GroupService {
         return groupRepository.findById(groupId);
     }
 
-    public void createConversation(int id1, int id2) {
-        GroupEntity groupEntity = new GroupEntity();
-        groupEntity.setName(null);
-        groupEntity.setUrl(UUID.randomUUID().toString());
-        groupEntity.setGroupTypeEnum(GroupTypeEnum.SINGLE);
-        GroupEntity savedGroup = groupRepository.save(groupEntity);
-
-        UserEntity user1 = userService.findById(id1);
-        UserEntity user2 = userService.findById(id2);
-
-        GroupUser groupUser1 = new GroupUser();
-        groupUser1.setId(new GroupRoleKey(savedGroup.getId(), id1));
-        groupUser1.setRole(0);
-        groupUser1.setUserMapping(user1);
-        groupUser1.setGroupMapping(groupEntity);
-
-        GroupUser groupUser2 = new GroupUser();
-        groupUser2.setId(new GroupRoleKey(savedGroup.getId(), id2));
-        groupUser2.setRole(0);
-        groupUser2.setUserMapping(user2);
-        groupUser2.setGroupMapping(groupEntity);
-        groupUserJoinService.save(groupUser1);
-        groupUserJoinService.save(groupUser2);
-
-    }
 }

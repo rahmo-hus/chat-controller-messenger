@@ -213,6 +213,10 @@ public class UserEntity implements UserDetails, Serializable {
         this.role = role;
     }
 
+    public void resetStrikes(){
+        this.strikes = 0;
+    }
+
     public void incrementStrikes(){
         this.strikes++;
     }

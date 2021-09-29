@@ -34,15 +34,6 @@ public class MessageService {
         return colorsArray[new Random().nextInt(colorsArray.length)];
     }
 
-    public MessageEntity createAndSaveMessage(int userId, int groupId, String type, String data) {
-        MessageEntity msg = new MessageEntity(userId, groupId, type, data);
-        return messageRepository.save(msg);
-    }
-
-    public void flush() {
-        messageRepository.flush();
-    }
-
     public MessageEntity save(MessageEntity messageEntity) {
         return messageRepository.save(messageEntity);
     }

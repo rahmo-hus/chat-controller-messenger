@@ -34,13 +34,6 @@ public class JwtWebConfig extends OncePerRequestFilter {
         String username;
         Cookie cookie = WebUtils.getCookie(request, StaticVariable.SECURE_COOKIE);
 
-//         Set response header to allow CORS
-//        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-//        response.setHeader("Access-Control-Allow-Credentials", "true");
-//        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
-//        response.setHeader("Access-Control-Max-Age", "3600");
-//        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
-
         if (cookie != null) {
             jwtToken = cookie.getValue();
         }
@@ -61,20 +54,4 @@ public class JwtWebConfig extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
-//    protected void doFilterInternal(HttpServletRequest req,
-//                                    HttpServletResponse res,
-//                                    FilterChain chain) throws IOException, ServletException {
-//        String header = req.getHeader(HEADER_STRING);
-//
-//        if (header == null || !header.startsWith(TOKEN_PREFIX)) {
-//            chain.doFilter(req, res);
-//            return;
-//        }
-//
-//        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        chain.doFilter(req, res);
-//    }
 }

@@ -1,5 +1,8 @@
 package org.unibl.etf.chat.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.unibl.etf.chat.dto.LightUserDTO;
 import org.unibl.etf.chat.dto.UserDTO;
 import org.unibl.etf.chat.entity.GroupRoleKey;
@@ -9,9 +12,6 @@ import org.unibl.etf.chat.mapper.UserMapper;
 import org.unibl.etf.chat.repository.UserRepository;
 import org.unibl.etf.chat.service.email.EmailService;
 import org.unibl.etf.chat.utils.CertificateUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.text.Normalizer;
@@ -50,23 +50,25 @@ public class UserService {
 
     @Transactional
     public void save(UserEntity userEntity) throws Exception {
-            certificateUtil.issueClientCert(userEntity.getUsername());
-            emailService.sendAttachment(userEntity.getMail(), "assets/certificates/"+userEntity.getUsername()+".cer");
-            userRepository.save(userEntity);
+        certificateUtil.issueClientCert(userEntity.getUsername());
+        emailService.sendAttachment(userEntity.getMail(), "assets/certificates/" + userEntity.getUsername() + ".cer");
+        userRepository.save(userEntity);
     }
 
-    public void disableUser(int userId){
+    public void disableUser(int userId) {
         userRepository.disableUser(userId);
     }
 
-    public UserEntity getUser(int userId){
+    public UserEntity getUser(int userId) {
         return userRepository.getOne(userId);
     }
 
     public List<LightUserDTO> fetchAllUsers() {
         List<LightUserDTO> toSend = new ArrayList<>();
         List<UserEntity> list = userRepository.findAll();
-        list.forEach(user -> toSend.add(new LightUserDTO(user.getId(), user.getFirstName(), user.getLastName())));
+        list.forEach(user -> {
+            if (user.getId() != 1) toSend.add(new LightUserDTO(user.getId(), user.getFirstName(), user.getLastName()));
+        });
         return toSend;
     }
 
@@ -121,13 +123,6 @@ public class UserService {
         return userRepository.countAllByFirstNameOrMail(firstName, mail) > 0;
     }
 
-
-    /**
-     * At WebSocket init, fetch user data and map it to a {@link UserDTO}
-     *
-     * @param username string value for username
-     * @return a {@link UserDTO}
-     */
     @Transactional
     public UserDTO getUserInformation(String username) {
         UserEntity userEntity = findByNameOrEmail(username, username);

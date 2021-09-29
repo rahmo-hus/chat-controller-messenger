@@ -19,13 +19,6 @@ public class UserMapper {
     @Autowired
     private GroupMapper groupMapper;
 
-    /**
-     * Map a UserEntity to a UserDTO
-     * The password is not sent
-     *
-     * @param userEntity the {@link UserEntity} to map
-     * @return a {@link UserDTO}
-     */
     public UserDTO toUserDTO(UserEntity userEntity) {
         // Init
         UserDTO userDTO = new UserDTO();
